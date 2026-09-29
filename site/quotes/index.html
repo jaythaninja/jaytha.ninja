@@ -49,7 +49,7 @@ a:hover{color:var(--teal)}
 .scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(127,218,221,.9)}
 .ghost{visibility:hidden}
 .cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--teal);box-shadow:0 0 14px rgba(26,173,179,.75);animation:blink 1.05s infinite}
-html.fast .cursor{background:var(--orange);box-shadow:0 0 14px rgba(255,77,26,.75)}   /* faster pace: the cursor (+ glow) goes brand orange */
+[data-mode="fast"] .cursor{background:var(--orange);box-shadow:0 0 14px rgba(255,77,26,.75)}   /* faster pace: the cursor (+ glow) goes brand orange */
 .by .cursor{margin-left:.35em}   /* the cursor stays for good, blinking after the attribution */
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
@@ -92,6 +92,7 @@ a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 <meta name="twitter:site" content="@jaythaninja">
 <meta name="twitter:description" content="a quote a day, a different person every day">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image.png">
+<link rel="stylesheet" href="/assets/rain.css"><script src="/assets/rain.js"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -131,68 +132,10 @@ const TIMING = {kickerSpeed: 55, quoteSpeed: 55, window: 4, afterKicker: 550, be
 
 (() => {
 /* ---- shared: glyph rain + decode typing (inlined into each mock) ---- */
-const DPR = Math.min(window.devicePixelRatio || 1, 2);
-const clamp = (v,a=0,b=1) => Math.max(a, Math.min(b, v));
-const smooth = (e0,e1,x) => { const t = clamp((x-e0)/(e1-e0)); return t*t*(3-2*t); };
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
-let seed = 7; const rnd = () => (seed = (seed*16807) % 2147483647, (seed-1)/2147483646);
 const RAIN_GLYPHS = '0123456789{}[]<>/\\=+*:;.-_#$%&@abcdefhjknrstuvxyz'.split('');
 const rg = () => RAIN_GLYPHS[Math.floor(Math.random()*RAIN_GLYPHS.length)];
 
-function Rain(cv, o){
-  const R = {cv, o, drops:[], rects:[], ptr:{x:-9999,y:-9999}, last:0};
-  R.build = () => {
-    const w = document.documentElement.clientWidth, H = document.documentElement.scrollHeight;
-    R.w = w; R.H = H; cv.style.height = H + 'px';
-    cv.width = Math.round(w*DPR); cv.height = Math.round(H*DPR);
-    const ctx = cv.getContext('2d'); ctx.setTransform(DPR,0,0,DPR,0,0); R.ctx = ctx;
-    const fs = w < 600 ? o.fsMobile : o.fs; R.fs = fs; R.lh = Math.round(fs*1.32); R.cw = Math.round(fs*1.12);
-    ctx.font = `500 ${fs}px ${o.mono}`; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
-    seed = o.seed || 17; R.drops = [];
-    for (const band of o.bands(w, H)){
-      const rows = Math.ceil((band.y1 - band.y0)/R.lh);
-      for (let x = 2; x < w; x += R.cw){
-        let n = band.perCol * (band.colDensity ? band.colDensity(x, w) : 1);
-        let k = Math.floor(n) + (rnd() < n % 1 ? 1 : 0);
-        for (let j=0;j<k;j++){
-          const len = band.lenMin + Math.floor(rnd()*(band.lenMax - band.lenMin));
-          const pal = o.palette(x, w, rnd()); const hm = o.headMix ?? .62; const head = pal.map((c,i) => Math.round(c + (o.head[i] - c)*hm));
-          R.drops.push({x, y0:band.y0, y1:band.y1, rows, row: Math.floor(rnd()*(rows + len)), len, pal, head, a:band.alpha*(.55 + rnd()*.45),
-            every: band.stepMin + rnd()*(band.stepMax - band.stepMin), last:0, g:Array.from({length:len}, () => RAIN_GLYPHS[Math.floor(rnd()*RAIN_GLYPHS.length)])});
-        }
-      }
-    }
-    R.measure();
-  };
-  R.measure = () => { R.rects = o.partSel ? [...document.querySelectorAll(o.partSel)].map(el => { const r = el.getBoundingClientRect(); return {l:r.left, t:r.top + scrollY, r:r.right, b:r.bottom + scrollY}; }) : []; };
-  const part = (x, y) => { let f = 1; for (const q of R.rects){ const dx = Math.max(q.l - x, 0, x - q.r), dy = Math.max(q.t - y, 0, y - q.b); const d = Math.hypot(dx, dy); f = Math.min(f, o.partFloor + (1 - o.partFloor)*smooth(0, o.partPad, d)); } return f; };
-  R.frame = (now) => {
-    requestAnimationFrame(R.frame);
-    if (now - R.last < 50) return; R.last = now;
-    const all = window.__rainAll, vt = all ? 0 : Math.max(0, scrollY - 60), vb = all ? R.H : Math.min(R.H, scrollY + innerHeight + 60), ctx = R.ctx, lh = R.lh;
-    ctx.clearRect(0, vt, R.w, vb - vt);
-    for (const d of R.drops){
-      if (!reduced && now - d.last > d.every){ d.last = now; d.row++; d.g.unshift(rg()); d.g.pop(); if (d.row - d.len > d.rows) d.row = -Math.floor(Math.random()*12); }
-      const headY = d.y0 + d.row*lh; if (headY < vt - 4 || headY - d.len*lh > vb) continue;
-      for (let i=0;i<d.len;i++){
-        const y = headY - i*lh; if (y < vt || y > vb || y < d.y0 || y > d.y1 - lh) continue;
-        if (Math.random() < .004) d.g[i] = rg();
-        let a = d.a * o.alphaAt(d.x, y, R) * part(d.x + R.cw/2, y + lh/2);
-        const pd = Math.hypot(d.x - R.ptr.x, y - R.ptr.y); let boost = 0;
-        if (pd < 110){ boost = (1 - pd/110); a = Math.min(1, a + boost*.5); }
-        if (a < .012) continue;
-        let col;
-        if (i === 0){ col = d.head; a = Math.min(1, a*1.9); }
-        else { const t = i / d.len; a *= i < 3 ? 1 : Math.pow(1 - t, 1.5); col = d.pal; }
-        ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${a})`;
-        ctx.fillText(boost > .4 && Math.random() < .3 ? rg() : d.g[i], d.x, y);
-      }
-    }
-  };
-  addEventListener('pointermove', e => { R.ptr.x = e.clientX; R.ptr.y = e.clientY + scrollY; });
-  document.addEventListener('pointerleave', () => { R.ptr.x = R.ptr.y = -9999; });
-  return R;
-}
 
 /* ---- typing: every line uses the hello line's decode effect ---- */
 const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('en', {granularity: 'grapheme'}) : null;
@@ -267,15 +210,17 @@ async function load(){
   } catch (err) { return {error: true, top: null, rest: []}; }
 }
 
-const T = [26,173,179], W = [214,222,222], HEAD = [255,255,255];   // rain: brand teal + dim white only (same as the homepage)
+const T = [26,173,179], PALE_TEAL = [121,205,207], W = [214,222,222], HEAD = [255,255,255], RAIN_ORANGE = [255,136,56], PALE_ORANGE = [255,179,138];   // rain: brand teal + dim white only (same as the homepage)
 const mob = () => document.documentElement.clientWidth < 760;
-const rain = Rain(document.getElementById('rain'), {
+const rain = JayRain.Rain(document.getElementById('rain'), {
   fs: 16, fsMobile: 13, mono: '"JetBrains Mono", monospace', seed: 5, head: HEAD, headMix: .6,
-  palette: (x, w, r) => r < .84 ? T : W,
+  tint: T, paleTint: PALE_TEAL, paleOrange: PALE_ORANGE,
+  palette: (x, w, r) => r < .84 ? T : PALE_TEAL,
   bands: (w, H) => [{y0: 0, y1: H, perCol: mob() ? 1.6 : 2.1, lenMin: 8, lenMax: 30, alpha: .56, stepMin: 60, stepMax: 170, colDensity: () => 1}],
-  alphaAt: (x, y, R) => 1 - .45*smooth(R.H*.55, R.H, y),
+  alphaAt: (x, y, R) => 1 - .45*JayRain.smooth(R.H*.55, R.H, y),
   partSel: '.copy', partPad: 50, partFloor: .3
 });
+window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; state.pace = pace; });
 
 async function main(){
   const [data] = await Promise.all([load(), document.fonts.ready]);
@@ -300,16 +245,7 @@ async function main(){
   lines[lines.length - 1].el.appendChild(cursor);   // the cursor stays, blinking at the end (teal; orange at the faster pace)
   state.done = true;
 }
-/* each tap/click toggles the typing pace (same as the homepage: normal = teal cursor, fast = orange). links never toggle.
-   a tap = press + release within 10px, so scrolls, drags + text selection don't count */
-let down = null;
-document.addEventListener('pointerdown', e => { down = e.isPrimary && e.button === 0 && !e.target.closest('a, button, input, label') ? {x: e.clientX, y: e.clientY} : null; });
-document.addEventListener('pointercancel', () => { down = null; });
-document.addEventListener('pointerup', e => {
-  if (!down || !e.isPrimary || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10 || String(getSelection())) return;
-  down = null; pace = pace === 2 ? 4 : 2; state.pace = pace;
-  document.documentElement.classList.toggle('fast', pace === 4);
-});
+/* shared rain.js owns tap-anywhere mode and the single mode state. */
 main();
 let lastW = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(rain.build, 150); });
 })();
