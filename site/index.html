@@ -43,7 +43,7 @@ a:hover{color:var(--teal)}
 .sig{margin-top:22px;font-size:20px;line-height:1.5;color:var(--teal)}
 .sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.4em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
 .sig .ninja.in{opacity:1;transform:none}
-.cta{margin-top:22px;font-size:20px;line-height:1.5}
+.cta{margin-top:52px;font-size:20px;line-height:1.5}   /* jay 2026.09.29: one extra blank line after the sign-off */
 .prompt{color:var(--white)}
 /* round 10: inline signup. prompt types, then the form slides in; the thank-you line types into the same slot (no reflow) */
 .signup{display:grid;grid-template-columns:minmax(0,1fr);margin-top:6px}
@@ -90,7 +90,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .para{font-size:16px;line-height:1.7}
   .para + .para{margin-top:16px}
   .sig{margin-top:18px;font-size:16px}
-  .cta{margin-top:18px;font-size:16px}
+  .cta{margin-top:42px;font-size:16px}
   .signup{margin-top:4px}
   .notify{gap:14px}
   .notify input{flex:1 1 auto;font-size:16px}
@@ -169,10 +169,10 @@ const COPY = {
     [{text: "i didn't have my ikigai...", teal: true}],
     [{text: "but now, i do", teal: true}],
     ["and one day, i hope you will benefit from my life's work"],
-    ["it's a long road, and i'm just getting started"],
+    ["the road ahead is long, but i'm just getting started"],
   ],
   signoff: "- jay tha",   // the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
-  cta: "want the first look?",   // typed (white) after the sign-off; then the email form slides in (round 10)
+  cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
   thanks: "almost there, check your email and tap confirm",   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all 7 out front, all orange
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
