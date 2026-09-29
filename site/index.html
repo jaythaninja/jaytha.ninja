@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="dark">
 <script>document.documentElement.classList.add('js')</script>
 <title>jay tha 🥷</title>
-<!-- MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer; round 14: drawer gone, all 7 icons out front) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
+<!-- v1.11 (fast speed turns the teal rain orange, peach tips). MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer; round 14: drawer gone, all 7 icons out front) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
      color order: teal #1AADB3 primary, white secondary, orange #FF4D1A only as a rare accent (links + social icons). rain: teal + dim white, white tips.
      everything types out with the hello line's decode effect; the social icons pop in at the end.
      self-contained: JetBrains Mono (latin, variable) is inlined; no external loads.
@@ -261,6 +261,11 @@ const rg = () => RAIN_GLYPHS[Math.floor(Math.random()*RAIN_GLYPHS.length)];
 
 function Rain(cv, o){
   const R = {cv, o, drops:[], rects:[], ptr:{x:-9999,y:-9999}, last:0};
+  // round 25 (preview): the TEAL drop bodies take a tint that eases between teal and orange when the typing speed flips (drops already falling too).
+  // round 26: their tips follow too (same 60% white mix, so teal-white -> pale peach); the dim white drops are drawn exactly as before
+  R.tint = o.tint ? {from: o.tint, to: o.tint, t0: 0, dur: 1} : null;
+  R.tintAt = now => { const q = R.tint, k = Math.min(1, Math.max(0, (now - q.t0)/q.dur)), e = k*k*(3 - 2*k); return q.from.map((c, i) => Math.round(c + (q.to[i] - c)*e)); };
+  R.setTint = (to, dur = 250) => { if (!R.tint) return; const now = performance.now(); R.tint = {from: R.tintAt(now), to, t0: now, dur}; };
   R.build = () => {
     const w = document.documentElement.clientWidth, H = document.documentElement.scrollHeight;
     R.w = w; R.H = H; cv.style.height = H + 'px';
@@ -291,6 +296,8 @@ function Rain(cv, o){
     if (now - R.last < 50) return; R.last = now;
     const all = window.__rainAll, vt = all ? 0 : Math.max(0, scrollY - 60), vb = all ? R.H : Math.min(R.H, scrollY + innerHeight + 60), ctx = R.ctx, lh = R.lh;
     ctx.clearRect(0, vt, R.w, vb - vt);
+    const tc = R.tint && R.tintAt(now);
+    const th = tc && tc.map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62)));   // round 26: the teal drops' tips (60% white + the tint) ease along: teal-white <-> pale peach
     for (const d of R.drops){
       if (!reduced && now - d.last > d.every){ d.last = now; d.row++; d.g.unshift(rg()); d.g.pop(); if (d.row - d.len > d.rows) d.row = -Math.floor(Math.random()*12); }
       const headY = d.y0 + d.row*lh; if (headY < vt - 4 || headY - d.len*lh > vb) continue;
@@ -302,8 +309,8 @@ function Rain(cv, o){
         if (pd < 110){ boost = (1 - pd/110); a = Math.min(1, a + boost*.5); }
         if (a < .012) continue;
         let col;
-        if (i === 0){ col = d.head; a = Math.min(1, a*1.9); }
-        else { const t = i / d.len; a *= i < 3 ? 1 : Math.pow(1 - t, 1.5); col = d.pal; }
+        if (i === 0){ col = th && d.pal === o.tint ? th : d.head; a = Math.min(1, a*1.9); }   // white drops keep their own tip
+        else { const t = i / d.len; a *= i < 3 ? 1 : Math.pow(1 - t, 1.5); col = tc && d.pal === o.tint ? tc : d.pal; }   // round 25: only teal bodies follow the tint (same fade/alpha)
         ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${a})`;
         ctx.fillText(boost > .4 && Math.random() < .3 ? rg() : d.g[i], d.x, y);
       }
@@ -474,6 +481,7 @@ form.addEventListener('submit', async e => {
 const state = window.__intro = {line: -1, para: -1, head: 0, icons: 0, done: false};   // line: 0 hello, 1 paragraphs, 2 sign-off, 3 icons
 
 const T = [26,173,179], W = [214,222,222], HEAD = [255,255,255];   // rain: brand teal + dim white only (orange is for links/icons)
+const RAIN_ORANGE = [255,77,26];   // round 25 (preview): at fast speed the teal drop bodies turn orange (like the orange cursor); tips go pale peach (round 26); white drops unchanged
 const mob = () => document.documentElement.clientWidth < 760;
 const rain = Rain(document.getElementById('rain'), {
   fs: 16, fsMobile: 13, mono: '"JetBrains Mono", monospace', seed: 5, head: HEAD, headMix: .6,
@@ -482,7 +490,8 @@ const rain = Rain(document.getElementById('rain'), {
       colDensity: () => 1}],   // same amount of rain across the full width (jay, round 6)
   alphaAt: (x, y, R) => 1 - .45*smooth(R.H*.55, R.H, y),
   // no parting: rain runs behind the text. over the text block it's dimmed to 30% (tips included), feathered over 50px, so there's no box edge
-  partSel: '.copy', partPad: 50, partFloor: .3
+  partSel: '.copy', partPad: 50, partFloor: .3,
+  tint: T   // round 25: the teal palette entry (by reference) is the one that follows the typing speed
 });
 
 let current = null, skipped = false;
@@ -534,6 +543,7 @@ document.addEventListener('pointerup', e => {
   if (!down || !e.isPrimary || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10 || String(getSelection())) return;
   down = null; pace = pace === 2 ? 4 : 2; state.pace = pace;
   document.documentElement.classList.toggle('fast', pace === 4);   // round 13: orange cursor while at 2x
+  rain.setTint(pace === 4 ? RAIN_ORANGE : T, 250);   // round 25 (preview): teal rain eases to orange (and back) over ~250ms
 });
 
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
