@@ -29,6 +29,7 @@ a:hover{color:var(--teal)}
 ::selection{background:var(--teal);color:#021213}
 .glows{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}   /* round 8: glow fades out so the top + bottom are pure #000 (blends into oled black) */
 .glow{position:absolute;border-radius:50%;filter:blur(14px)}
+/* round 24 (jay 2026.09.29): orange text (egg line + its falling letters/trails/arrow, "[ notify me ]") is regular 400; teal + white stay 500 */
 #rain{position:absolute;left:0;top:0;width:100%;z-index:1;pointer-events:none}
 .scan{position:fixed;inset:0;z-index:30;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(235,250,250,.026) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:screen;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}
 
@@ -66,7 +67,7 @@ a:hover{color:var(--teal)}
 .notify input:hover{border-bottom-color:rgba(26,173,179,.8)}
 .notify input:focus{border-bottom-color:var(--teal);box-shadow:0 1px 0 var(--teal),0 10px 18px -12px rgba(26,173,179,.9)}
 .notify input:-webkit-autofill{-webkit-text-fill-color:var(--white);-webkit-box-shadow:0 0 0 60px #000 inset;caret-color:var(--teal);transition:background-color 9999s}
-.notify button{flex:none;font:inherit;font-size:18px;line-height:1.5;color:var(--orange);background:transparent;border:0;border-radius:6px;padding:4px 6px;margin:0 -6px;cursor:pointer;white-space:nowrap;transition:color .15s ease,background-color .15s ease}
+.notify button{flex:none;font:inherit;font-size:18px;line-height:1.5;color:var(--orange);background:transparent;border:0;border-radius:6px;padding:4px 6px;margin:0 -6px;cursor:pointer;white-space:nowrap;font-weight:400;transition:color .15s ease,background-color .15s ease}
 .notify button:hover,.notify button:focus-visible{color:var(--teal);background:rgba(26,173,179,.08)}
 .notify button[disabled]{cursor:default;color:var(--ink-3);background:transparent}
 .status{align-self:center;color:var(--teal);font-size:20px;line-height:1.5}
@@ -94,7 +95,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .social li.cur .cursor{margin:0 0 0 7px;vertical-align:0}
 /* round 16: easter egg for people who stay. with the icons (round 23: starts ~250ms before the first one), the quote rains down in orange, one column per letter, and stays (jay 2026.09.29)
    the line is reserved in layout from the start (hidden), so nothing reflows when it lands */
-.egg{margin-top:52px;font-size:20px;line-height:1.5;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
+.egg{margin-top:52px;font-size:20px;line-height:1.5;font-weight:400;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
 .egg.on{visibility:visible}
 .egg a{color:var(--orange)}
 .egg a:hover{color:var(--teal);text-shadow:0 0 12px rgba(26,173,179,.6)}
