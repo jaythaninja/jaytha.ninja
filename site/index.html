@@ -22,7 +22,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;font-style:normal}
 html{background:var(--bg);touch-action:manipulation}   /* round 12: taps toggle typing speed, so no double-tap zoom (pinch zoom + scrolling still work) */
-body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
+body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh;min-height:100svh}   /* round 17: svh = the visible area between safari's bars, so a page that fits never scrolls */
 a{color:var(--orange);text-decoration:none;transition:color .15s ease}
 a:hover{color:var(--teal)}
 ::selection{background:var(--teal);color:#021213}
@@ -31,7 +31,7 @@ a:hover{color:var(--teal)}
 #rain{position:absolute;left:0;top:0;width:100%;z-index:1;pointer-events:none}
 .scan{position:fixed;inset:0;z-index:30;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(235,250,250,.026) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:screen;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}
 
-.stage{position:relative;z-index:2;min-height:100vh;display:flex;align-items:center;padding:clamp(48px,8vh,96px) 0 clamp(56px,9vh,100px)}   /* centered; if the block is taller than the viewport the stage just grows (no clipping) */
+.stage{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:clamp(48px,8vh,96px) 0 clamp(56px,9vh,100px)}   /* centered; if the block is taller than the viewport the stage just grows (no clipping) */
 .copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:20px;text-shadow:0 0 8px rgba(0,0,0,.8)}
 .hello{font-size:21px;line-height:1.4;color:var(--teal)}
 .paras{margin-top:26px}
@@ -80,26 +80,50 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify input:focus-visible{outline:none}
 @media (prefers-reduced-motion:reduce){.notify{transition:none!important}}
 .ic{width:28px;height:22px}
+/* round 16: the cursor stays after everything renders, blinking at the end of the icon row (teal at 1x, orange at 2x) (jay 2026.09.29) */
+.social li.cur{display:flex;align-items:center;height:40px;pointer-events:none}
+.social li.cur .cursor{margin:0 0 0 7px;vertical-align:0}
+/* round 16: easter egg for people who stay. after the icons, the quote rains down in orange, one column per letter, and stays (jay 2026.09.29)
+   the line is reserved in layout from the start (hidden), so nothing reflows when it lands */
+.egg{margin-top:52px;font-size:20px;line-height:1.5;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
+.egg.on{visibility:visible}
+.egg a{color:var(--orange)}
+.egg a:hover{color:var(--teal);text-shadow:0 0 12px rgba(26,173,179,.6)}
+.egg .w{white-space:nowrap}   /* if it ever has to wrap, it wraps between words */
+.egg .c{display:inline-block;position:relative}
+.egg .c.fall{color:#ffd9cc;text-shadow:0 0 8px rgba(255,77,26,.95),0 0 20px rgba(255,77,26,.7)}   /* the falling head: hot orange-white, like the rain's white tips */
+.egg .tr{position:absolute;left:0;bottom:100%;white-space:pre;line-height:1.25;color:var(--orange);text-shadow:0 0 10px rgba(255,77,26,.55);pointer-events:none;
+  -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,0));mask-image:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,0));transition:opacity .7s ease-out}
+.egg .tr.off{opacity:0}
+.egg .c.land{animation:egg-land 1.1s ease-out}
+@keyframes egg-land{0%{color:#fff;text-shadow:0 0 10px #fff,0 0 22px rgba(255,77,26,.95)}100%{color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6)}}
+.egg.fade{animation:egg-fade 1.4s ease-out both}   /* reduced motion: no falling, the line just fades in */
+@keyframes egg-fade{from{opacity:0}to{opacity:1}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 @media (max-width:760px){
-  .stage{padding:56px 0 64px}
+  /* round 17: tighter vertical rhythm so the whole page (egg included) fits one iphone 17 screen in ios 26 safari (402x718 visible, compact tab bar), no scrolling (jay 2026.09.29).
+     was: stage 56/64, paras 20, para gap 16, sig 18, cta 42, icons 24, egg 42. body font + line-height unchanged; the sign-off + egg keep their extra gap */
+  .stage{padding:24px 0 22px}
   .copy{margin-left:24px;width:calc(100vw - 48px)}
   .hello{font-size:17px}
-  .paras{margin-top:20px}
+  .paras{margin-top:14px}
   .para{font-size:16px;line-height:1.7}
-  .para + .para{margin-top:16px}
-  .sig{margin-top:18px;font-size:16px}
-  .cta{margin-top:42px;font-size:16px}
+  .para + .para{margin-top:12px}
+  .sig{margin-top:15px;font-size:16px}
+  .cta{margin-top:32px;font-size:16px}
   .signup{margin-top:4px}
   .notify{gap:14px}
   .notify input{flex:1 1 auto;font-size:16px}
   .notify button{font-size:16px}
   .status{font-size:16px}
-  .elsewhere{margin-top:24px}
+  .elsewhere{margin-top:16px}
   .social{margin-left:-9px;gap:2px 2px}
   .social a{width:40px;height:40px}
   .ic{width:25px;height:20px}
+  .social li.cur{font-size:16px}
+  .social li.cur .cursor{margin-left:6px}
+  .egg{margin-top:30px;font-size:clamp(12.5px,calc((100vw - 48px)/24.6),16px)}   /* round 16: 40 chars in one line down to ~350px wide (14px at 390, 12.7px at 360); narrower wraps at a word */
 }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -148,6 +172,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
     </nav>
+    <p class="egg" aria-hidden="true"></p>   <!-- round 16: the easter egg quote lands here (jay 2026.09.29) -->
   </div>
 </main>
 
@@ -165,15 +190,18 @@ const COPY = {
   hello: "hello, world...",                  // first line (teal)
   // jay's copy, 2026.09.28 (round 5). one [ ] per paragraph, typed in order with a pause between.
   paragraphs: [
-    ["once upon a time, i made decent money doing work that never felt like mine"],
-    [{text: "i didn't have my ikigai...", teal: true}],
-    [{text: "but now, i do", teal: true}],
+    ["once upon a time, i \"succeeded\" doing work that never felt like mine"],   // round 18 copy (jay 2026.09.29)
+    ["i let it take me so far from myself that i didn't know who jay was"],
+    [{text: "because i didn't have my ikigai", teal: true}],
+    [{text: "but now... i do", teal: true}],
     ["and one day, i hope you will benefit from my life's work"],
-    ["the road ahead is long, but i'm just getting started"],
+    ["the road ahead is long, but the lights are bright and i can use tesla fsd now"],
   ],
   signoff: "- jay tha",   // the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
-  thanks: "almost there, check your email and tap confirm",   // typed (teal) in place of the form. buttondown is double opt-in
+  thanks: "almost there, check your email and tap confirm",
+  egg: "the clearest view of a man is from below",   // round 16: easter egg. rains down in orange after the icons pop in, then stays (lowercase as written)
+  eggHref: "",   // round 16: leave "" for plain text; put a url here and the landed line becomes a link   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all 7 out front, all orange
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
     {label: "github",           icon: "github",    href: "https://github.com/jaythaninja"},
@@ -191,7 +219,9 @@ const TIMING = {
   afterHello: 550,       // pause after the first line
   betweenParas: 450,     // pause between paragraphs
   afterEllipsis: 850,    // longer beat after a paragraph ending in "..." (so "but now, i do" lands)
-  beforeSignoff: 300, beforeIcons: 250, iconStagger: 150
+  beforeSignoff: 300, beforeIcons: 250, iconStagger: 150,
+  eggTotal: 8500,        // round 16: the whole egg rain lasts about this long (ms). each letter falls ~3-4.6s, starts staggered at random
+  eggStep: [95, 150]     // round 16: ms per row a letter drops (matrix-style stepping, like the rain); random per letter
 };
 /* ===================================================================== */
 
@@ -275,7 +305,7 @@ const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('
 const graphemes = t => seg ? Array.from(seg.segment(t), x => x.segment) : Array.from(t);
 const cursor = document.createElement('span'); cursor.className = 'cursor';
 const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
-let pace = 1;   // round 12: 1 = normal, 2 = double speed. a tap toggles it (see below); scales every typed line + the pauses between them
+let pace = 2;   // round 19 (jay 2026.09.29): normal is now the old 2x, a tap doubles it to 4x (orange). was round 12: 1 = normal, 2 = double speed. a tap toggles it (see below); scales every typed line + the pauses between them
 
 /* lays out every piece up front (untyped text is held invisibly), so wrapping is final from the first frame */
 function prepare(el, pieces){
@@ -334,6 +364,59 @@ const iconLink = s => { const a = mk('a'); a.setAttribute('href', s.href); a.set
   if (/^https?:/.test(s.href)){ a.target = '_blank'; a.rel = 'noopener'; }
   a.innerHTML = ICONS[s.icon] || ''; return a; };
 COPY.socials.forEach(s => { const li = mk('li'); li.appendChild(iconLink(s)); ul.appendChild(li); });
+const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true');   // round 16: the cursor's final home, after the last icon
+
+/* ---- round 16: easter egg (jay 2026.09.29). for people who stay: once the icons are in, the quote rains down slowly in orange,
+   one column per letter (a scrambling head + a short fading trail, stepping row by row like the rain), resolves as it lands, and stays.
+   laid out up front (hidden) so the landing never reflows; letters start above the viewport, so nothing adds scroll height or width */
+const eggEl = $('.egg'), eggText = COPY.egg || '';
+const eggChars = [];
+eggText.split(' ').forEach((word, wi) => {
+  if (wi) eggEl.appendChild(document.createTextNode(' '));   // spaces are just gaps (no falling glyph)
+  const w = mk('span', 'w');
+  graphemes(word).forEach(ch => { const c = mk('span', 'c'); c.textContent = ch; w.appendChild(c); eggChars.push({el: c, ch}); });
+  eggEl.appendChild(w);
+});
+function eggSettle(){   // the final line: plain text (or a link, if COPY.eggHref is set), readable by screen readers
+  eggEl.textContent = '';
+  if (COPY.eggHref){ const a = mk('a'); a.setAttribute('href', COPY.eggHref); if (/^https?:/.test(COPY.eggHref)){ a.target = '_blank'; a.rel = 'noopener'; } a.textContent = eggText; eggEl.appendChild(a); }
+  else eggEl.textContent = eggText;
+  eggEl.removeAttribute('aria-hidden'); state.egg = 'landed';
+}
+let eggStarted = false;
+function egg(){
+  if (eggStarted || !eggText) return; eggStarted = true; state.egg = 'falling';
+  if (reduced || !eggEl.animate){ eggSettle(); eggEl.classList.add('on', 'fade'); return; }
+  const fs = parseFloat(getComputedStyle(eggEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep;
+  let left = eggChars.length, last = 0;
+  const t0 = performance.now();
+  for (const c of eggChars){
+    const top = c.el.getBoundingClientRect().top;
+    const rows = Math.max(8, Math.ceil((top + row*2)/row));   // start just above the viewport, drop row by row into the slot
+    const dur = Math.min(4600, Math.max(3000, rows*(s0 + Math.random()*(s1 - s0))));
+    const delay = Math.random()*Math.max(0, TIMING.eggTotal - dur);
+    last = Math.max(last, delay + dur);
+    const tr = mk('span', 'tr'); c.trail = Array.from({length: 4 + Math.floor(Math.random()*4)}, rg); tr.textContent = c.trail.join('\n');
+    c.tr = tr; c.el.appendChild(tr); c.el.firstChild.textContent = rg(); c.el.classList.add('fall');
+    c.end = t0 + delay + dur;
+    const an = c.el.animate([{transform: `translateY(${-rows*row}px)`}, {transform: 'translateY(0)'}], {duration: dur, delay, easing: `steps(${rows}, end)`, fill: 'backwards'});
+    an.finished.then(() => {
+      c.done = true; c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall'); c.el.classList.add('land');
+      tr.classList.add('off'); setTimeout(() => tr.remove(), 750);
+      if (--left === 0){ clearInterval(scr); setTimeout(eggSettle, 1200); }
+    });
+  }
+  state.eggMs = Math.round(last);
+  eggEl.classList.add('on');
+  const scr = setInterval(() => {   // scramble: heads flicker, trails shift like the rain columns; the real letter shows just before it lands
+    const now = performance.now();
+    for (const c of eggChars){
+      if (c.done) continue;
+      c.el.firstChild.textContent = c.end - now < 260 ? c.ch : Math.random() < .7 ? rg() : c.el.firstChild.textContent;
+      c.trail.pop(); c.trail.unshift(rg()); c.tr.textContent = c.trail.join('\n');
+    }
+  }, 90);
+}
 
 /* ---- signup (round 10): progressive enhancement. no js = a normal form post */
 const form = $('.notify'), statusEl = $('.status');
@@ -366,11 +449,15 @@ const rain = Rain(document.getElementById('rain'), {
 
 let current = null, skipped = false;
 function popIcons(instant){
-  [...ul.children].forEach((li, i) => {
+  const done = () => {   // round 16: the cursor comes back for good at the end of the icon row, then the egg starts raining
+    curLi.appendChild(cursor); ul.appendChild(curLi); curLi.classList.add('in'); state.done = true; egg();
+  };
+  const icons = [...ul.children].filter(li => li !== curLi);
+  icons.forEach((li, i) => {
     if (instant){ li.classList.add('in'); state.icons = i + 1; return; }
-    setTimeout(() => { li.classList.add('in'); state.icons = i + 1; if (i === ul.children.length - 1) setTimeout(() => state.done = true, 400); }, i*TIMING.iconStagger);
+    setTimeout(() => { li.classList.add('in'); state.icons = i + 1; if (i === icons.length - 1) setTimeout(done, 400); }, i*TIMING.iconStagger);
   });
-  if (instant) state.done = true;
+  if (instant) done();
 }
 async function intro(){
   document.body.classList.add('typing');
@@ -402,8 +489,8 @@ document.addEventListener('pointerdown', e => { down = e.isPrimary && e.button =
 document.addEventListener('pointercancel', () => { down = null; });
 document.addEventListener('pointerup', e => {
   if (!down || !e.isPrimary || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10 || String(getSelection())) return;
-  down = null; pace = pace === 1 ? 2 : 1; state.pace = pace;
-  document.documentElement.classList.toggle('fast', pace === 2);   // round 13: orange cursor while at 2x
+  down = null; pace = pace === 2 ? 4 : 2; state.pace = pace;
+  document.documentElement.classList.toggle('fast', pace === 4);   // round 13: orange cursor while at 2x
 });
 
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
