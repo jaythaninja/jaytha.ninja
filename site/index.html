@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="dark">
 <script>document.documentElement.classList.add('js')</script>
 <title>jay tha 🥷</title>
-<!-- v1.11 (fast speed turns the teal rain orange, peach tips). MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer; round 14: drawer gone, all 7 icons out front) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
+<!-- PREVIEW v1.12 (fast-speed rain is a muted orange #D1723C; not shipped). MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer; round 14: drawer gone, all 7 icons out front) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
      color order: teal #1AADB3 primary, white secondary, orange #FF4D1A only as a rare accent (links + social icons). rain: teal + dim white, white tips.
      everything types out with the hello line's decode effect; the social icons pop in at the end.
      self-contained: JetBrains Mono (latin, variable) is inlined; no external loads.
@@ -481,7 +481,7 @@ form.addEventListener('submit', async e => {
 const state = window.__intro = {line: -1, para: -1, head: 0, icons: 0, done: false};   // line: 0 hello, 1 paragraphs, 2 sign-off, 3 icons
 
 const T = [26,173,179], W = [214,222,222], HEAD = [255,255,255];   // rain: brand teal + dim white only (orange is for links/icons)
-const RAIN_ORANGE = [255,77,26];   // round 25 (preview): at fast speed the teal drop bodies turn orange (like the orange cursor); tips go pale peach (round 26); white drops unchanged
+const RAIN_ORANGE = [209,114,60];   // round 27 (preview): muted orange #D1723C = oklch(.65 .137 48), the orange twin of the faded teal (same rendered OKLab lightness + chroma as the teal rain; #FF4D1A had ~2x the chroma and read much louder). fast-speed teal bodies take it, tips = the same 60% white mix (pale peach); white drops unchanged. the egg letters, landed text + cursor keep #FF4D1A
 const mob = () => document.documentElement.clientWidth < 760;
 const rain = Rain(document.getElementById('rain'), {
   fs: 16, fsMobile: 13, mono: '"JetBrains Mono", monospace', seed: 5, head: HEAD, headMix: .6,
