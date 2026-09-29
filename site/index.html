@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="dark">
 <script>document.documentElement.classList.add('js')</script>
 <title>jay tha 🥷</title>
-<!-- PREVIEW v1.12 (fast-speed rain is a muted orange #D1723C; not shipped). MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer; round 14: drawer gone, all 7 icons out front) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
+<!-- PREVIEW v1.13-floor75 (rain behind the text at 75%; not shipped). v1.12 base. MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer; round 14: drawer gone, all 7 icons out front) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
      color order: teal #1AADB3 primary, white secondary, orange #FF4D1A only as a rare accent (links + social icons). rain: teal + dim white, white tips.
      everything types out with the hello line's decode effect; the social icons pop in at the end.
      self-contained: JetBrains Mono (latin, variable) is inlined; no external loads.
@@ -490,7 +490,7 @@ const rain = Rain(document.getElementById('rain'), {
       colDensity: () => 1}],   // same amount of rain across the full width (jay, round 6)
   alphaAt: (x, y, R) => 1 - .45*smooth(R.H*.55, R.H, y),
   // no parting: rain runs behind the text. over the text block it's dimmed to 30% (tips included), feathered over 50px, so there's no box edge
-  partSel: '.copy', partPad: 50, partFloor: .3,
+  partSel: '.copy', partPad: 50, partFloor: .75,   // round 28 preview: rain over the text at 75% (was .3)
   tint: T   // round 25: the teal palette entry (by reference) is the one that follows the typing speed
 });
 
