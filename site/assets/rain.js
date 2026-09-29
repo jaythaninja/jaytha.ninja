@@ -110,7 +110,7 @@ function Rain(cv, o){
     <path d="M163 214h17v12c0 7-4 11-9 11s-9-4-9-11v-7c0-2 0-4 1-5Z" fill="#FFE8A0" opacity=".82"/>
     </g>
   </svg>`;
-  const arrows=n=>`<svg class="speed-arrows" data-count="${n}" viewBox="0 0 ${n===1?12:20} 24" aria-label="${n===1?'one':'two'} speed arrow${n===1?'':'s'}"><path d="${n===1?'M2.5 3.5L9.5 12 2.5 20.5':'M2.5 3.5L9.5 12 2.5 20.5M10.5 3.5L17.5 12 10.5 20.5'}"/></svg>`;
+  const arrows=n=>`<svg class="speed-arrows" data-count="${n}" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="${n===1?'one':'two'} speed arrow${n===1?'':'s'}"><path d="${n===1?'M2.5 3.5L9.5 12 2.5 20.5':'M2.5 3.5L9.5 12 2.5 20.5M10.5 3.5L17.5 12 10.5 20.5'}"/></svg>`;
   let rain=null,hint=null,down=null,booted=false,onMode=null;
   const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`anywhere for${arrows(fast?1:2)}`;}};
   const ensure=()=>{

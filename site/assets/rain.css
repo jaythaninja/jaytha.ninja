@@ -3,4 +3,4 @@
 .tap-hint.ready{opacity:.7;transform:none}.tap-hint.settled{opacity:.52}[data-mode="fast"] .tap-hint{--hint-icon:#FF6A2B;color:var(--orange)}.tap-hint svg{width:1.35em;height:1.35em;display:block;flex:none;color:var(--hint-icon);transition:color .25s ease}.tap-hint b{font-weight:500}
 @media(prefers-reduced-motion:reduce){.tap-hint{transition:none;transform:none}.tap-hint.ready{opacity:.7}.tap-hint.settled{opacity:.52}}
 
-.speed-label{display:flex;align-items:center;gap:.3em}.speed-arrows{width:.675em;height:1.35em;display:block;flex:none;color:currentColor;overflow:visible}.speed-arrows path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}.speed-arrows[data-count="2"]{width:1.125em}
+.speed-label{display:flex;align-items:center;gap:.3em}.speed-arrows{width:1.125em;height:1.35em;display:block;flex:none;color:currentColor;overflow:visible}.speed-arrows path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
