@@ -7,7 +7,7 @@
 <meta name="color-scheme" content="dark">
 <script>document.documentElement.classList.add('js')</script>
 <title>jay tha 🥷</title>
-<!-- MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
+<!-- MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer; round 14: drawer gone, all 7 icons out front) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
      color order: teal #1AADB3 primary, white secondary, orange #FF4D1A only as a rare accent (links + social icons). rain: teal + dim white, white tips.
      everything types out with the hello line's decode effect; the social icons pop in at the end.
      self-contained: JetBrains Mono (latin, variable) is inlined; no external loads.
@@ -69,25 +69,16 @@ a:hover{color:var(--teal)}
 html.fast .cursor{background:var(--orange);box-shadow:0 0 14px rgba(255,77,26,.75)}   /* round 13: at 2x the cursor (+ its glow) goes brand orange */
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
-.elsewhere{position:relative;margin-top:30px}
+.elsewhere{margin-top:30px}
 .social{margin-left:-8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;list-style:none}
 .social li{opacity:0;transform:scale(.55) translateY(6px);transition:opacity .28s ease-out,transform .38s cubic-bezier(.34,1.56,.64,1)}
 .social li.in{opacity:1;transform:none}
 .social a{display:flex;align-items:center;justify-content:center;width:42px;height:40px;border-radius:8px}
 .social a:hover{background:rgba(26,173,179,.08)}
-/* round 10: only 𝕏 stays orange; the rest live in a quiet drawer behind "more +" */
-.more{display:flex;align-items:center;height:40px;padding:0 10px;font:inherit;font-size:16px;color:var(--ink-2);background:transparent;border:0;border-radius:8px;cursor:pointer;white-space:nowrap;transition:color .15s ease,background-color .15s ease}
-.more:hover,.more[aria-expanded="true"]{color:var(--teal)}
-.more:hover{background:rgba(26,173,179,.08)}
-.more .pm{display:inline-block;width:1ch;margin-left:.5ch;text-align:center}
-.drawer{position:absolute;left:-8px;top:calc(100% + 4px);display:flex;flex-wrap:wrap;gap:4px 6px;list-style:none;opacity:0;transform:translateY(-6px);clip-path:inset(0 100% 0 0);transition:opacity .22s ease-out,transform .3s cubic-bezier(.22,1,.36,1),clip-path .34s cubic-bezier(.22,1,.36,1)}
-.drawer[hidden]{display:none}
-.drawer.open{opacity:1;transform:none;clip-path:inset(0 0 0 0)}
-.drawer a{display:flex;align-items:center;justify-content:center;width:42px;height:40px;border-radius:8px;color:rgba(246,239,233,.5)}
-.drawer a:hover,.drawer a:focus-visible{color:var(--teal);background:rgba(26,173,179,.08)}
+/* round 14: all 7 icons out front, same orange as the links (no "more +" drawer) */
 a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .notify input:focus-visible{outline:none}
-@media (prefers-reduced-motion:reduce){.notify,.drawer{transition:none!important}}
+@media (prefers-reduced-motion:reduce){.notify{transition:none!important}}
 .ic{width:28px;height:22px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
@@ -107,9 +98,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .status{font-size:16px}
   .elsewhere{margin-top:24px}
   .social{margin-left:-9px;gap:2px 2px}
-  .social a,.drawer a{width:40px;height:40px}
-  .drawer{left:-9px;gap:2px 2px}
-  .more{font-size:15px}
+  .social a{width:40px;height:40px}
   .ic{width:25px;height:20px}
 }
 </style>
@@ -158,7 +147,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     </div>
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
-      <ul class="drawer" id="more-links" aria-label="more links" hidden inert></ul>
     </nav>
   </div>
 </main>
@@ -186,11 +174,11 @@ const COPY = {
   signoff: "- jay tha",   // the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want the first look?",   // typed (white) after the sign-off; then the email form slides in (round 10)
   thanks: "almost there, check your email and tap confirm",   // typed (teal) in place of the form. buttondown is double opt-in
-  socials: [   // order per jay (round 4); icon = key in ICONS below
-    {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja", main: true},   // main: stays out front (orange); the rest sit in the "more +" drawer (round 10)
-    {label: "github",           icon: "github",    href: "https://github.com/jaythaninja", main: true},
+  socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all 7 out front, all orange
+    {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
+    {label: "github",           icon: "github",    href: "https://github.com/jaythaninja"},
     {label: "spotify playlist", icon: "spotify",   href: "https://open.spotify.com/playlist/4agJs1yW7WQcFx1Lg5VVZq?si=5117b6d947e84f1f"},
-    {label: "instagram",        icon: "instagram", href: "https://www.instagram.com/jaythaninja", main: true},
+    {label: "instagram",        icon: "instagram", href: "https://www.instagram.com/jaythaninja"},
     {label: "threads",          icon: "threads",   href: "https://www.threads.com/jaythaninja"},
     {label: "tiktok",           icon: "tiktok",    href: "https://www.tiktok.com/@jaythaninja"},
     {label: "linkedin",         icon: "linkedin",  href: "https://www.linkedin.com/in/jaythaninja"}
@@ -341,31 +329,11 @@ const paraLines = (COPY.paragraphs || [COPY.paragraph]).map(pieces => { const p 
 const lines = [prepare($('.hello'), COPY.hello), ...paraLines, prepare($('.sig'), COPY.signoff), prepare($('.prompt'), COPY.cta)];
 const LAST = lines.length - 1;
 const ninja = mk('img', 'ninja'); ninja.alt = '🥷'; ninja.src = NINJA; $('.sig').appendChild(ninja);
-const ul = $('.social'), drawer = $('#more-links');
+const ul = $('.social');
 const iconLink = s => { const a = mk('a'); a.setAttribute('href', s.href); a.setAttribute('aria-label', s.label); a.title = s.label;
   if (/^https?:/.test(s.href)){ a.target = '_blank'; a.rel = 'noopener'; }
   a.innerHTML = ICONS[s.icon] || ''; return a; };
-COPY.socials.forEach(s => { const li = mk('li'); li.appendChild(iconLink(s)); (s.main ? ul : drawer).appendChild(li); });
-
-/* ---- "more +" drawer (round 10): real button, aria-expanded/controls, drawer hidden + inert when closed, esc closes ---- */
-const moreLi = mk('li'), more = mk('button', 'more');
-more.type = 'button'; more.setAttribute('aria-expanded', 'false'); more.setAttribute('aria-controls', 'more-links');
-more.innerHTML = 'more<span class="sr"> links</span><span class="pm" aria-hidden="true">+</span>';
-moreLi.appendChild(more); ul.appendChild(moreLi);
-let dt;
-function setDrawer(open, refocus){
-  if (open === (more.getAttribute('aria-expanded') === 'true')) return;
-  more.setAttribute('aria-expanded', String(open));
-  more.querySelector('.pm').textContent = open ? '\u2212' : '+';
-  clearTimeout(dt);
-  if (open){ drawer.hidden = false; drawer.inert = false; void drawer.offsetWidth; drawer.classList.add('open'); }
-  else { drawer.inert = true; drawer.classList.remove('open'); dt = setTimeout(() => { drawer.hidden = true; rain.measure(); }, reduced ? 0 : 340); }
-  if (refocus) more.focus();
-  rain.measure();
-}
-more.addEventListener('click', () => setDrawer(more.getAttribute('aria-expanded') !== 'true'));
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && more.getAttribute('aria-expanded') === 'true'){ e.preventDefault(); setDrawer(false, true); } });
-document.addEventListener('pointerdown', e => { if (!e.target.closest('.elsewhere')) setDrawer(false); });
+COPY.socials.forEach(s => { const li = mk('li'); li.appendChild(iconLink(s)); ul.appendChild(li); });
 
 /* ---- signup (round 10): progressive enhancement. no js = a normal form post */
 const form = $('.notify'), statusEl = $('.status');
