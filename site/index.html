@@ -40,6 +40,8 @@ a:hover{color:var(--teal)}
 .para .bold{font-weight:700;color:var(--white)}
 .para .teal{color:var(--teal)}
 .sig{margin-top:22px;font-size:20px;line-height:1.5;color:var(--teal)}
+.sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.4em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
+.sig .ninja.in{opacity:1;transform:none}
 .cta{margin-top:22px;font-size:20px;line-height:1.5}
 .cta a{white-space:nowrap}
 /* typing internals: resolved text, scrambling window, and the not-yet-typed text held invisibly so lines never reflow */
@@ -70,6 +72,21 @@ a:hover{color:var(--teal)}
   .ic{width:25px;height:20px}
 }
 </style>
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="description" content="hello, world...">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jaytha.ninja/">
+<meta property="og:title" content="jay tha 🥷">
+<meta property="og:description" content="hello, world...">
+<meta property="og:image" content="https://jaytha.ninja/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:site" content="@jaythaninja">
+<meta name="twitter:image" content="https://jaytha.ninja/og-image.png">
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -98,6 +115,7 @@ a:hover{color:var(--teal)}
      {text: "bold text", bold: true}
      {text: "teal text", teal: true}
    ===================================================================== */
+const NINJA = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij4KPGRlZnM+CiAgPHJhZGlhbEdyYWRpZW50IGlkPSJzdWl0IiBjeD0iMzglIiBjeT0iMjUlIiByPSI4NSUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzNiNDI0NSIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMWExZTIwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDcwOTBhIi8+PC9yYWRpYWxHcmFkaWVudD4KICA8cmFkaWFsR3JhZGllbnQgaWQ9ImhlYWQiIGN4PSIzNiUiIGN5PSIyOCUiIHI9Ijc1JSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNGE1MjU2Ii8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzIyMjgyYiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA5MGIwYyIvPjwvcmFkaWFsR3JhZGllbnQ+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJza2luIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZENzY2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjVCODM1Ii8+PC9saW5lYXJHcmFkaWVudD4KICA8bGluZWFyR3JhZGllbnQgaWQ9InRlYWwiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1RkQ2REEiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMUFBREIzIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMEU3QzgxIi8+PC9saW5lYXJHcmFkaWVudD4KICA8bGluZWFyR3JhZGllbnQgaWQ9InRlYWxSIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkY4QTVFIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iI0ZGNEQxQSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0I4MzAwQSIvPjwvbGluZWFyR3JhZGllbnQ+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJndWFyZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZiNzQ3OCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFjMjEyNCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgPHJhZGlhbEdyYWRpZW50IGlkPSJzaGluZSIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmYiIHN0b3Atb3BhY2l0eT0iLjM1Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmZmIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PgogIDxjbGlwUGF0aCBpZD0iaGVhZGNsaXAiPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjEwNCIgcj0iNzYiLz48L2NsaXBQYXRoPgo8L2RlZnM+CjwhLS0ga2F0YW5hIGJlaGluZCByaWdodCBzaG91bGRlciAob3JhbmdlIHdyYXAsIGpheSAyMDI2LTA5LTI5KSAtLT4KPGcgdHJhbnNmb3JtPSJyb3RhdGUoMzggMTkwIDcwKSI+CiAgPHJlY3QgeD0iMTgxIiB5PSItOCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjcwIiByeD0iNiIgZmlsbD0idXJsKCN0ZWFsUikiLz4KICA8ZyBzdHJva2U9IiM1YTE2MDQiIHN0cm9rZS13aWR0aD0iMyIgb3BhY2l0eT0iLjciPgogICAgPHBhdGggZD0iTTE4MSA0IEwxOTkgMTYgTTE5OSA0IEwxODEgMTYgTTE4MSAyMiBMMTk5IDM0IE0xOTkgMjIgTDE4MSAzNCBNMTgxIDQwIEwxOTkgNTIgTTE5OSA0MCBMMTgxIDUyIi8+CiAgPC9nPgogIDxyZWN0IHg9IjE3OSIgeT0iLTE0IiB3aWR0aD0iMjIiIGhlaWdodD0iMTAiIHJ4PSI0IiBmaWxsPSIjMGIwZDBlIi8+CiAgPGVsbGlwc2UgY3g9IjE5MCIgY3k9IjY2IiByeD0iMjAiIHJ5PSI3IiBmaWxsPSJ1cmwoI2d1YXJkKSIvPgogIDxyZWN0IHg9IjE4MiIgeT0iNzAiIHdpZHRoPSIxNiIgaGVpZ2h0PSIzMCIgcng9IjQiIGZpbGw9IiMwYjBkMGUiLz4KPC9nPgo8IS0tIGJvZHkgLS0+CjxwYXRoIGQ9Ik0zOCAyNTYgQzM4IDIwNiA3MCAxNzggMTI4IDE3OCBDMTg2IDE3OCAyMTggMjA2IDIxOCAyNTYgWiIgZmlsbD0idXJsKCNzdWl0KSIvPgo8IS0tIGtpbW9ubyBjcm9zcyBjb2xsYXIgLS0+CjxwYXRoIGQ9Ik05NiAxODIgTDEyOCAyMzggTDE2MCAxODIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBhMGMwZCIgc3Ryb2tlLXdpZHRoPSIxNCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNOTYgMTgyIEwxMjggMjM4IEwxNjAgMTgyIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjdGVhbCkiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8IS0tIHNhc2ggLS0+CjxwYXRoIGQ9Ik00NCAyMzggQzkwIDIyOCAxNjYgMjI4IDIxMiAyMzggTDIxNCAyNTYgTDQyIDI1NiBaIiBmaWxsPSJ1cmwoI3RlYWwpIi8+CjxwYXRoIGQ9Ik00NCAyMzggQzkwIDIyOCAxNjYgMjI4IDIxMiAyMzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlCRUJFRSIgc3Ryb2tlLW9wYWNpdHk9Ii41IiBzdHJva2Utd2lkdGg9IjIiLz4KPCEtLSBoZWFkIC8gaG9vZCAtLT4KPGNpcmNsZSBjeD0iMTI4IiBjeT0iMTA0IiByPSI3NiIgZmlsbD0idXJsKCNoZWFkKSIvPgo8ZyBjbGlwLXBhdGg9InVybCgjaGVhZGNsaXApIj4KICA8IS0tIGxvd2VyIGZhY2Ugd3JhcCBmb2xkcyAtLT4KICA8cGF0aCBkPSJNNjAgMTUwIEM5NSAxNDAgMTYxIDE0MCAxOTYgMTUwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iNCIvPgogIDxwYXRoIGQ9Ik02NiAxNjQgQzEwMCAxNTUgMTU2IDE1NSAxOTAgMTY0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS1vcGFjaXR5PSIuMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPCEtLSBleWUgc2xpdCAtLT4KICA8cmVjdCB4PSI1MCIgeT0iOTgiIHdpZHRoPSIxNTYiIGhlaWdodD0iNDIiIHJ4PSIyMSIgZmlsbD0idXJsKCNza2luKSIvPgogIDxyZWN0IHg9IjUwIiB5PSI5OCIgd2lkdGg9IjE1NiIgaGVpZ2h0PSIxMCIgcng9IjUiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4xOCIvPgogIDwhLS0gaGVhZGJhbmQgLS0+CiAgPHJlY3QgeD0iNDgiIHk9IjcwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjIwIiByeD0iNCIgZmlsbD0idXJsKCN0ZWFsKSIvPgogIDxyZWN0IHg9IjQ4IiB5PSI3MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI0IiBmaWxsPSIjQTZGMEYyIiBvcGFjaXR5PSIuNTUiLz4KPC9nPgo8IS0tIGhlYWRiYW5kIGtub3QgKyB0YWlscyBvbiB0aGUgbGVmdCAtLT4KPHBhdGggZD0iTTU4IDgwIEM0MCA3NiAyNiA4NiAxNCAxMDQgQzMwIDEwMCA0MCA5NiA1MiA5MiBaIiBmaWxsPSJ1cmwoI3RlYWwpIi8+CjxwYXRoIGQ9Ik01OCA4NCBDNDQgOTIgMzQgMTA4IDMwIDEyOCBDNDQgMTE2IDUyIDEwNCA2MCA5MiBaIiBmaWxsPSIjMTI4RTkzIi8+CjxjaXJjbGUgY3g9IjU4IiBjeT0iODIiIHI9IjkiIGZpbGw9InVybCgjdGVhbCkiLz4KPCEtLSBleWVzIC0tPgo8ZWxsaXBzZSBjeD0iMTAwIiBjeT0iMTIxIiByeD0iMTAiIHJ5PSIxMiIgZmlsbD0iIzNhMjQxMCIvPgo8ZWxsaXBzZSBjeD0iMTU2IiBjeT0iMTIxIiByeD0iMTAiIHJ5PSIxMiIgZmlsbD0iIzNhMjQxMCIvPgo8Y2lyY2xlIGN4PSIxMDMuNSIgY3k9IjExNi41IiByPSIzLjQiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii45Ii8+CjxjaXJjbGUgY3g9IjE1OS41IiBjeT0iMTE2LjUiIHI9IjMuNCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz4KPCEtLSBicm93cyAtLT4KPHBhdGggZD0iTTg0IDEwNiBRMTAwIDEwMCAxMTQgMTA2IiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTI0MTAiIHN0cm9rZS13aWR0aD0iNC41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPHBhdGggZD0iTTE0MiAxMDYgUTE1NiAxMDAgMTcyIDEwNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM2EyNDEwIiBzdHJva2Utd2lkdGg9IjQuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjwhLS0gdGVhbCByaW0gbGlnaHQgc28gdGhlIGhvb2QgcmVhZHMgb24gcHVyZSBibGFjayAtLT4KPGNpcmNsZSBjeD0iMTI4IiBjeT0iMTA0IiByPSI3NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMUFBREIzIiBzdHJva2Utb3BhY2l0eT0iLjQ1IiBzdHJva2Utd2lkdGg9IjIuNSIvPgo8cGF0aCBkPSJNNDAgMjU2IEM0MCAyMDggNzIgMTgwIDEyOCAxODAgQzE4NCAxODAgMjE2IDIwOCAyMTYgMjU2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxQUFEQjMiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iMi41Ii8+CjwhLS0gaG9vZCBzaGluZSAtLT4KPGVsbGlwc2UgY3g9Ijk4IiBjeT0iNTQiIHJ4PSIzNCIgcnk9IjE4IiBmaWxsPSJ1cmwoI3NoaW5lKSIgdHJhbnNmb3JtPSJyb3RhdGUoLTIwIDk4IDU0KSIvPgo8L3N2Zz4K';
 const COPY = {
   hello: "hello, world...",                  // first line (teal)
   // jay's copy, 2026.09.28 (round 5). one [ ] per paragraph, typed in order with a pause between.
@@ -108,7 +126,7 @@ const COPY = {
     ["and one day, i hope you will benefit from my life's work"],
     ["we'll see - there's a long road ahead"],
   ],
-  signoff: "- jay tha 🥷",
+  signoff: "- jay tha",   // the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: [{text: "get notified", href: "mailto:bots@jaytha.ninja?subject=what%27s%20up%2C%20nerd&body=please%20add%20my%20email%20address%20to%20the%20waitlist%20for%20whatever%20the%20heck%20you%27re%20working%20on"}],   // orange link, typed after the sign-off (jay, round 7)
   socials: [   // order per jay (round 4); icon = key in ICONS below
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
@@ -263,6 +281,7 @@ const parasEl = $('.paras');
 const paraLines = (COPY.paragraphs || [COPY.paragraph]).map(pieces => { const p = mk('p', 'para'); p.setAttribute('data-part', ''); parasEl.appendChild(p); return prepare(p, pieces); });
 const lines = [prepare($('.hello'), COPY.hello), ...paraLines, prepare($('.sig'), COPY.signoff), prepare($('.cta'), COPY.cta)];
 const LAST = lines.length - 1;
+const ninja = mk('img', 'ninja'); ninja.alt = '🥷'; ninja.src = NINJA; $('.sig').appendChild(ninja);
 const ul = $('.social');
 COPY.socials.forEach(s => {
   const li = mk('li'), a = mk('a'); a.setAttribute('href', s.href); a.setAttribute('aria-label', s.label); a.title = s.label;
@@ -300,6 +319,7 @@ async function intro(){
     current = type(lines[i], {speed: i === 0 ? TIMING.helloSpeed : TIMING.paraSpeed, window: TIMING.window}); await current;
     if (skipped) return;
     if (i === LAST) document.body.classList.remove('typing');
+    if (i === LAST - 1){ cursor.remove(); ninja.classList.add('in'); await wait(420); }
     const ended = lines[i].runs.flatMap(r => r.g).join('').trimEnd();
     await wait(i === 0 ? TIMING.afterHello : i === LAST ? TIMING.beforeIcons : i === LAST - 1 ? TIMING.beforeSignoff : ended.endsWith('...') ? TIMING.afterEllipsis : TIMING.betweenParas);
   }
@@ -310,7 +330,7 @@ function skip(){
   skipped = true; current && current.finish();
   lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window));
   lines[LAST].runs[lines[LAST].runs.length - 1].node.appendChild(cursor);
-  document.body.classList.remove('typing'); state.line = 3; popIcons(true);
+  ninja.classList.add('in'); document.body.classList.remove('typing'); state.line = 3; popIcons(true);
 }
 /* round 8: no skip. the full intro always types out (reduced-motion users still get the finished page) */
 
