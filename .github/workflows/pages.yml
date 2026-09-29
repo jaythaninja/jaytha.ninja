@@ -1,11 +1,4 @@
-# Deploys the built site to GitHub Pages at
-# https://jaythaninja.github.io/jaytha.ninja/
-#
-# The owner turns this on once, in the repo settings:
-#   Settings → Pages → Build and deployment → Source: GitHub Actions
-#
-# There is no CNAME. This workflow does not touch jaytha.ninja.
-
+# Static site in site/, deployed to GitHub Pages.
 name: Deploy GitHub Pages
 
 on:
@@ -23,32 +16,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: npm
-      - name: Install
-        run: npm ci
-      - name: Build
-        run: npm run build
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy
+          path: site
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
