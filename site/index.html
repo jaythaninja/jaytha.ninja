@@ -5,8 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
+<script>document.documentElement.classList.add('js')</script>
 <title>jay tha 🥷</title>
-<!-- MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
+<!-- MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
      color order: teal #1AADB3 primary, white secondary, orange #FF4D1A only as a rare accent (links + social icons). rain: teal + dim white, white tips.
      everything types out with the hello line's decode effect; the social icons pop in at the end.
      self-contained: JetBrains Mono (latin, variable) is inlined; no external loads.
@@ -43,18 +44,49 @@ a:hover{color:var(--teal)}
 .sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.4em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
 .sig .ninja.in{opacity:1;transform:none}
 .cta{margin-top:22px;font-size:20px;line-height:1.5}
-.cta a{white-space:nowrap}
+.prompt{color:var(--white)}
+/* round 10: inline signup. prompt types, then the form slides in; the thank-you line types into the same slot (no reflow) */
+.signup{display:grid;grid-template-columns:minmax(0,1fr);margin-top:6px}
+.signup > *{grid-area:1/1}
+.notify{display:flex;min-width:0;align-items:baseline;gap:18px;transition:opacity .45s ease-out,transform .5s cubic-bezier(.22,1,.36,1),visibility 0s}
+.js .notify{opacity:0;transform:translateY(6px);visibility:hidden}
+.js .notify.in{opacity:1;transform:none;visibility:visible}
+.js .notify.gone{opacity:0;transform:translateY(-4px);visibility:hidden;transition:opacity .2s ease-in,transform .2s ease-in,visibility 0s .2s}
+.notify input{flex:0 1 23ch;min-width:0;font:inherit;font-size:18px;line-height:1.5;color:var(--white);background:transparent;border:0;border-bottom:1px solid rgba(26,173,179,.55);border-radius:0;padding:4px 0 5px;caret-color:var(--teal);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s ease,box-shadow .2s ease}
+.notify input::placeholder{color:rgba(246,239,233,.34);opacity:1}
+.notify input:hover{border-bottom-color:rgba(26,173,179,.8)}
+.notify input:focus{border-bottom-color:var(--teal);box-shadow:0 1px 0 var(--teal),0 10px 18px -12px rgba(26,173,179,.9)}
+.notify input:-webkit-autofill{-webkit-text-fill-color:var(--white);-webkit-box-shadow:0 0 0 60px #000 inset;caret-color:var(--teal);transition:background-color 9999s}
+.notify button{flex:none;font:inherit;font-size:18px;line-height:1.5;color:var(--orange);background:transparent;border:0;border-radius:6px;padding:4px 6px;margin:0 -6px;cursor:pointer;white-space:nowrap;transition:color .15s ease,background-color .15s ease}
+.notify button:hover,.notify button:focus-visible{color:var(--teal);background:rgba(26,173,179,.08)}
+.notify button[disabled]{cursor:default;color:var(--ink-3);background:transparent}
+.status{align-self:center;color:var(--teal);font-size:20px;line-height:1.5}
+.status:empty{display:none}
 /* typing internals: resolved text, scrambling window, and the not-yet-typed text held invisibly so lines never reflow */
 .scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(127,218,221,.9)}
 .ghost{visibility:hidden}
 .cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--teal);box-shadow:0 0 14px rgba(26,173,179,.75);animation:blink 1.05s infinite}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
-.social{margin-top:30px;margin-left:-8px;display:flex;flex-wrap:wrap;gap:4px 6px;list-style:none}
+.elsewhere{position:relative;margin-top:30px}
+.social{margin-left:-8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;list-style:none}
 .social li{opacity:0;transform:scale(.55) translateY(6px);transition:opacity .28s ease-out,transform .38s cubic-bezier(.34,1.56,.64,1)}
 .social li.in{opacity:1;transform:none}
 .social a{display:flex;align-items:center;justify-content:center;width:42px;height:40px;border-radius:8px}
 .social a:hover{background:rgba(26,173,179,.08)}
+/* round 10: only 𝕏 stays orange; the rest live in a quiet drawer behind "more +" */
+.more{display:flex;align-items:center;height:40px;padding:0 10px;font:inherit;font-size:16px;color:var(--ink-2);background:transparent;border:0;border-radius:8px;cursor:pointer;white-space:nowrap;transition:color .15s ease,background-color .15s ease}
+.more:hover,.more[aria-expanded="true"]{color:var(--teal)}
+.more:hover{background:rgba(26,173,179,.08)}
+.more .pm{display:inline-block;width:1ch;margin-left:.5ch;text-align:center}
+.drawer{position:absolute;left:-8px;top:calc(100% + 4px);display:flex;flex-wrap:wrap;gap:4px 6px;list-style:none;opacity:0;transform:translateY(-6px);clip-path:inset(0 100% 0 0);transition:opacity .22s ease-out,transform .3s cubic-bezier(.22,1,.36,1),clip-path .34s cubic-bezier(.22,1,.36,1)}
+.drawer[hidden]{display:none}
+.drawer.open{opacity:1;transform:none;clip-path:inset(0 0 0 0)}
+.drawer a{display:flex;align-items:center;justify-content:center;width:42px;height:40px;border-radius:8px;color:rgba(246,239,233,.5)}
+.drawer a:hover,.drawer a:focus-visible{color:var(--teal);background:rgba(26,173,179,.08)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+.notify input:focus-visible{outline:none}
+@media (prefers-reduced-motion:reduce){.notify,.drawer{transition:none!important}}
 .ic{width:28px;height:22px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
@@ -67,8 +99,16 @@ a:hover{color:var(--teal)}
   .para + .para{margin-top:16px}
   .sig{margin-top:18px;font-size:16px}
   .cta{margin-top:18px;font-size:16px}
-  .social{margin-top:24px;margin-left:-9px;gap:2px 2px}
-  .social a{width:40px;height:40px}
+  .signup{margin-top:4px}
+  .notify{gap:14px}
+  .notify input{flex:1 1 auto;font-size:16px}
+  .notify button{font-size:16px}
+  .status{font-size:16px}
+  .elsewhere{margin-top:24px}
+  .social{margin-left:-9px;gap:2px 2px}
+  .social a,.drawer a{width:40px;height:40px}
+  .drawer{left:-9px;gap:2px 2px}
+  .more{font-size:15px}
   .ic{width:25px;height:20px}
 }
 </style>
@@ -76,16 +116,17 @@ a:hover{color:var(--teal)}
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
-<meta name="description" content="hello, world...">
+<meta name="description" content="something human in the works">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://jaytha.ninja/">
 <meta property="og:title" content="jay tha 🥷">
-<meta property="og:description" content="hello, world...">
+<meta property="og:description" content="something human in the works">
 <meta property="og:image" content="https://jaytha.ninja/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@jaythaninja">
+<meta name="twitter:description" content="something human in the works">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image.png">
 </head>
 <body>
@@ -101,8 +142,23 @@ a:hover{color:var(--teal)}
     <p class="hello" data-part></p>
     <div class="paras"></div>
     <p class="sig" data-part></p>
-    <p class="cta" data-part></p>
-    <ul class="social" data-part aria-label="elsewhere"></ul>
+    <div class="cta" data-part>
+      <p class="prompt"></p>
+      <div class="signup">
+        <!-- buttondown (double opt-in): subscribers get a confirm email -->
+        <form class="notify" action="https://buttondown.com/api/emails/embed-subscribe/jaythaninja" method="post">
+          <label class="sr" for="notify-email">your email</label>
+          <input id="notify-email" type="email" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
+          <input type="hidden" name="embed" value="1">
+          <button type="submit"><span aria-hidden="true">[ </span>notify me<span aria-hidden="true"> ]</span></button>
+        </form>
+        <p class="status" role="status" aria-live="polite"></p>
+      </div>
+    </div>
+    <nav class="elsewhere" data-part aria-label="elsewhere">
+      <ul class="social"></ul>
+      <ul class="drawer" id="more-links" aria-label="more links" hidden inert></ul>
+    </nav>
   </div>
 </main>
 
@@ -124,12 +180,13 @@ const COPY = {
     [{text: "i didn't have my ikigai...", teal: true}],
     [{text: "but now, i do", teal: true}],
     ["and one day, i hope you will benefit from my life's work"],
-    ["we'll see - there's a long road ahead"],
+    ["it's a long road, and i'm just getting started"],
   ],
   signoff: "- jay tha",   // the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
-  cta: [{text: "get notified", href: "mailto:bots@jaytha.ninja?subject=what%27s%20up%2C%20nerd&body=please%20add%20my%20email%20address%20to%20the%20waitlist%20for%20whatever%20the%20heck%20you%27re%20working%20on"}],   // orange link, typed after the sign-off (jay, round 7)
+  cta: "want the first look?",   // typed (white) after the sign-off; then the email form slides in (round 10)
+  thanks: "almost there, check your email and tap confirm",   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below
-    {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
+    {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja", main: true},   // main: stays out front (orange); the rest sit in the "more +" drawer (round 10)
     {label: "github",           icon: "github",    href: "https://github.com/jaythaninja"},
     {label: "spotify playlist", icon: "spotify",   href: "https://open.spotify.com/playlist/4agJs1yW7WQcFx1Lg5VVZq?si=5117b6d947e84f1f"},
     {label: "instagram",        icon: "instagram", href: "https://www.instagram.com/jaythaninja"},
@@ -279,14 +336,49 @@ const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms));
 const $ = s => document.querySelector(s);
 const parasEl = $('.paras');
 const paraLines = (COPY.paragraphs || [COPY.paragraph]).map(pieces => { const p = mk('p', 'para'); p.setAttribute('data-part', ''); parasEl.appendChild(p); return prepare(p, pieces); });
-const lines = [prepare($('.hello'), COPY.hello), ...paraLines, prepare($('.sig'), COPY.signoff), prepare($('.cta'), COPY.cta)];
+const lines = [prepare($('.hello'), COPY.hello), ...paraLines, prepare($('.sig'), COPY.signoff), prepare($('.prompt'), COPY.cta)];
 const LAST = lines.length - 1;
 const ninja = mk('img', 'ninja'); ninja.alt = '🥷'; ninja.src = NINJA; $('.sig').appendChild(ninja);
-const ul = $('.social');
-COPY.socials.forEach(s => {
-  const li = mk('li'), a = mk('a'); a.setAttribute('href', s.href); a.setAttribute('aria-label', s.label); a.title = s.label;
+const ul = $('.social'), drawer = $('#more-links');
+const iconLink = s => { const a = mk('a'); a.setAttribute('href', s.href); a.setAttribute('aria-label', s.label); a.title = s.label;
   if (/^https?:/.test(s.href)){ a.target = '_blank'; a.rel = 'noopener'; }
-  a.innerHTML = ICONS[s.icon] || ''; li.appendChild(a); ul.appendChild(li);
+  a.innerHTML = ICONS[s.icon] || ''; return a; };
+COPY.socials.forEach(s => { const li = mk('li'); li.appendChild(iconLink(s)); (s.main ? ul : drawer).appendChild(li); });
+
+/* ---- "more +" drawer (round 10): real button, aria-expanded/controls, drawer hidden + inert when closed, esc closes ---- */
+const moreLi = mk('li'), more = mk('button', 'more');
+more.type = 'button'; more.setAttribute('aria-expanded', 'false'); more.setAttribute('aria-controls', 'more-links');
+more.innerHTML = 'more<span class="sr"> links</span><span class="pm" aria-hidden="true">+</span>';
+moreLi.appendChild(more); ul.appendChild(moreLi);
+let dt;
+function setDrawer(open, refocus){
+  if (open === (more.getAttribute('aria-expanded') === 'true')) return;
+  more.setAttribute('aria-expanded', String(open));
+  more.querySelector('.pm').textContent = open ? '\u2212' : '+';
+  clearTimeout(dt);
+  if (open){ drawer.hidden = false; drawer.inert = false; void drawer.offsetWidth; drawer.classList.add('open'); }
+  else { drawer.inert = true; drawer.classList.remove('open'); dt = setTimeout(() => { drawer.hidden = true; rain.measure(); }, reduced ? 0 : 340); }
+  if (refocus) more.focus();
+  rain.measure();
+}
+more.addEventListener('click', () => setDrawer(more.getAttribute('aria-expanded') !== 'true'));
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && more.getAttribute('aria-expanded') === 'true'){ e.preventDefault(); setDrawer(false, true); } });
+document.addEventListener('pointerdown', e => { if (!e.target.closest('.elsewhere')) setDrawer(false); });
+
+/* ---- signup (round 10): progressive enhancement. no js = a normal form post */
+const form = $('.notify'), statusEl = $('.status');
+const showForm = () => form.classList.add('in');
+form.addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = form.querySelector('button'); btn.disabled = true;
+  try { await fetch(form.action, {method: 'POST', mode: 'no-cors', body: new FormData(form)}); }
+  catch (err) { btn.disabled = false; form.submit(); return; }
+  form.inert = true; form.classList.add('gone');
+  statusEl.innerHTML = '<span class="sr"></span><span class="typed" aria-hidden="true"></span>';
+  statusEl.firstChild.textContent = COPY.thanks;
+  const t = prepare(statusEl.lastChild, COPY.thanks); render(t, 0, TIMING.window);
+  statusEl.tabIndex = -1; statusEl.style.outline = 'none'; statusEl.focus({preventScroll: true});
+  await wait(180); await type(t, {speed: TIMING.paraSpeed, window: TIMING.window});
 });
 const state = window.__intro = {line: -1, para: -1, head: 0, icons: 0, done: false};   // line: 0 hello, 1 paragraphs, 2 sign-off, 3 icons
 
@@ -318,7 +410,7 @@ async function intro(){
     state.line = i === 0 ? 0 : i === LAST ? 2 : 1; state.para = i === 0 ? -1 : i - 1; state.head = 0;
     current = type(lines[i], {speed: i === 0 ? TIMING.helloSpeed : TIMING.paraSpeed, window: TIMING.window}); await current;
     if (skipped) return;
-    if (i === LAST) document.body.classList.remove('typing');
+    if (i === LAST){ document.body.classList.remove('typing'); cursor.remove(); showForm(); await wait(520); }
     if (i === LAST - 1){ cursor.remove(); ninja.classList.add('in'); await wait(420); }
     const ended = lines[i].runs.flatMap(r => r.g).join('').trimEnd();
     await wait(i === 0 ? TIMING.afterHello : i === LAST ? TIMING.beforeIcons : i === LAST - 1 ? TIMING.beforeSignoff : ended.endsWith('...') ? TIMING.afterEllipsis : TIMING.betweenParas);
@@ -329,7 +421,7 @@ function skip(){
   if (skipped || state.line >= 3) return;
   skipped = true; current && current.finish();
   lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window));
-  lines[LAST].runs[lines[LAST].runs.length - 1].node.appendChild(cursor);
+  cursor.remove(); showForm();
   ninja.classList.add('in'); document.body.classList.remove('typing'); state.line = 3; popIcons(true);
 }
 /* round 8: no skip. the full intro always types out (reduced-motion users still get the finished page) */
