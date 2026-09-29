@@ -21,7 +21,7 @@
   --left:max(64px,calc((100vw - 1312px)/2));
 }
 *{box-sizing:border-box;margin:0;padding:0;font-style:normal}
-html{background:var(--bg)}
+html{background:var(--bg);touch-action:manipulation}   /* round 12: taps toggle typing speed, so no double-tap zoom (pinch zoom + scrolling still work) */
 body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh}
 a{color:var(--orange);text-decoration:none;transition:color .15s ease}
 a:hover{color:var(--teal)}
@@ -66,6 +66,7 @@ a:hover{color:var(--teal)}
 .scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(127,218,221,.9)}
 .ghost{visibility:hidden}
 .cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--teal);box-shadow:0 0 14px rgba(26,173,179,.75);animation:blink 1.05s infinite}
+html.fast .cursor{background:var(--orange);box-shadow:0 0 14px rgba(255,77,26,.75)}   /* round 13: at 2x the cursor (+ its glow) goes brand orange */
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
 .elsewhere{position:relative;margin-top:30px}
@@ -286,6 +287,7 @@ const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('
 const graphemes = t => seg ? Array.from(seg.segment(t), x => x.segment) : Array.from(t);
 const cursor = document.createElement('span'); cursor.className = 'cursor';
 const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
+let pace = 1;   // round 12: 1 = normal, 2 = double speed. a tap toggles it (see below); scales every typed line + the pauses between them
 
 /* lays out every piece up front (untyped text is held invisibly), so wrapping is final from the first frame */
 function prepare(el, pieces){
@@ -323,14 +325,14 @@ function type(t, opt){
       if (head - win >= t.n) return resolve();
       const c = all[Math.min(head, t.n) - 1];
       const delay = head > t.n ? base*.7 : c === '.' ? base*3.2 : c === ',' ? base*3 : base*(.75 + Math.random()*.6);
-      setTimeout(tick, reduced ? 0 : delay);
+      setTimeout(tick, reduced ? 0 : delay/pace);
     };
     tick();
   });
   p.finish = () => { cancelled = true; render(t, t.n + win, win); };
   return p;
 }
-const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms));
+const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms/pace));
 
 /* ---- build ---- */
 const $ = s => document.querySelector(s);
@@ -425,6 +427,16 @@ function skip(){
   ninja.classList.add('in'); document.body.classList.remove('typing'); state.line = 3; popIcons(true);
 }
 /* round 8: no skip. the full intro always types out (reduced-motion users still get the finished page) */
+/* round 12: each tap/click toggles typing speed 1x <-> 2x. a tap = press + release within 10px, so scrolls, drags + text selection don't count.
+   links, buttons + the email input never toggle and keep working as usual. the rain keeps its own speed */
+let down = null;
+document.addEventListener('pointerdown', e => { down = e.isPrimary && e.button === 0 && !e.target.closest('a, button, input, label') ? {x: e.clientX, y: e.clientY} : null; });
+document.addEventListener('pointercancel', () => { down = null; });
+document.addEventListener('pointerup', e => {
+  if (!down || !e.isPrimary || Math.hypot(e.clientX - down.x, e.clientY - down.y) > 10 || String(getSelection())) return;
+  down = null; pace = pace === 1 ? 2 : 1; state.pace = pace;
+  document.documentElement.classList.toggle('fast', pace === 2);   // round 13: orange cursor while at 2x
+});
 
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
 cursor.remove();
