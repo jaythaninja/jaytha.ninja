@@ -110,14 +110,17 @@ function Rain(cv, o){
     <path d="M163 214h17v12c0 7-4 11-9 11s-9-4-9-11v-7c0-2 0-4 1-5Z" fill="#FFE8A0" opacity=".82"/>
     </g>
   </svg>`;
+  const arrows=n=>`<svg class="speed-arrows" data-count="${n}" viewBox="0 0 ${n===1?12:20} 24" aria-label="${n===1?'one':'two'} speed arrow${n===1?'':'s'}"><path d="${n===1?'M2.5 3.5L9.5 12 2.5 20.5':'M2.5 3.5L9.5 12 2.5 20.5M10.5 3.5L17.5 12 10.5 20.5'}"/></svg>`;
   let rain=null,hint=null,down=null,booted=false,onMode=null;
+  const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`anywhere for${arrows(fast?1:2)}`;}};
   const ensure=()=>{
     hint=document.querySelector('.tap-hint');
-    if(!hint){ hint=document.createElement('div'); hint.className='tap-hint'; hint.setAttribute('aria-hidden','true'); hint.innerHTML=ICON+'<span>anywhere for <b>2x</b></span>'; (document.querySelector('.scan')||document.body).after(hint); }
-    hint.classList.add('ready'); requestAnimationFrame(()=>hint.classList.add('ready')); place();
+    if(hint){const legacy=hint.querySelector('.speed-label')||hint.querySelector('.speed')||hint.querySelector(':scope > span');if(legacy)legacy.className='speed-label';}
+    if(!hint){ hint=document.createElement('div'); hint.className='tap-hint'; hint.setAttribute('aria-hidden','true'); hint.innerHTML=ICON+'<span class="speed-label"></span>'; (document.querySelector('.scan')||document.body).after(hint); }
+    setHintMode(modeName()==='fast'); hint.classList.add('ready'); requestAnimationFrame(()=>hint.classList.add('ready')); place();
   };
   const place=()=>{if(!hint)return;const copy=document.querySelector('.copy');if(!copy)return;const r=copy.getBoundingClientRect();const mobile=innerWidth<760;const lh=parseFloat(getComputedStyle(copy.querySelector('.hello')||copy).lineHeight)||30;hint.style.top=mobile?`calc(env(safe-area-inset-top,0px) + 11px)`:`${Math.max(11,r.top-2*lh)}px`;if(mobile){hint.style.right=`calc(env(safe-area-inset-right,0px) + 14px)`;return;}let right=0;for(const el of copy.querySelectorAll('.hello,.para,.sig,.prompt')){const range=document.createRange();range.selectNodeContents(el);for(const q of range.getClientRects())right=Math.max(right,q.right);}if(!right)right=r.right;hint.style.right=Math.max(14,innerWidth-right-16)+'px';};
-  const mode=fast=>{const next=fast?'fast':'normal';document.documentElement.dataset.mode=next;document.documentElement.classList.toggle('fast',fast);if(hint){hint.querySelector('b').textContent=fast?'1x':'2x';hint.classList.toggle('settled',fast||hint.classList.contains('settled'));}if(rain){rain.fast=fast;rain.setSpeed(fast?2:1,250);rain.setTint(fast?RAIN_ORANGE:T,250);}if(onMode)onMode(fast);};
+  const mode=fast=>{const next=fast?'fast':'normal';document.documentElement.dataset.mode=next;document.documentElement.classList.toggle('fast',fast);if(hint){setHintMode(fast);hint.classList.toggle('settled',fast||hint.classList.contains('settled'));}if(rain){rain.fast=fast;rain.setSpeed(fast?2:1,250);rain.setTint(fast?RAIN_ORANGE:T,250);}if(onMode)onMode(fast);};
   const boot=()=>{if(booted)return;booted=true;ensure();document.addEventListener('pointerdown',e=>{down=e.isPrimary&&e.button===0&&!e.target.closest('a,button,input,label')?{x:e.clientX,y:e.clientY}:null});document.addEventListener('pointercancel',()=>down=null);document.addEventListener('pointerup',e=>{if(!down||!e.isPrimary||Math.hypot(e.clientX-down.x,e.clientY-down.y)>10||String(getSelection()))return;down=null;mode(!document.documentElement.classList.contains('fast'));});addEventListener('resize',place);if(window.ResizeObserver){const c=document.querySelector('.copy');c&&new ResizeObserver(place).observe(c)}};
   const register=(r,cb)=>{rain=r;onMode=cb||null;boot()};
   document.documentElement.dataset.mode=document.documentElement.dataset.mode==='fast'?'fast':'normal';
