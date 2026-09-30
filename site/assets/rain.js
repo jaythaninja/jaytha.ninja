@@ -113,7 +113,10 @@ function Rain(cv, o){
   const arrows=n=>`<svg class="speed-arrows" data-count="${n}" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="${n===1?'one':'two'} speed arrow${n===1?'':'s'}"><path d="${n===1?'M2.5 3.5L9.5 12 2.5 20.5':'M2.5 3.5L9.5 12 2.5 20.5M10.5 3.5L17.5 12 10.5 20.5'}"/></svg>`;
   let rain=null,hint=null,down=null,booted=false,onMode=null;
   const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`anywhere for${arrows(fast?1:2)}`;}};
+  // v1.20: each teal background glow gets an orange twin that fades in at >> speed (both pages via this shared file)
+  const glowTwins=()=>document.querySelectorAll('.glow:not(.glow-fast):not([data-twin])').forEach(g=>{g.dataset.twin='1';const t=g.cloneNode(false);t.classList.add('glow-fast');t.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,77,26,'));g.after(t);});
   const ensure=()=>{
+    glowTwins();
     hint=document.querySelector('.tap-hint');
     if(hint){const legacy=hint.querySelector('.speed-label')||hint.querySelector('.speed')||hint.querySelector(':scope > span');if(legacy)legacy.className='speed-label';}
     if(!hint){ hint=document.createElement('div'); hint.className='tap-hint'; hint.setAttribute('aria-hidden','true'); hint.innerHTML=ICON+'<span class="speed-label"></span>'; (document.querySelector('.scan')||document.body).after(hint); }
