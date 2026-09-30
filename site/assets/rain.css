@@ -5,3 +5,5 @@
 
 .speed-label{display:flex;align-items:center;gap:.3em}.speed-arrows{width:1.125em;height:1.35em;display:block;flex:none;color:currentColor;overflow:visible}.speed-arrows path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 .glow{transition:opacity .5s ease}.glow-fast{opacity:0}[data-mode="fast"] .glow{opacity:0}[data-mode="fast"] .glow-fast{opacity:.85}@media(prefers-reduced-motion:reduce){.glow{transition:none}}
+/* jay 2026.09.30 v1.25: the homepage intro's "finish the dump" glyph (››|), shown only at 2x while the intro types. the hint's orange (#FF6A2B, same as the fast-mode › and glove). same box as the chevrons, so nothing shifts */
+.tap-hint .speed-arrows.dump{color:#FF6A2B}

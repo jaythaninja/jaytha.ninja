@@ -22,7 +22,7 @@
   --left:max(64px,calc((100vw - 1312px)/2));
 }
 *{box-sizing:border-box;margin:0;padding:0;font-style:normal}
-html{background:var(--bg);touch-action:manipulation}   /* round 12: taps toggle typing speed, so no double-tap zoom (pinch zoom + scrolling still work) */
+html{background:var(--bg);touch-action:manipulation}   /* round 12: taps toggle typing speed, so no double-tap zoom (pinch zoom + scrolling still work). jay 2026.09.30 v1.25: during the intro a tap is the terminal dump; after it, the 1x/2x rain toggle */
 body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh;min-height:100svh}   /* round 17: svh = the visible area between safari's bars, so a page that fits never scrolls */
 a{color:var(--orange);text-decoration:none;transition:color .15s ease}
 a:hover{color:var(--teal)}
@@ -83,7 +83,8 @@ a:hover{color:var(--teal)}
 .elsewhere{margin-top:30px}
 .social{margin-left:-8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;list-style:none}
 .social li{opacity:0;transform:scale(.55) translateY(6px);transition:opacity .28s ease-out,transform .38s cubic-bezier(.34,1.56,.64,1)}
-.social li.in{opacity:1;transform:none}.revealed .social li.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .sig .ninja.in,.revealed .para .icb img.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .notify.in{opacity:1!important;transform:none!important;visibility:visible;transition:none!important}.revealed .egg.fade{opacity:1!important;animation:none!important}
+.social li.in{opacity:1;transform:none}.revealed .social li.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .sig .ninja.in,.revealed .para .icb img.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .notify.in:not(.gone){opacity:1!important;transform:none!important;visibility:visible;transition:none!important}.revealed .egg.fade{opacity:1!important;animation:none!important}
+/* jay 2026.09.30 v1.25: :not(.gone) so a signup sent before the page is fully loaded stays gone (the thank-you line isn't covered by the form when .revealed lands) */
 .social a{display:flex;align-items:center;justify-content:center;width:42px;height:40px;border-radius:8px}
 .social a:hover{background:rgba(26,173,179,.08)}
 /* round 14: all 7 icons out front, same orange as the links (no "more +" drawer) */
@@ -99,7 +100,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .egg{margin-top:52px;font-size:20px;line-height:1.5;font-weight:400;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
 .egg.on{visibility:visible}
 .egg p{margin:0}.egg p + p{margin-top:4px}   /* songs preview: two lines, a hair apart so each reads as its own link */
-.egg p.song{white-space:nowrap}   /* jay 2026.09.30: the 🎶 lyric line never wraps; if it's too long for the column, fitEgg shrinks the font instead */
+.egg p.song{white-space:nowrap}   /* jay 2026.09.30: the 🎧 lyric line never wraps; if it's too long for the column, fitEgg shrinks the font instead */
 .egg a{color:var(--orange)}
 .egg a:hover{color:var(--teal);text-shadow:0 0 12px rgba(26,173,179,.6)}
 .egg .w{white-space:nowrap}   /* if it ever has to wrap, it wraps between words (the emoji stays with the first word, the arrow with the last) */
@@ -212,7 +213,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
     </nav>
-    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎶 lyric →" (/songs/) then "🎙️ quote →" (/quotes/), the very last line -->
+    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/songs/) then "🎙️ quote →" (/quotes/), the very last line -->
   </div>
 </main>
 
@@ -243,7 +244,7 @@ const COPY = {
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
   thanks: "almost there, check your email and tap confirm",
-  lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎶 <lyric> →" and links to lyricHref. set it by hand (lowercase as written); "" hides the line.
+  lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand (lowercase as written); "" hides the line.
                                           // always one line: up to 36 chars at the normal size on every phone (40 at 375px+); longer still stays on one line, just a bit smaller (see fitEgg)
   lyricHref: "/songs/",
   egg: "🎙️ the clearest view of a man is from below →",   // songs preview: + "🎙️ ", and it is now the second (and very last) line. round 23: + " →" (falls like one more letter, part of the link). round 16: easter egg. rains down in orange after the icons pop in, then stays (lowercase as written)
@@ -298,7 +299,7 @@ const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('
 const graphemes = t => seg ? Array.from(seg.segment(t), x => x.segment) : Array.from(t);
 const cursor = document.createElement('span'); cursor.className = 'cursor';
 const mk = (tag, cls) => { const e = document.createElement(tag); if (cls) e.className = cls; return e; };
-let pace = 2;   // round 19 (jay 2026.09.29): normal is now the old 2x, a tap doubles it to 4x (orange). was round 12: 1 = normal, 2 = double speed. a tap toggles it (see below); scales every typed line + the pauses between them
+let pace = 2;   // jay 2026.09.30 v1.25: the intro no longer changes pace on a tap (a tap dumps it); pace still follows the 1x/2x mode for the thank-you line. round 19 (jay 2026.09.29): normal is now the old 2x, a tap doubles it to 4x (orange). was round 12: 1 = normal, 2 = double speed. a tap toggles it (see below); scales every typed line + the pauses between them
 
 /* lays out every piece up front (untyped text is held invisibly), so wrapping is final from the first frame */
 const gateTap = el => { el.style.pointerEvents = 'none'; el.tabIndex = -1; el.setAttribute('aria-hidden', 'true'); return el; };
@@ -357,6 +358,7 @@ function type(t, opt){
     tick();
   });
   p.finish = () => { cancelled = true; render(t, t.n + win, win); };
+  p.stop = () => { cancelled = true; };   // jay 2026.09.30 v1.25: cancel where it is (the terminal dump takes over from this head)
   return p;
 }
 const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms/pace));
@@ -381,7 +383,7 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
 const eggEl = $('.egg');
 /* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
    every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
-const EGG = [{text: COPY.lyric ? `🎶 ${COPY.lyric} →` : '', href: COPY.lyricHref, song: true}, {text: COPY.egg || '', href: COPY.eggHref}].filter(l => l.text.trim());
+const EGG = [{text: COPY.lyric ? `🎧 ${COPY.lyric} →` : '', href: COPY.lyricHref, song: true}, {text: COPY.egg || '', href: COPY.eggHref}].filter(l => l.text.trim());
 const eggText = EGG.map(l => l.text).join('\n');
 const isDeco = w => w === '→' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
 const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], ..., [last word, →]
@@ -407,7 +409,7 @@ const eggLines = EGG.map(l => {
   });
   return {p, l};
 });
-function fitEgg(){   /* jay 2026.09.30: the 🎶 lyric line always stays on one line (css nowrap). if it's wider than the column: shrink both egg lines together
+function fitEgg(){   /* jay 2026.09.30: the 🎧 lyric line always stays on one line (css nowrap). if it's wider than the column: shrink both egg lines together
      (so they still match) down to 85% of the css size (floor 11px); if it still doesn't fit, the lyric line alone goes smaller. the quote line keeps its word wrap */
   eggEl.style.fontSize = ''; eggLines.forEach(({p}) => p.style.fontSize = '');
   const song = eggLines.find(x => x.l.song); if (!song) return;
@@ -435,14 +437,14 @@ function eggSettle(){   // the final lines: plain links (same no-wrap groups, so
   }
   eggEl.removeAttribute('aria-hidden'); state.egg = 'landed';
 }
-let eggStarted = false;
+let eggStarted = false, eggRun = null;   // jay 2026.09.30 v1.25: eggRun = the live fall (animations, scramble, settle timers) so the dump or a full load can stop it
 function egg(){
   if (eggStarted || !eggText) return; eggStarted = true; state.egg = 'falling';
   if (reduced || !eggEl.animate){ eggSettle(); eggEl.classList.add('on', 'fade'); return; }
   const fs = parseFloat(getComputedStyle(eggEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep;
   let left = eggChars.length, last = 0, settled = false;
   const settleOnce = () => { if (settled) return; settled = true; eggSettle(); };
-  const t0 = performance.now();
+  const t0 = performance.now(); eggRun = {anims: [], timers: [], scr: 0};
   for (const c of eggChars){
     const top = c.el.getBoundingClientRect().top;
     const rows = Math.max(8, Math.ceil((top + row*2)/row));   // start just above the viewport, drop row by row into the slot
@@ -453,14 +455,15 @@ function egg(){
     c.tr = tr; c.el.appendChild(tr); c.el.firstChild.textContent = rg(); c.el.classList.add('fall');
     c.end = t0 + delay + dur;
     const an = c.el.animate([{transform: `translateY(${-rows*row}px)`}, {transform: 'translateY(0)'}], {duration: dur, delay, easing: `steps(${rows}, end)`, fill: 'backwards'});
+    eggRun.anims.push(an);
     an.finished.then(() => {
       c.done = true; c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall'); c.el.classList.add('land');
       tr.classList.add('off'); setTimeout(() => tr.remove(), 750);
-      if (--left === 0){ clearInterval(scr); setTimeout(settleOnce, 1200); }
-    });
+      if (--left === 0){ clearInterval(scr); eggRun.timers.push(setTimeout(settleOnce, 1200)); }
+    }, () => {});   // cancelled by eggStop(): nothing to do
   }
   state.eggMs = Math.round(last);
-  setTimeout(settleOnce, last + 1400);
+  eggRun.timers.push(setTimeout(settleOnce, last + 1400));
   eggEl.classList.add('on');
   const scr = setInterval(() => {   // scramble: heads flicker, trails shift like the rain columns; the real letter shows just before it lands
     const now = performance.now();
@@ -470,6 +473,12 @@ function egg(){
       c.trail.pop(); c.trail.unshift(rg()); c.tr.textContent = c.trail.join('\n');
     }
   }, 90);
+  eggRun.scr = scr;
+}
+function eggStop(){   // jay 2026.09.30 v1.25: stop a live fall. landed letters stay; the rest go back to their resting glyph (the dump hides + types them)
+  eggStarted = true; if (!eggRun) return;
+  clearInterval(eggRun.scr); eggRun.timers.forEach(clearTimeout); eggRun.anims.forEach(a => a.cancel()); eggRun = null;
+  for (const c of eggChars){ if (c.tr) c.tr.remove(); c.tr = null; c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall', 'land'); }
 }
 
 /* ---- signup (round 10): progressive enhancement. no js = a normal form post */
@@ -507,26 +516,37 @@ const rain = JayRain.Rain(document.getElementById('rain'), {
   partSel: '.copy', partPad: 50, partFloor: .75,   // round 28 preview: rain over the text at 75% (was .3)
   tint: T, paleTint: PALE_TEAL, paleOrange: PALE_ORANGE   // both teal-family entries follow the typing speed
 });
-window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; state.pace = pace; setHintMode(fast); });
+/* jay 2026.09.30 v1.25: tap flow while the intro types: at 1x a tap is the usual 2x switch (rain.js); going 2x mid-intro turns the hint to ››| (same tick, so hand, glyph and rain change together);
+   at 2x mid-intro a tap is the terminal dump (taps during the dump are swallowed). once fully loaded, finishUp() drops ››| and taps are the 1x/2x toggle, as before. reduced motion never types, so never ››| */
+const fastNow = () => document.documentElement.dataset.mode === 'fast';
+window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; state.pace = pace; setHintMode(fast); if (!state.done && !reduced) JayRain.dump(fast); },
+  () => { if (state.done || reduced || !fastNow()) return false; dump(); return true; });
 
-let current = null, skipped = false;
+let current = null, skipped = false, lineAt = 0;   // jay 2026.09.30 v1.25: lineAt = the line the intro is on (the dump picks up from there)
+const iconTimers = [], icons = [...ul.children].filter(li => li !== curLi);
+/* jay 2026.09.30 v1.25: the page is fully loaded (naturally, after the dump, or at once). round 16: the cursor comes back for good at the end of the icon row.
+   the hint goes back to the 1x/2x toggle, and this tab remembers it has shown the homepage (see the back-navigation rule below) */
+function finishUp(){
+  if (state.done) return;
+  document.body.classList.add('revealed');
+  curHold.remove(); curLi.appendChild(cursor); ul.appendChild(curLi); curLi.classList.add('in'); state.done = true; hint.classList.add('ready'); JayRain.dump(false); markSeen();
+}
 function popIcons(instant){
-  const done = () => { document.body.classList.add('revealed');   // round 16: the cursor comes back for good at the end of the icon row. round 23: the egg is already raining by now (egg() is a no-op here; reduced motion: it fades in here)
-    curHold.remove(); curLi.appendChild(cursor); ul.appendChild(curLi); curLi.classList.add('in'); state.done = true; hint.classList.add('ready'); egg();
-  };
-  const icons = [...ul.children].filter(li => li !== curLi);
+  const done = () => { finishUp(); egg(); };   // round 23: the egg is already raining by now (egg() is a no-op here; reduced motion: it fades in here)
   icons.forEach((li, i) => {
     const a = li.querySelector('a');
     if (instant){ li.classList.add('in'); revealTap(a); state.icons = i + 1; return; }
-    setTimeout(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); state.icons = i + 1; if (i === icons.length - 1) setTimeout(done, 400); }, i*TIMING.iconStagger);
+    iconTimers.push(setTimeout(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); state.icons = i + 1; if (i === icons.length - 1) iconTimers.push(setTimeout(done, 400)); }, i*TIMING.iconStagger));
   });
   if (instant) done();
 }
 async function intro(){
+  if (skipped) return;   // v1.25: a tap before the fonts were ready already dumped the page
   document.body.classList.add('typing');
   await wait(450);
   for (let i=0;i<lines.length;i++){
     if (skipped) return;
+    lineAt = i; state.i = i;
     state.line = i === 0 ? 0 : i === LAST ? 2 : 1; state.para = i === 0 ? -1 : i - 1; state.head = 0;
     current = type(lines[i], {speed: i === 0 ? TIMING.helloSpeed : TIMING.paraSpeed, window: TIMING.window}); await current;
     if (skipped) return;
@@ -549,13 +569,86 @@ function skip(){
   cursor.remove(); showForm();
   ninja.classList.add('in'); document.body.classList.remove('typing'); state.line = 3; popIcons(true);
 }
-/* round 8: no skip. the full intro always types out (reduced-motion users still get the finished page) */
-/* shared rain.js owns tap-anywhere mode; typing pace remains page-local. */
+/* jay 2026.09.30 v1.25: the whole page at once, no typing, no pops, no egg fall (back navigation + bfcache restores). safe to call at any point, mid-intro or mid-dump */
+function complete(){
+  skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); stopDump();
+  document.body.classList.add('revealed'); document.body.classList.remove('typing');   // .revealed first, so nothing below transitions in
+  lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window)); cursor.remove();
+  ninja.classList.add('in');
+  if (!form.classList.contains('gone')){ form.classList.add('in'); formTaps.forEach(revealTap); }
+  icons.forEach(li => { li.classList.add('in'); revealTap(li.querySelector('a')); }); state.icons = icons.length;
+  state.line = 3; finishUp();
+  if (eggText && state.egg !== 'landed'){ eggStop(); eggSettle(); eggEl.classList.add('on'); }
+}
+
+/* jay 2026.09.30 v1.25: terminal dump. round 8's "no skip" is retired. three taps: the intro loads like today (teal ››); a first tap is the usual 2x (typing + rain go fast, orange);
+   once in 2x while the intro still types, the hint shows an orange ››| and the next tap dumps the rest. after that, taps toggle 1x/2x as before.
+   everything left types out REALLY fast in order (the same decode typing, a few scrambling characters ahead of what's resolved), then the icons pop,
+   then the egg types out in its own orange, the 🎧 lyric first and the 🎙️ quote last of all. one step per character, spread over ~1.2s whatever is left.
+   the dump only ever starts from 2x, so the rain is already fast orange and stays there: the page lands on orange › (2x), and the next tap is 1x */
+const DUMP = {ms: 1200, perStep: 14, eggWindow: 3};   // total budget (ms); per-step cap so a short remainder still reads as a burst; egg letters that scramble at once
+let dumping = false, dumpRaf = 0;
+function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; dumping = false; }
+function dump(){
+  if (dumping || state.done) return;
+  if (reduced) return complete();
+  dumping = true; skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout);
+  if (document.documentElement.dataset.mode !== 'fast') JayRain.mode(true);   // always already 2x via the tap flow; kept so the dump can never end in a teal/orange mismatch
+  const tape = [], win = TIMING.window;
+  for (let j = lineAt; j < lines.length; j++){
+    const t = lines[j];
+    for (let h = (j === lineAt ? state.head : 0) + 1; h <= t.n + win; h++) tape.push(() => render(t, h, win));
+    if (j === LAST - 1) tape.push(() => { cursor.remove(); ninja.classList.add('in'); });
+    if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); cursor.remove(); if (!form.classList.contains('in')) showForm(); });
+  }
+  icons.forEach(li => { if (li.classList.contains('in')) return; const a = li.querySelector('a');
+    tape.push(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); }, () => {}); });
+  const scrambling = new Set(), eggLeft = [];
+  if (eggText && state.egg !== 'landed'){
+    eggStop(); state.egg = 'dumping';
+    for (const c of eggChars) if (!c.done){ c.el.style.visibility = 'hidden'; eggLeft.push(c); }
+    eggEl.classList.add('on');
+    const W = DUMP.eggWindow, land = c => { scrambling.delete(c); c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall'); };
+    for (let k = 0; k < eggLeft.length + W; k++) tape.push(() => {
+      const c = eggLeft[k]; if (c){ c.el.style.visibility = ''; c.el.classList.add('fall'); scrambling.add(c); }
+      if (k - W >= 0) land(eggLeft[k - W]);
+    });
+  }
+  const total = tape.length, D = Math.min(DUMP.ms, total*DUMP.perStep), t0 = performance.now();
+  let at = 0;
+  state.dump = {steps: total, ms: Math.round(D), t0, from: {line: lineAt, head: state.head}};
+  const frame = now => {
+    const k = Math.min(total, Math.ceil((now - t0)/D*total));
+    while (at < k) tape[at++]();
+    for (const c of scrambling) c.el.firstChild.textContent = rg();
+    if (at < total){ dumpRaf = requestAnimationFrame(frame); return; }
+    dumpRaf = 0; dumping = false; state.dump.took = Math.round(performance.now() - t0);
+    state.line = 3; state.icons = icons.length;
+    if (eggText && state.egg === 'dumping') eggSettle();
+    finishUp();
+  };
+  dumpRaf = requestAnimationFrame(frame);
+}
+
+/* jay 2026.09.30 v1.25: back navigation shows the page fully loaded. the rule: this tab has already shown the homepage (sessionStorage "jtn.home", set when the
+   intro finishes and whenever the homepage is left), AND this load is a back/forward navigation or came from the "← jaytha.ninja" link on /songs/ or /quotes/
+   (a one-shot "jtn.back" note that rain.js leaves there). a new tab, a new visit, or a reload still types the full intro. a bfcache restore (pageshow persisted)
+   finishes whatever was left at once, even mid-intro or mid-dump */
+const store = (() => { try { return window.sessionStorage; } catch (e) { return null; } })();
+const ssGet = k => { try { return store && store.getItem(k); } catch (e) { return null; } };
+const markSeen = () => { try { store && store.setItem('jtn.home', '1'); } catch (e) {} };
+const navType = ((performance.getEntriesByType && performance.getEntriesByType('navigation')[0]) || {}).type || '';
+const fromLink = ssGet('jtn.back') === '1'; try { store && store.removeItem('jtn.back'); } catch (e) {}
+const cameBack = ssGet('jtn.home') === '1' && (navType === 'back_forward' || fromLink);
+state.nav = navType; state.instant = cameBack;
+addEventListener('pagehide', markSeen);
+addEventListener('pageshow', e => { if (e.persisted && !(state.done && (state.egg === 'landed' || !eggText))) complete(); });
 
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
 cursor.remove();
 lines[0].runs[0].node.insertBefore(cursor, lines[0].runs[0].ghost);
-document.fonts.ready.then(() => { fitEgg(); rain.build(); requestAnimationFrame(rain.frame); if (reduced){ skip(); } else intro(); });
+if (cameBack) complete();   // v1.25: fully loaded from the very first paint
+document.fonts.ready.then(() => { fitEgg(); rain.build(); requestAnimationFrame(rain.frame); if (cameBack) return; if (reduced){ skip(); } else intro(); });
 let lastW = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(() => { fitEgg(); rain.build(); }, 150); });
 })();
 </script>
