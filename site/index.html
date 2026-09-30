@@ -99,7 +99,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .egg{margin-top:52px;font-size:20px;line-height:1.5;font-weight:400;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
 .egg.on{visibility:visible}
 .egg p{margin:0}.egg p + p{margin-top:4px}   /* songs preview: two lines, a hair apart so each reads as its own link */
-.egg p.song{white-space:nowrap}   /* jay 2026.09.30: the 🎶 lyric line never wraps; if it's too long for the column, fitEgg shrinks the font instead */
+.egg p.song{white-space:nowrap}   /* jay 2026.09.30: the 🎧 lyric line never wraps; if it's too long for the column, fitEgg shrinks the font instead */
 .egg a{color:var(--orange)}
 .egg a:hover{color:var(--teal);text-shadow:0 0 12px rgba(26,173,179,.6)}
 .egg .w{white-space:nowrap}   /* if it ever has to wrap, it wraps between words (the emoji stays with the first word, the arrow with the last) */
@@ -212,7 +212,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
     </nav>
-    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎶 lyric →" (/songs/) then "🎙️ quote →" (/quotes/), the very last line -->
+    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/songs/) then "🎙️ quote →" (/quotes/), the very last line -->
   </div>
 </main>
 
@@ -243,7 +243,7 @@ const COPY = {
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
   thanks: "almost there, check your email and tap confirm",
-  lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎶 <lyric> →" and links to lyricHref. set it by hand (lowercase as written); "" hides the line.
+  lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand (lowercase as written); "" hides the line.
                                           // always one line: up to 36 chars at the normal size on every phone (40 at 375px+); longer still stays on one line, just a bit smaller (see fitEgg)
   lyricHref: "/songs/",
   egg: "🎙️ the clearest view of a man is from below →",   // songs preview: + "🎙️ ", and it is now the second (and very last) line. round 23: + " →" (falls like one more letter, part of the link). round 16: easter egg. rains down in orange after the icons pop in, then stays (lowercase as written)
@@ -381,7 +381,7 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
 const eggEl = $('.egg');
 /* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
    every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
-const EGG = [{text: COPY.lyric ? `🎶 ${COPY.lyric} →` : '', href: COPY.lyricHref, song: true}, {text: COPY.egg || '', href: COPY.eggHref}].filter(l => l.text.trim());
+const EGG = [{text: COPY.lyric ? `🎧 ${COPY.lyric} →` : '', href: COPY.lyricHref, song: true}, {text: COPY.egg || '', href: COPY.eggHref}].filter(l => l.text.trim());
 const eggText = EGG.map(l => l.text).join('\n');
 const isDeco = w => w === '→' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
 const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], ..., [last word, →]
@@ -407,7 +407,7 @@ const eggLines = EGG.map(l => {
   });
   return {p, l};
 });
-function fitEgg(){   /* jay 2026.09.30: the 🎶 lyric line always stays on one line (css nowrap). if it's wider than the column: shrink both egg lines together
+function fitEgg(){   /* jay 2026.09.30: the 🎧 lyric line always stays on one line (css nowrap). if it's wider than the column: shrink both egg lines together
      (so they still match) down to 85% of the css size (floor 11px); if it still doesn't fit, the lyric line alone goes smaller. the quote line keeps its word wrap */
   eggEl.style.fontSize = ''; eggLines.forEach(({p}) => p.style.fontSize = '');
   const song = eggLines.find(x => x.l.song); if (!song) return;
