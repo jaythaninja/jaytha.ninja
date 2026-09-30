@@ -100,7 +100,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .egg{margin-top:52px;font-size:20px;line-height:1.5;font-weight:400;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
 .egg.on{visibility:visible}
 .egg p{margin:0}.egg p + p{margin-top:4px}   /* songs preview: two lines, a hair apart so each reads as its own link */
-.egg p.song{white-space:nowrap}   /* jay 2026.09.30: the 🎧 lyric line never wraps; if it's too long for the column, fitEgg shrinks the font instead */
+.egg{position:relative}   /* v1.26: holds the (invisible) measuring line */
+.egg p{white-space:nowrap}   /* jay v1.26: BOTH egg lines never wrap and never shrink: at the normal size, a line too long for the column is cut at a word and ends in "… →" (fitEgg) */
+.egg .measure{position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap;pointer-events:none}   /* v1.26: fitEgg measures candidate lines here with the real font at the real column width */
 .egg a{color:var(--orange)}
 .egg a:hover{color:var(--teal);text-shadow:0 0 12px rgba(26,173,179,.6)}
 .egg .w{white-space:nowrap}   /* if it ever has to wrap, it wraps between words (the emoji stays with the first word, the arrow with the last) */
@@ -137,7 +139,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .ic{width:25px;height:20px}
   .social li.cur{font-size:16px}
   .social li.cur .cursor{margin-left:6px}
-  .egg{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}   /* songs preview: "🎙️ " + 42 chars in one line (~26.9em incl. the emoji): 12.8px at 402, 12.4px at 390, 11.3px at 360. js (fitEgg) shrinks it further only if a line (e.g. a long lyric) would still wrap. was /25.9 for 42 chars */
+  .egg{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}   /* songs preview: "🎙️ " + 42 chars in one line (~26.9em incl. the emoji): 12.8px at 402, 12.4px at 390, 11.3px at 360. v1.26: never shrunk by js any more; a line that doesn't fit is truncated with "… →" (fitEgg). was /25.9 for 42 chars */
 }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -244,10 +246,11 @@ const COPY = {
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
   thanks: "almost there, check your email and tap confirm",
-  lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand (lowercase as written); "" hides the line.
-                                          // always one line: up to 36 chars at the normal size on every phone (40 at 375px+); longer still stays on one line, just a bit smaller (see fitEgg)
+  lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
+                                          // v1.26: always one line at the normal size; if it doesn't fit the column it's cut at a word with "… →" (the full lyric stays in the link's title + aria-label; see fitEgg)
   lyricHref: "/songs/",
-  egg: "🎙️ the clearest view of a man is from below →",   // songs preview: + "🎙️ ", and it is now the second (and very last) line. round 23: + " →" (falls like one more letter, part of the link). round 16: easter egg. rains down in orange after the icons pop in, then stays (lowercase as written)
+  egg: "today's quote",   // v1.26 (jay 2026.09.30): the last line is TODAY'S quote, read from eggData (the same quotes.json /quotes/ types at the top: the newest entry dated today or earlier, america/chicago). shown as "🎙️ <quote> →", lowercase, no author, one line (cut with "… →" if long). THIS text is only the fallback if quotes.json can't be read.
+  eggData: "/quotes/quotes.json",   // v1.26: the daily 5:10am routine updates only this file (it already does for /quotes/); nothing on the homepage needs editing. was (<= v1.25): egg: "🎙️ the clearest view of a man is from below →"
   eggHref: "/quotes/",   // round 16: leave "" for plain text; put a url here and the landed line becomes a link   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all out front, all orange. round 24: instagram 3rd, + telegram 4th
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
@@ -383,8 +386,13 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
 const eggEl = $('.egg');
 /* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
    every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
-const EGG = [{text: COPY.lyric ? `🎧 ${COPY.lyric} →` : '', href: COPY.lyricHref, song: true}, {text: COPY.egg || '', href: COPY.eggHref}].filter(l => l.text.trim());
-const eggText = EGG.map(l => l.text).join('\n');
+/* v1.26 (jay 2026.09.30): line 1 = "🎧 <COPY.lyric> →" (/songs/), line 2 = "🎙️ <today's quote> →" (/quotes/), the very last line. the quote comes from quotes.json (see loadQuote below).
+   both lines are lowercase and always ONE line at the normal size: fitEgg measures each line with the real font at the real column width and, if it would wrap,
+   cuts it at a word boundary and ends it with "… →" so it fits exactly (the arrow always shows). the full text stays in the link's title + aria-label */
+const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
+const EGG = [{icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '🎙️', body: lc(COPY.egg), href: COPY.eggHref, quote: true}];
+const quoteLine = EGG[1];
+const lineText = (l, body) => `${l.icon} ${body} →`;
 const isDeco = w => w === '→' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
 const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], ..., [last word, →]
   const words = text.split(' ').filter(Boolean), groups = [];
@@ -395,46 +403,81 @@ const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], .
   });
   return groups;
 };
-const eggChars = [];
-const eggLines = EGG.map(l => {
-  const p = mk('p', l.song ? 'song' : ''); eggEl.appendChild(p);
-  eggGroups(l.text).forEach((g, gi) => {
-    if (gi) p.appendChild(document.createTextNode(' '));
-    const w = mk('span', 'w');
-    g.forEach((word, wi) => {
-      if (wi) w.appendChild(document.createTextNode(' '));
-      graphemes(word).forEach(ch => { const c = mk('span', 'c'); c.textContent = ch; w.appendChild(c); eggChars.push({el: c, ch}); });
-    });
-    p.appendChild(w);
+let eggChars = [], eggLines = [], eggText = '';
+const fillChars = (p, text, into) => eggGroups(text).forEach((g, gi) => {   // the falling version: every grapheme its own inline-block letter
+  if (gi) p.appendChild(document.createTextNode(' '));
+  const w = mk('span', 'w');
+  g.forEach((word, wi) => {
+    if (wi) w.appendChild(document.createTextNode(' '));
+    graphemes(word).forEach(ch => { const c = mk('span', 'c'); c.textContent = ch; w.appendChild(c); if (into) into.push({el: c, ch}); });
   });
-  return {p, l};
+  p.appendChild(w);
 });
-function fitEgg(){   /* jay 2026.09.30: the 🎧 lyric line always stays on one line (css nowrap). if it's wider than the column: shrink both egg lines together
-     (so they still match) down to 85% of the css size (floor 11px); if it still doesn't fit, the lyric line alone goes smaller. the quote line keeps its word wrap */
-  eggEl.style.fontSize = ''; eggLines.forEach(({p}) => p.style.fontSize = '');
-  const song = eggLines.find(x => x.l.song); if (!song) return;
-  const width = () => { const r = document.createRange(); r.selectNodeContents(song.p); return r.getBoundingClientRect().width; };
-  const avail = eggEl.clientWidth, w = width(); if (w <= avail) return;
-  const fs = parseFloat(getComputedStyle(eggEl).fontSize), floor = Math.max(11, fs*.85), want = Math.floor(fs*avail/w*10)/10 - .1;
-  eggEl.style.fontSize = Math.max(floor, want) + 'px';
-  if (want < floor){ song.p.style.fontSize = (Math.floor(floor*avail/width()*10)/10 - .1) + 'px'; }
+const fillPlain = (el, text) => eggGroups(text).forEach((g, gi) => {   // the landed version: plain text (emoji + arrow hidden from screen readers)
+  if (gi) el.appendChild(document.createTextNode(' '));
+  const w = mk('span', 'w');
+  g.forEach((word, wi) => {
+    if (wi) w.appendChild(document.createTextNode(' '));
+    if (isDeco(word)){ const d = mk('span'); d.setAttribute('aria-hidden', 'true'); d.textContent = word; w.appendChild(d); }
+    else w.appendChild(document.createTextNode(word));
+  });
+  el.appendChild(w);
+});
+let meas = null;
+const textW = (text, falling) => {   // rendered width of a candidate line (real font, real size, both the falling + landed markup)
+  if (!meas || meas.parentNode !== eggEl){ meas = mk('div', 'measure'); meas.setAttribute('aria-hidden', 'true'); }
+  eggEl.appendChild(meas); meas.textContent = '';
+  (falling ? fillChars : fillPlain)(meas, text);
+  const r = document.createRange(); r.selectNodeContents(meas); return r.getBoundingClientRect().width;
+};
+const TRAIL = /[\s,.;:!?…\-–—]+$/u;   // punctuation left dangling before the "…" is dropped ("excellence," -> "excellence…")
+function fitLine(l, avail){
+  const fits = t => Math.max(textW(t, true), textW(t, false)) <= avail + .01;
+  const full = lineText(l, l.body);
+  if (fits(full)) return {text: full, cut: false};
+  const words = l.body.split(' ');
+  const cut = k => { const b = words.slice(0, k).join(' ').replace(TRAIL, ''); return b ? lineText(l, b + '…') : null; };
+  let lo = 0, hi = words.length - 1;   // the most whole words that fit with "… →"
+  while (lo < hi){ const m = Math.ceil((lo + hi)/2), t = cut(m); if (t && fits(t)) lo = m; else hi = m - 1; }
+  if (lo > 0 && cut(lo)) return {text: cut(lo), cut: true};
+  const g = graphemes(words[0]); let a = 1, b = g.length - 1;   // not even one whole word fits: cut inside the first word
+  const part = n => lineText(l, g.slice(0, n).join('') + '…');
+  if (!fits(part(1))) return {text: lineText(l, '…'), cut: true};
+  while (a < b){ const m = Math.ceil((a + b)/2); if (fits(part(m))) a = m; else b = m - 1; }
+  return {text: part(a), cut: true};
 }
-function eggSettle(){   // the final lines: plain links (same no-wrap groups, so nothing moves), readable by screen readers
-  for (const {p, l} of eggLines){
-    p.textContent = '';
-    const into = el => eggGroups(l.text).forEach((g, gi) => {
-      if (gi) el.appendChild(document.createTextNode(' '));
-      const w = mk('span', 'w');
-      g.forEach((word, wi) => {
-        if (wi) w.appendChild(document.createTextNode(' '));
-        if (isDeco(word)){ const d = mk('span'); d.setAttribute('aria-hidden', 'true'); d.textContent = word; w.appendChild(d); }
-        else w.appendChild(document.createTextNode(word));
-      });
-      el.appendChild(w);
-    });
-    if (l.href){ const a = gateTap(mk('a')); a.setAttribute('href', l.href); if (/^https?:/.test(l.href)){ a.target = '_blank'; a.rel = 'noopener'; } into(a); p.appendChild(a); revealTap(a); }
-    else into(p);
-  }
+function fitAll(){   // -> the lines as they fit the column right now
+  const avail = eggEl.getBoundingClientRect().width;
+  const out = EGG.filter(l => l.body).map(l => Object.assign({l, full: lineText(l, l.body)}, fitLine(l, avail)));
+  if (meas){ meas.remove(); meas = null; }
+  state.eggFit = {avail: Math.round(avail*10)/10, lines: out.map(x => ({full: x.full, shown: x.text, cut: x.cut}))};
+  return out;
+}
+function buildEgg(){   // the falling letters, laid out (hidden) up front, so the landing never reflows
+  const fitted = fitAll();
+  eggEl.textContent = ''; eggChars = [];
+  eggLines = fitted.map(f => { const p = mk('p', f.l.song ? 'song' : 'quote'); fillChars(p, f.text, eggChars); eggEl.appendChild(p); return {p, l: f.l, text: f.text}; });
+  eggText = eggLines.map(x => x.text).join('\n');
+}
+let fitW = -1;
+function fitEgg(force){   /* v1.26: (re)fit both lines to the column. runs once the fonts are ready, and again on resize / orientation change */
+  const w = eggEl.getBoundingClientRect().width;
+  if (!force && Math.abs(w - fitW) < .5) return; fitW = w;
+  if (state.egg === 'dumping') return;   // the dump's last step lands the lines (eggSettle refits them to the width then)
+  if (state.egg === 'falling'){ eggStop(); eggSettle(); return; }   // resized mid-rain (e.g. a phone rotated): land it now, refit, so nothing ever overflows
+  if (state.egg === 'landed') eggSettle(); else buildEgg();
+}
+function eggSettle(){   // the final lines: plain links (same no-wrap groups, so nothing moves), readable by screen readers. v1.26: refit to the column as it is now
+  const fitted = fitAll();
+  eggEl.textContent = ''; eggChars = [];
+  eggLines = fitted.map(f => {
+    const {l} = f, p = mk('p', l.song ? 'song' : 'quote'); eggEl.appendChild(p);
+    const label = el => { el.title = l.body; el.setAttribute('aria-label', l.body); };   // v1.26: the full (untruncated) text
+    if (l.href){ const a = gateTap(mk('a')); a.setAttribute('href', l.href); if (/^https?:/.test(l.href)){ a.target = '_blank'; a.rel = 'noopener'; } fillPlain(a, f.text); label(a); p.appendChild(a); revealTap(a); }
+    else { fillPlain(p, f.text); label(p); }
+    return {p, l, text: f.text};
+  });
+  eggText = eggLines.map(x => x.text).join('\n');
   eggEl.removeAttribute('aria-hidden'); state.egg = 'landed';
 }
 let eggStarted = false, eggRun = null;   // jay 2026.09.30 v1.25: eggRun = the live fall (animations, scramble, settle timers) so the dump or a full load can stop it
@@ -644,12 +687,35 @@ state.nav = navType; state.instant = cameBack;
 addEventListener('pagehide', markSeen);
 addEventListener('pageshow', e => { if (e.persisted && !(state.done && (state.egg === 'landed' || !eggText))) complete(); });
 
+/* v1.26: today's quote = what /quotes/ shows at the top: the newest quotes.json entry dated today or earlier (america/chicago; same rule as quotes/index.html).
+   the egg is laid out from the start with the quote this tab saw last today (sessionStorage "jtn.quote"), else COPY.egg; the fetch swaps in the real one
+   (before the rain starts it's invisible; after it landed it just refits). if quotes.json can't be read, the line stays COPY.egg */
+const chiDay = () => new Intl.DateTimeFormat('en-CA', {timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
+function applyQuote(q, src){
+  const body = lc(q); state.quote = {src, text: body || quoteLine.body};
+  if (!body || body === quoteLine.body) return;
+  quoteLine.body = body;
+  if (!state.egg) buildEgg(); else if (state.egg === 'landed') eggSettle();   // falling / dumping: eggSettle picks it up as it lands
+}
+try { const c = JSON.parse(ssGet('jtn.quote') || 'null'); if (c && c.day === chiDay() && c.quote) applyQuote(c.quote, 'session'); } catch (e) {}
+if (!state.quote) state.quote = {src: 'fallback', text: quoteLine.body};
+buildEgg();
+fetch(COPY.eggData, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(all => {
+  const day = chiDay();
+  const top = (Array.isArray(all) ? all : []).filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && e.quote && e.date <= day).sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)[0];
+  if (!top) return;
+  try { store && store.setItem('jtn.quote', JSON.stringify({day, quote: top.quote})); } catch (e) {}
+  applyQuote(top.quote, 'quotes.json');
+}).catch(() => { state.quoteError = true; });
+
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
 cursor.remove();
 lines[0].runs[0].node.insertBefore(cursor, lines[0].runs[0].ghost);
 if (cameBack) complete();   // v1.25: fully loaded from the very first paint
-document.fonts.ready.then(() => { fitEgg(); rain.build(); requestAnimationFrame(rain.frame); if (cameBack) return; if (reduced){ skip(); } else intro(); });
+document.fonts.ready.then(() => { fitEgg(true); rain.build(); requestAnimationFrame(rain.frame); if (cameBack) return; if (reduced){ skip(); } else intro(); });
 let lastW = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(() => { fitEgg(); rain.build(); }, 150); });
+addEventListener('orientationchange', () => setTimeout(() => fitEgg(), 250));   // v1.26: the egg refits on rotation too (fitEgg skips if the column width didn't change)
+if (window.ResizeObserver){ let ro; new ResizeObserver(() => { clearTimeout(ro); ro = setTimeout(() => fitEgg(), 120); }).observe(eggEl); }   // ...and whenever the column width changes for any other reason
 })();
 </script>
 </body>
