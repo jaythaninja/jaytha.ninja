@@ -131,7 +131,7 @@ function Rain(cv, o){
   // jay 2026.09.30 v1.25: optional tap hook. if it returns true the page used the tap (the homepage's terminal dump) and the 1x/2x toggle is skipped
   const register=(r,cb,tap)=>{rain=r;onMode=cb||null;onTap=tap||null;boot()};
   const dump=on=>{dumpHint=!!on;setHintMode(modeName()==='fast')};
-  // jay 2026.09.30 v1.25: back-navigation note. off the homepage (/songs/, /quotes/), a plain same-tab click on a link home ("← jaytha.ninja") leaves a one-shot sessionStorage note; the homepage reads + clears it and opens fully loaded
+  // jay 2026.09.30 v1.25: back-navigation note. off the homepage (/song-of-the-day/, /quote-of-the-day/), a plain same-tab click on a link home ("← jaytha.ninja") leaves a one-shot sessionStorage note; the homepage reads + clears it and opens fully loaded
   const HOME=/^\/(index\.html)?$/;
   if(!HOME.test(location.pathname))document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(a.target&&a.target!=='_self'))return;const u=new URL(a.href,location.href);if(u.origin===location.origin&&HOME.test(u.pathname)){try{sessionStorage.setItem('jtn.back','1')}catch(_){}}},true);
   document.documentElement.dataset.mode=document.documentElement.dataset.mode==='fast'?'fast':'normal';

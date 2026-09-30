@@ -215,7 +215,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
     </nav>
-    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/songs/) then "🎙️ quote →" (/quotes/), the very last line -->
+    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/song-of-the-day/) then "🎙️ quote →" (/quote-of-the-day/), the very last line -->
   </div>
 </main>
 
@@ -248,10 +248,10 @@ const COPY = {
   thanks: "almost there, check your email and tap confirm",
   lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
                                           // v1.26: always one line at the normal size; if it doesn't fit the column it's cut at a word with "… →" (the full lyric stays in the link's title + aria-label; see fitEgg)
-  lyricHref: "/songs/",
-  egg: "today's quote",   // v1.26 (jay 2026.09.30): the last line is TODAY'S quote, read from eggData (the same quotes.json /quotes/ types at the top: the newest entry dated today or earlier, america/chicago). shown as "🎙️ <quote> →", lowercase, no author, one line (cut with "… →" if long). THIS text is only the fallback if quotes.json can't be read.
-  eggData: "/quotes/quotes.json",   // v1.26: the daily 5:10am routine updates only this file (it already does for /quotes/); nothing on the homepage needs editing. was (<= v1.25): egg: "🎙️ the clearest view of a man is from below →"
-  eggHref: "/quotes/",   // round 16: leave "" for plain text; put a url here and the landed line becomes a link   // typed (teal) in place of the form. buttondown is double opt-in
+  lyricHref: "/song-of-the-day/",   // v1.27 (jay 2026.09.30): was "/songs/" (the old url is now a redirect stub)
+  egg: "today's quote",   // v1.26 (jay 2026.09.30): the last line is TODAY'S quote, read from eggData (the same quotes.json /quote-of-the-day/ types at the top: the newest entry dated today or earlier, america/chicago). shown as "🎙️ <quote> →", lowercase, no author, one line (cut with "… →" if long). THIS text is only the fallback if quotes.json can't be read.
+  eggData: "/quote-of-the-day/quotes.json",   // v1.26: the daily 5:10am routine updates only this file (it already does for /quote-of-the-day/); nothing on the homepage needs editing. was (<= v1.25): egg: "🎙️ the clearest view of a man is from below →"
+  eggHref: "/quote-of-the-day/",   // v1.27: was "/quotes/" (now a redirect stub). round 16: leave "" for plain text; put a url here and the landed line becomes a link   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all out front, all orange. round 24: instagram 3rd, + telegram 4th. v1.26 (jay 2026.09.30): tiktok removed
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
     {label: "github",           icon: "github",    href: "https://github.com/jaythaninja"},
@@ -384,7 +384,7 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
 const eggEl = $('.egg');
 /* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
    every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
-/* v1.26 (jay 2026.09.30): line 1 = "🎧 <COPY.lyric> →" (/songs/), line 2 = "🎙️ <today's quote> →" (/quotes/), the very last line. the quote comes from quotes.json (see loadQuote below).
+/* v1.26 (jay 2026.09.30): line 1 = "🎧 <COPY.lyric> →" (/song-of-the-day/), line 2 = "🎙️ <today's quote> →" (/quote-of-the-day/), the very last line. the quote comes from quotes.json (see loadQuote below).
    both lines are lowercase and always ONE line at the normal size: fitEgg measures each line with the real font at the real column width and, if it would wrap,
    cuts it at a word boundary and ends it with "… →" so it fits exactly (the arrow always shows). the full text stays in the link's title + aria-label */
 const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
@@ -672,7 +672,7 @@ function dump(){
 }
 
 /* jay 2026.09.30 v1.25: back navigation shows the page fully loaded. the rule: this tab has already shown the homepage (sessionStorage "jtn.home", set when the
-   intro finishes and whenever the homepage is left), AND this load is a back/forward navigation or came from the "← jaytha.ninja" link on /songs/ or /quotes/
+   intro finishes and whenever the homepage is left), AND this load is a back/forward navigation or came from the "← jaytha.ninja" link on /song-of-the-day/ or /quote-of-the-day/
    (a one-shot "jtn.back" note that rain.js leaves there). a new tab, a new visit, or a reload still types the full intro. a bfcache restore (pageshow persisted)
    finishes whatever was left at once, even mid-intro or mid-dump */
 const store = (() => { try { return window.sessionStorage; } catch (e) { return null; } })();
@@ -685,7 +685,7 @@ state.nav = navType; state.instant = cameBack;
 addEventListener('pagehide', markSeen);
 addEventListener('pageshow', e => { if (e.persisted && !(state.done && (state.egg === 'landed' || !eggText))) complete(); });
 
-/* v1.26: today's quote = what /quotes/ shows at the top: the newest quotes.json entry dated today or earlier (america/chicago; same rule as quotes/index.html).
+/* v1.26: today's quote = what /quote-of-the-day/ shows at the top: the newest quotes.json entry dated today or earlier (america/chicago; same rule as quote-of-the-day/index.html).
    the egg is laid out from the start with the quote this tab saw last today (sessionStorage "jtn.quote"), else COPY.egg; the fetch swaps in the real one
    (before the rain starts it's invisible; after it landed it just refits). if quotes.json can't be read, the line stays COPY.egg */
 const chiDay = () => new Intl.DateTimeFormat('en-CA', {timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
