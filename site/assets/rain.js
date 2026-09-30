@@ -1,4 +1,4 @@
-/* shared v1.16 rain, mode toggle, and hint */
+/* shared v1.16 rain, mode toggle, and hint. jay 2026.09.30 v1.25: + the homepage's intro-only "finish the dump" hint state, a page tap hook, and the back-navigation note */
 (()=>{
   const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
   const GLYPHS='0123456789{}[]<>/\\=+*:;.-_#$%&@abcdefhjknrstuvxyz'.split('');
@@ -111,8 +111,11 @@ function Rain(cv, o){
     </g>
   </svg>`;
   const arrows=n=>`<svg class="speed-arrows" data-count="${n}" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="${n===1?'one':'two'} speed arrow${n===1?'':'s'}"><path d="${n===1?'M2.5 3.5L9.5 12 2.5 20.5':'M2.5 3.5L9.5 12 2.5 20.5M10.5 3.5L17.5 12 10.5 20.5'}"/></svg>`;
-  let rain=null,hint=null,down=null,booted=false,onMode=null;
-  const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`anywhere for${arrows(fast?1:2)}`;}};
+  // jay 2026.09.30 v1.25: "finish the dump" glyph ››| (fast-forward to the end). same 20x24 box, stroke, and caps as the chevrons, so the hint never changes width; orange (see rain.css)
+  const DUMP_GLYPH=`<svg class="speed-arrows dump" data-count="end" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="skip to the end"><path d="M1.6 3.5L8.1 12 1.6 20.5M8.6 3.5L15.1 12 8.6 20.5M18.4 3.5V20.5"/></svg>`;
+  let rain=null,hint=null,down=null,booted=false,onMode=null,onTap=null,dumpHint=false;
+  // jay 2026.09.30 v1.25: while a page has the dump state on (only the homepage intro turns it on, at 2x), the hint shows ››| instead of the 1x/2x chevrons
+  const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`anywhere for${dumpHint?DUMP_GLYPH:arrows(fast?1:2)}`;}};
   // v1.20: each teal background glow gets an orange twin that fades in at >> speed (both pages via this shared file)
   const glowTwins=()=>document.querySelectorAll('.glow:not(.glow-fast):not([data-twin])').forEach(g=>{g.dataset.twin='1';const t=g.cloneNode(false);t.classList.add('glow-fast');t.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,77,26,'));g.after(t);});
   const ensure=()=>{
@@ -124,9 +127,14 @@ function Rain(cv, o){
   };
   const place=()=>{if(!hint)return;const copy=document.querySelector('.copy');if(!copy)return;const r=copy.getBoundingClientRect();const mobile=innerWidth<760;const lh=parseFloat(getComputedStyle(copy.querySelector('.hello')||copy).lineHeight)||30;hint.style.top=mobile?`calc(env(safe-area-inset-top,0px) + 11px)`:`${Math.max(11,r.top-2*lh)}px`;if(mobile){hint.style.right=`calc(env(safe-area-inset-right,0px) + 14px)`;return;}let right=0;for(const el of copy.querySelectorAll('.hello,.para,.sig,.prompt')){const range=document.createRange();range.selectNodeContents(el);for(const q of range.getClientRects())right=Math.max(right,q.right);}if(!right)right=r.right;hint.style.right=Math.max(14,innerWidth-right-16)+'px';};
   const mode=fast=>{const next=fast?'fast':'normal';document.documentElement.dataset.mode=next;document.documentElement.classList.toggle('fast',fast);if(hint){setHintMode(fast);hint.classList.toggle('settled',fast||hint.classList.contains('settled'));}if(rain){rain.fast=fast;rain.setSpeed(fast?2:1,250);rain.setTint(fast?RAIN_ORANGE:T,250);}if(onMode)onMode(fast);};
-  const boot=()=>{if(booted)return;booted=true;ensure();document.addEventListener('pointerdown',e=>{down=e.isPrimary&&e.button===0&&!e.target.closest('a,button,input,label')?{x:e.clientX,y:e.clientY}:null});document.addEventListener('pointercancel',()=>down=null);document.addEventListener('pointerup',e=>{if(!down||!e.isPrimary||Math.hypot(e.clientX-down.x,e.clientY-down.y)>10||String(getSelection()))return;down=null;mode(!document.documentElement.classList.contains('fast'));});addEventListener('resize',place);if(window.ResizeObserver){const c=document.querySelector('.copy');c&&new ResizeObserver(place).observe(c)}};
-  const register=(r,cb)=>{rain=r;onMode=cb||null;boot()};
+  const boot=()=>{if(booted)return;booted=true;ensure();document.addEventListener('pointerdown',e=>{down=e.isPrimary&&e.button===0&&!e.target.closest('a,button,input,label')?{x:e.clientX,y:e.clientY}:null});document.addEventListener('pointercancel',()=>down=null);document.addEventListener('pointerup',e=>{if(!down||!e.isPrimary||Math.hypot(e.clientX-down.x,e.clientY-down.y)>10||String(getSelection()))return;down=null;if(onTap&&onTap())return;mode(!document.documentElement.classList.contains('fast'));});addEventListener('resize',place);if(window.ResizeObserver){const c=document.querySelector('.copy');c&&new ResizeObserver(place).observe(c)}};
+  // jay 2026.09.30 v1.25: optional tap hook. if it returns true the page used the tap (the homepage's terminal dump) and the 1x/2x toggle is skipped
+  const register=(r,cb,tap)=>{rain=r;onMode=cb||null;onTap=tap||null;boot()};
+  const dump=on=>{dumpHint=!!on;setHintMode(modeName()==='fast')};
+  // jay 2026.09.30 v1.25: back-navigation note. off the homepage (/songs/, /quotes/), a plain same-tab click on a link home ("← jaytha.ninja") leaves a one-shot sessionStorage note; the homepage reads + clears it and opens fully loaded
+  const HOME=/^\/(index\.html)?$/;
+  if(!HOME.test(location.pathname))document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(a.target&&a.target!=='_self'))return;const u=new URL(a.href,location.href);if(u.origin===location.origin&&HOME.test(u.pathname)){try{sessionStorage.setItem('jtn.back','1')}catch(_){}}},true);
   document.documentElement.dataset.mode=document.documentElement.dataset.mode==='fast'?'fast':'normal';
-  window.JayRain={Rain,register,mode,smooth:sm};
+  window.JayRain={Rain,register,mode,dump,smooth:sm};
   if(document.readyState!=='loading')boot();else addEventListener('DOMContentLoaded',boot,{once:true});
 })();
