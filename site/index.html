@@ -29,7 +29,7 @@ a:hover{color:var(--teal)}
 ::selection{background:var(--teal);color:#021213}
 .glows{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}   /* round 8: glow fades out so the top + bottom are pure #000 (blends into oled black) */
 .glow{position:absolute;border-radius:50%;filter:blur(14px)}
-/* round 24 (jay 2026.09.29): orange text (egg line + its falling letters/trails/arrow, "[ count me in ]", was "[ notify me ]" until round 27 (jay 2026.09.30)) is regular 400; teal + white stay 500 */
+/* round 24 (jay 2026.09.29): orange text (egg line + its falling letters/trails/arrow, "[ count me in ]", round 27 (jay 2026.09.30): was "[ notify me ]") is regular 400; teal + white stay 500 */
 #rain{position:absolute;left:0;top:0;width:100%;z-index:1;pointer-events:none}
 .scan{position:fixed;inset:0;z-index:30;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(235,250,250,.026) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:screen;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}
 
@@ -98,9 +98,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
    the line is reserved in layout from the start (hidden), so nothing reflows when it lands */
 .egg{margin-top:52px;font-size:20px;line-height:1.5;font-weight:400;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
 .egg.on{visibility:visible}
+.egg p{margin:0}.egg p + p{margin-top:4px}   /* songs preview: two lines, a hair apart so each reads as its own link */
+.egg p.song{white-space:nowrap}   /* jay 2026.09.30: the 🎶 lyric line never wraps; if it's too long for the column, fitEgg shrinks the font instead */
 .egg a{color:var(--orange)}
 .egg a:hover{color:var(--teal);text-shadow:0 0 12px rgba(26,173,179,.6)}
-.egg .w{white-space:nowrap}   /* if it ever has to wrap, it wraps between words */
+.egg .w{white-space:nowrap}   /* if it ever has to wrap, it wraps between words (the emoji stays with the first word, the arrow with the last) */
 .egg .c{display:inline-block;position:relative}
 .egg .c.fall{color:#ffd9cc;text-shadow:0 0 8px rgba(255,77,26,.95),0 0 20px rgba(255,77,26,.7)}   /* the falling head: hot orange-white, like the rain's white tips */
 .egg .tr{position:absolute;left:0;bottom:100%;white-space:pre;line-height:1.25;color:var(--orange);text-shadow:0 0 10px rgba(255,77,26,.55);pointer-events:none;
@@ -134,7 +136,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .ic{width:25px;height:20px}
   .social li.cur{font-size:16px}
   .social li.cur .cursor{margin-left:6px}
-  .egg{margin-top:30px;font-size:clamp(12px,calc((100vw - 48px)/25.9),16px)}   /* round 23: 42 chars (with " →") in one line down to 360 wide (13.7px at 402, 13.2px at 390, 12.05px at 360); narrower wraps at a word. was /24.6 for 40 chars */
+  .egg{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}   /* songs preview: "🎙️ " + 42 chars in one line (~26.9em incl. the emoji): 12.8px at 402, 12.4px at 390, 11.3px at 360. js (fitEgg) shrinks it further only if a line (e.g. a long lyric) would still wrap. was /25.9 for 42 chars */
 }
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
@@ -210,7 +212,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
     </nav>
-    <p class="egg" aria-hidden="true"></p>   <!-- round 16: the easter egg quote lands here (jay 2026.09.29) -->
+    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎶 lyric →" (/songs/) then "🎙️ quote →" (/quotes/), the very last line -->
   </div>
 </main>
 
@@ -241,7 +243,10 @@ const COPY = {
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
   thanks: "almost there, check your email and tap confirm",
-  egg: "the clearest view of a man is from below →",   // round 23: + " →" (falls like one more letter, part of the link). round 16: easter egg. rains down in orange after the icons pop in, then stays (lowercase as written)
+  lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎶 <lyric> →" and links to lyricHref. set it by hand (lowercase as written); "" hides the line.
+                                          // always one line: up to 36 chars at the normal size on every phone (40 at 375px+); longer still stays on one line, just a bit smaller (see fitEgg)
+  lyricHref: "/songs/",
+  egg: "🎙️ the clearest view of a man is from below →",   // songs preview: + "🎙️ ", and it is now the second (and very last) line. round 23: + " →" (falls like one more letter, part of the link). round 16: easter egg. rains down in orange after the icons pop in, then stays (lowercase as written)
   eggHref: "/quotes/",   // round 16: leave "" for plain text; put a url here and the landed line becomes a link   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all out front, all orange. round 24: instagram 3rd, + telegram 4th
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
@@ -368,34 +373,66 @@ const iconLink = s => { const a = gateTap(mk('a')); a.setAttribute('href', s.hre
   if (/^https?:/.test(s.href)){ a.target = '_blank'; a.rel = 'noopener'; }
   a.innerHTML = ICONS[s.icon] || ''; return a; };
 COPY.socials.forEach(s => { const li = mk('li'); li.appendChild(iconLink(s)); ul.appendChild(li); });
-const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true');   // round 16: the cursor's final home, after the last icon
+const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const curHold = cursor.cloneNode(); curHold.style.visibility = 'hidden'; curLi.appendChild(curHold); ul.appendChild(curLi);   // round 16: the cursor's final home, after the last icon. songs preview: reserved from the start with an invisible cursor-sized placeholder; on phones the cursor wraps to its own row, which used to push the page (and the falling egg) down 20px mid-rain
 
 /* ---- round 16: easter egg (jay 2026.09.29). for people who stay: once the icons are in, the quote rains down slowly in orange,
    one column per letter (a scrambling head + a short fading trail, stepping row by row like the rain), resolves as it lands, and stays.
    laid out up front (hidden) so the landing never reflows; letters start above the viewport, so nothing adds scroll height or width */
-const eggEl = $('.egg'), eggText = COPY.egg || '';
+const eggEl = $('.egg');
+/* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
+   every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
+const EGG = [{text: COPY.lyric ? `🎶 ${COPY.lyric} →` : '', href: COPY.lyricHref, song: true}, {text: COPY.egg || '', href: COPY.eggHref}].filter(l => l.text.trim());
+const eggText = EGG.map(l => l.text).join('\n');
+const isDeco = w => w === '→' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
+const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], ..., [last word, →]
+  const words = text.split(' ').filter(Boolean), groups = [];
+  words.forEach((w, i) => {
+    if (w === '→' && groups.length) groups[groups.length - 1].push(w);
+    else if (i === 1 && isDeco(words[0]) && words[0] !== '→') groups[0].push(w);
+    else groups.push([w]);
+  });
+  return groups;
+};
 const eggChars = [];
-let eggW = null;
-eggText.split(' ').forEach((word, wi) => {
-  if (word === '→' && eggW){   // round 23: the arrow never wraps away from "below"; it still falls as its own letter
-    eggW.appendChild(document.createTextNode(' '));
-    const c = mk('span', 'c'); c.textContent = word; eggW.appendChild(c); eggChars.push({el: c, ch: word}); return;
-  }
-  if (wi) eggEl.appendChild(document.createTextNode(' '));   // spaces are just gaps (no falling glyph)
-  const w = mk('span', 'w');
-  graphemes(word).forEach(ch => { const c = mk('span', 'c'); c.textContent = ch; w.appendChild(c); eggChars.push({el: c, ch}); });
-  eggEl.appendChild(w); eggW = w;
+const eggLines = EGG.map(l => {
+  const p = mk('p', l.song ? 'song' : ''); eggEl.appendChild(p);
+  eggGroups(l.text).forEach((g, gi) => {
+    if (gi) p.appendChild(document.createTextNode(' '));
+    const w = mk('span', 'w');
+    g.forEach((word, wi) => {
+      if (wi) w.appendChild(document.createTextNode(' '));
+      graphemes(word).forEach(ch => { const c = mk('span', 'c'); c.textContent = ch; w.appendChild(c); eggChars.push({el: c, ch}); });
+    });
+    p.appendChild(w);
+  });
+  return {p, l};
 });
-function eggSettle(){   // the final line: plain text (or a link, if COPY.eggHref is set), readable by screen readers
-  eggEl.textContent = '';
-  const into = el => {   // round 23: a trailing " →" stays glued to the last word and is decorative (hidden from screen readers)
-    const m = eggText.match(/^(.*? )?(\S+) →$/);
-    if (!m){ el.textContent = eggText; return; }
-    if (m[1]) el.appendChild(document.createTextNode(m[1]));
-    const w = mk('span', 'w'); w.textContent = m[2] + ' '; const ar = mk('span'); ar.setAttribute('aria-hidden', 'true'); ar.textContent = '→'; w.appendChild(ar); el.appendChild(w);
-  };
-  if (COPY.eggHref){ const a = gateTap(mk('a')); a.setAttribute('href', COPY.eggHref); if (/^https?:/.test(COPY.eggHref)){ a.target = '_blank'; a.rel = 'noopener'; } into(a); eggEl.appendChild(a); revealTap(a); }
-  else into(eggEl);
+function fitEgg(){   /* jay 2026.09.30: the 🎶 lyric line always stays on one line (css nowrap). if it's wider than the column: shrink both egg lines together
+     (so they still match) down to 85% of the css size (floor 11px); if it still doesn't fit, the lyric line alone goes smaller. the quote line keeps its word wrap */
+  eggEl.style.fontSize = ''; eggLines.forEach(({p}) => p.style.fontSize = '');
+  const song = eggLines.find(x => x.l.song); if (!song) return;
+  const width = () => { const r = document.createRange(); r.selectNodeContents(song.p); return r.getBoundingClientRect().width; };
+  const avail = eggEl.clientWidth, w = width(); if (w <= avail) return;
+  const fs = parseFloat(getComputedStyle(eggEl).fontSize), floor = Math.max(11, fs*.85), want = Math.floor(fs*avail/w*10)/10 - .1;
+  eggEl.style.fontSize = Math.max(floor, want) + 'px';
+  if (want < floor){ song.p.style.fontSize = (Math.floor(floor*avail/width()*10)/10 - .1) + 'px'; }
+}
+function eggSettle(){   // the final lines: plain links (same no-wrap groups, so nothing moves), readable by screen readers
+  for (const {p, l} of eggLines){
+    p.textContent = '';
+    const into = el => eggGroups(l.text).forEach((g, gi) => {
+      if (gi) el.appendChild(document.createTextNode(' '));
+      const w = mk('span', 'w');
+      g.forEach((word, wi) => {
+        if (wi) w.appendChild(document.createTextNode(' '));
+        if (isDeco(word)){ const d = mk('span'); d.setAttribute('aria-hidden', 'true'); d.textContent = word; w.appendChild(d); }
+        else w.appendChild(document.createTextNode(word));
+      });
+      el.appendChild(w);
+    });
+    if (l.href){ const a = gateTap(mk('a')); a.setAttribute('href', l.href); if (/^https?:/.test(l.href)){ a.target = '_blank'; a.rel = 'noopener'; } into(a); p.appendChild(a); revealTap(a); }
+    else into(p);
+  }
   eggEl.removeAttribute('aria-hidden'); state.egg = 'landed';
 }
 let eggStarted = false;
@@ -475,7 +512,7 @@ window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; 
 let current = null, skipped = false;
 function popIcons(instant){
   const done = () => { document.body.classList.add('revealed');   // round 16: the cursor comes back for good at the end of the icon row. round 23: the egg is already raining by now (egg() is a no-op here; reduced motion: it fades in here)
-    curLi.appendChild(cursor); ul.appendChild(curLi); curLi.classList.add('in'); state.done = true; hint.classList.add('ready'); egg();
+    curHold.remove(); curLi.appendChild(cursor); ul.appendChild(curLi); curLi.classList.add('in'); state.done = true; hint.classList.add('ready'); egg();
   };
   const icons = [...ul.children].filter(li => li !== curLi);
   icons.forEach((li, i) => {
@@ -518,8 +555,8 @@ function skip(){
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
 cursor.remove();
 lines[0].runs[0].node.insertBefore(cursor, lines[0].runs[0].ghost);
-document.fonts.ready.then(() => { rain.build(); requestAnimationFrame(rain.frame); if (reduced){ skip(); } else intro(); });
-let lastW = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(rain.build, 150); });
+document.fonts.ready.then(() => { fitEgg(); rain.build(); requestAnimationFrame(rain.frame); if (reduced){ skip(); } else intro(); });
+let lastW = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(() => { fitEgg(); rain.build(); }, 150); });
 })();
 </script>
 </body>
