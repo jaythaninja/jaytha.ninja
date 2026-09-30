@@ -29,7 +29,7 @@ a:hover{color:var(--teal)}
 ::selection{background:var(--teal);color:#021213}
 .glows{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}   /* round 8: glow fades out so the top + bottom are pure #000 (blends into oled black) */
 .glow{position:absolute;border-radius:50%;filter:blur(14px)}
-/* round 24 (jay 2026.09.29): orange text (egg line + its falling letters/trails/arrow, "[ notify me ]") is regular 400; teal + white stay 500 */
+/* round 24 (jay 2026.09.29): orange text (egg line + its falling letters/trails/arrow, "[ count me in ]", was "[ notify me ]" until round 27 (jay 2026.09.30)) is regular 400; teal + white stay 500 */
 #rain{position:absolute;left:0;top:0;width:100%;z-index:1;pointer-events:none}
 .scan{position:fixed;inset:0;z-index:30;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(235,250,250,.026) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:screen;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}
 
@@ -201,7 +201,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
           <label class="sr" for="notify-email">your email</label>
           <input id="notify-email" type="email" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
           <input type="hidden" name="embed" value="1">
-          <button type="submit"><span aria-hidden="true">[ </span>notify me<span aria-hidden="true"> ]</span></button>
+          <button type="submit"><span aria-hidden="true">[ </span>count me in<span aria-hidden="true"> ]</span></button>   <!-- round 27 (jay 2026.09.30): was "notify me" -->
         </form>
         <p class="status" role="status" aria-live="polite"></p>
       </div>
@@ -230,11 +230,11 @@ const COPY = {
   hello: "hello, world...",                  // first line (teal)
   // jay's copy, 2026.09.28 (round 5). one [ ] per paragraph, typed in order with a pause between.
   paragraphs: [
-    ["once upon a time, i \"succeeded\" doing work that never felt like mine"],   // round 18 copy (jay 2026.09.29)
+    ["for years, i \"succeeded\" at work that never felt like mine"],   // round 27 (jay 2026.09.30): was "once upon a time, i \"succeeded\" doing work…". round 18 copy (jay 2026.09.29)
     ["i let it take me so far from myself that i didn't know who jay was"],
-    [{text: "because i didn't have my ikigai", teal: true}],
-    [{text: "but now... i do", teal: true}],
-    ["and one day, i hope you will benefit from my life's work"],
+    [{text: "because i hadn't found my ikigai", teal: true}],   // round 27 (jay 2026.09.30): was "didn't have"
+    [{text: "but now... i have", teal: true}],   // round 27 (jay 2026.09.30): was "i do"
+    ["and i hope what i build helps you find yours"],   // round 27 (jay 2026.09.30): was "and one day, i hope you will benefit from my life's work"
     ["the road ahead is long, but i'm in ludicrous ", {text: "mode ", icon: "rocket", alt: "🚀"}],   // round 25 (jay 2026.09.30): tesla nod without the car flex. "mode" + the rocket never wrap apart
   ],
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
