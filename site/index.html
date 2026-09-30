@@ -109,6 +109,12 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 @keyframes egg-land{0%{color:#fff;text-shadow:0 0 10px #fff,0 0 22px rgba(255,77,26,.95)}100%{color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6)}}
 .egg.fade{animation:egg-fade 1.4s ease-out both}   /* reduced motion: no falling, the line just fades in */
 @keyframes egg-fade{from{opacity:0}to{opacity:1}}
+/* v1.30 (jay 2026.09.30): the daily drop's date, "🗓️ yyyy.mm.dd" in white, right above the two egg lines (same font + size as them). COPY.dayDate, set by the 5am song + quote routine.
+   hidden until the egg shows (fades in as the egg starts to rain; at once when the page loads fully). it takes the egg's gap below the icons (desktop 52 -> 36px so 1440x900 still fits with ~5px to spare); the egg sits 4px under it */
+.day{margin-top:36px;font-size:20px;line-height:1.5;font-weight:400;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45);white-space:nowrap;visibility:hidden}
+.day.on{visibility:visible}
+.day.in{animation:egg-fade 1.4s ease-out both}
+.day + .egg{margin-top:4px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 @media (max-width:760px){
@@ -133,7 +139,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .ic{width:25px;height:20px}
   .social li.cur{font-size:16px}
   .social li.cur .cursor{margin-left:6px}
-  .egg{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}   /* songs preview: "🎙️ " + 42 chars in one line (~26.9em incl. the emoji): 12.8px at 402, 12.4px at 390, 11.3px at 360. v1.26: never shrunk by js any more; a line that doesn't fit is truncated with "… →" (fitEgg). was /25.9 for 42 chars */
+  .egg{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}
+  .day{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}   /* v1.30: same size as the egg lines; the egg's 30px gap below the icons moves to the date */   /* songs preview: "🎙️ " + 42 chars in one line (~26.9em incl. the emoji): 12.8px at 402, 12.4px at 390, 11.3px at 360. v1.26: never shrunk by js any more; a line that doesn't fit is truncated with "… →" (fitEgg). was /25.9 for 42 chars */
 }
 
 /* v1.29 (jay 2026.09.30): the submit button is the site's rocket (orange body = tappable, teal flame), bigger than the text so it reads as the button.
@@ -146,10 +153,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify .rkb:active .rk{transform:scale(.92)}
 .notify .rkb[disabled]{background:transparent}
 @media (max-width:760px){.notify .rkb{width:48px;height:48px;margin:-7px -6px -7px -4px;border-radius:11px}}
-/* v1.29 (jay 2026.09.30): idle until the email looks real. dim rocket, pilot-light flame; a valid email (form.ok) ignites it: full orange, a slow glow pulse, the flame flickers */
-.notify:not(.ok) .rkb .rk{opacity:.42;filter:saturate(.55)}
-.notify:not(.ok) .rkb:hover .rk{opacity:.62}
-.notify:not(.ok) .rk .rk-fl{opacity:.4;transform:scaleY(.55)}
+/* v1.29 (jay 2026.09.30): idle until the email looks real; a valid email (form.ok) ignites it: full orange, a slow glow pulse, the flame flickers.
+   v1.30 (jay 2026.09.30): idle is only slightly dimmed, full color, near-full flame (was opacity .42 + saturate(.55), flame .4 at 55% length, hover .62); hover while idle = full */
+.notify:not(.ok) .rkb .rk{opacity:.8}
+.notify:not(.ok) .rkb:hover .rk{opacity:1}
+.notify:not(.ok) .rk .rk-fl{opacity:.85;transform:scaleY(.92)}
 .rk .rk-fl{transition:opacity .35s ease,transform .35s ease}
 .notify.ok .rkb .rk{opacity:1;animation:rk-pulse 1.9s ease-in-out infinite}
 .notify.ok .rk .rk-fl{animation:rk-flick .42s ease-in-out infinite}
@@ -176,6 +184,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 @keyframes rk-flick-hot{0%,100%{transform:scale(1.05,1.45)}50%{transform:scale(.95,1.75)}}
 @keyframes rk-flick-long{0%,100%{transform:scale(1.1,2.4)}33%{transform:scale(.92,2.9)}66%{transform:scale(1.02,2.1)}}
 @media (prefers-reduced-motion:reduce){.notify.ign .rkb .rk,.notify.ign .rk .rk-fl{animation:none}}
+/* v1.30 (jay 2026.09.30): failed liftoff (no valid email yet): smoke + a couple of dim rain glyphs, in a throwaway sky layer so nothing on the page moves */
+.rk-sky .puff.smoke{background:radial-gradient(closest-side,rgba(170,186,188,.5),rgba(26,173,179,.16) 60%,rgba(26,173,179,0))}
+.rk-sky .wk.dim{color:#8fa9aa;text-shadow:0 0 6px rgba(26,173,179,.5)}
 /* v1.29 (jay 2026.09.30): the success line = a heart (teal, burns to orange) + "please confirm via email". one line, never wraps, never taller than the form row it replaces */
 .status{white-space:nowrap}
 .status .hb{position:relative;display:inline-block;width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:.5em;filter:drop-shadow(0 0 5px rgba(255,77,26,.7))}
@@ -257,7 +268,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
           <label class="sr" for="notify-email">your email</label>
           <input id="notify-email" type="email" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
           <input type="hidden" name="embed" value="1">
-          <button type="submit" class="rkb" aria-label="count me in" title="count me in"><svg class="rk" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><defs><linearGradient id="rk-b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF8A5E"/><stop offset=".45" stop-color="#FF4D1A"/><stop offset="1" stop-color="#B8300A"/></linearGradient><linearGradient id="rk-w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#c9d3d5"/></linearGradient><linearGradient id="rk-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5FD6DA"/><stop offset=".55" stop-color="#1AADB3"/><stop offset="1" stop-color="#0E7C81" stop-opacity="0"/></linearGradient><linearGradient id="rk-n" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b7478"/><stop offset="1" stop-color="#1c2124"/></linearGradient><radialGradient id="rk-g" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#2b7e83"/><stop offset=".6" stop-color="#0c3b3e"/><stop offset="1" stop-color="#051a1c"/></radialGradient></defs><g transform="rotate(45 128 128) translate(0 6)"><g class="rk-fl"><path d="M112 196 C112 214 120 228 128 244 C136 228 144 214 144 196 Z" fill="url(#rk-f)"/><path d="M121 196 C121 206 124 213 128 222 C132 213 135 206 135 196 Z" fill="#C9F3F4" opacity=".85"/></g><path d="M104 180 L152 180 L146 198 L110 198 Z" fill="url(#rk-n)"/><path d="M90 132 L56 170 C52 175 54 186 60 190 L92 176 Z" fill="url(#rk-w)"/><path d="M166 132 L200 170 C204 175 202 186 196 190 L164 176 Z" fill="url(#rk-w)"/><path d="M128 14 C164 40 178 88 176 138 C175 158 170 172 164 184 L92 184 C86 172 81 158 80 138 C78 88 92 40 128 14 Z" fill="url(#rk-b)"/><path d="M128 14 C144 25 156 40 164 56 C142 49 114 49 92 56 C100 40 112 25 128 14 Z" fill="url(#rk-w)"/><rect x="122" y="150" width="12" height="44" rx="6" fill="url(#rk-w)"/><circle cx="128" cy="104" r="24" fill="#fff"/><circle cx="128" cy="104" r="17" fill="url(#rk-g)"/><path d="M117 99 A12 12 0 0 1 127 92" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="4" stroke-linecap="round"/><path d="M128 15 C163 41 177 88 175 138 C174 158 169 172 163 183 L93 183 C87 172 82 158 81 138 C79 88 93 41 128 15 Z" fill="none" stroke="#FFC2A8" stroke-opacity=".45" stroke-width="2.5"/><path d="M100 70 C96 92 95 118 98 146" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="7" stroke-linecap="round"/></g></svg></button>   <!-- v1.29 (jay 2026.09.30): the site's rocket is the button (orange = tappable, teal flame). accessible name stays "count me in". round 27: was "[ count me in ]", before that "notify me" -->
+          <button type="submit" class="rkb" aria-label="liftoff" title="liftoff"><svg class="rk" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><defs><linearGradient id="rk-b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF8A5E"/><stop offset=".45" stop-color="#FF4D1A"/><stop offset="1" stop-color="#B8300A"/></linearGradient><linearGradient id="rk-w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#c9d3d5"/></linearGradient><linearGradient id="rk-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5FD6DA"/><stop offset=".55" stop-color="#1AADB3"/><stop offset="1" stop-color="#0E7C81" stop-opacity="0"/></linearGradient><linearGradient id="rk-n" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b7478"/><stop offset="1" stop-color="#1c2124"/></linearGradient><radialGradient id="rk-g" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#2b7e83"/><stop offset=".6" stop-color="#0c3b3e"/><stop offset="1" stop-color="#051a1c"/></radialGradient></defs><g transform="rotate(45 128 128) translate(0 6)"><g class="rk-fl"><path d="M112 196 C112 214 120 228 128 244 C136 228 144 214 144 196 Z" fill="url(#rk-f)"/><path d="M121 196 C121 206 124 213 128 222 C132 213 135 206 135 196 Z" fill="#C9F3F4" opacity=".85"/></g><path d="M104 180 L152 180 L146 198 L110 198 Z" fill="url(#rk-n)"/><path d="M90 132 L56 170 C52 175 54 186 60 190 L92 176 Z" fill="url(#rk-w)"/><path d="M166 132 L200 170 C204 175 202 186 196 190 L164 176 Z" fill="url(#rk-w)"/><path d="M128 14 C164 40 178 88 176 138 C175 158 170 172 164 184 L92 184 C86 172 81 158 80 138 C78 88 92 40 128 14 Z" fill="url(#rk-b)"/><path d="M128 14 C144 25 156 40 164 56 C142 49 114 49 92 56 C100 40 112 25 128 14 Z" fill="url(#rk-w)"/><rect x="122" y="150" width="12" height="44" rx="6" fill="url(#rk-w)"/><circle cx="128" cy="104" r="24" fill="#fff"/><circle cx="128" cy="104" r="17" fill="url(#rk-g)"/><path d="M117 99 A12 12 0 0 1 127 92" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="4" stroke-linecap="round"/><path d="M128 15 C163 41 177 88 175 138 C174 158 169 172 163 183 L93 183 C87 172 82 158 81 138 C79 88 93 41 128 15 Z" fill="none" stroke="#FFC2A8" stroke-opacity=".45" stroke-width="2.5"/><path d="M100 70 C96 92 95 118 98 146" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="7" stroke-linecap="round"/></g></svg></button>   <!-- v1.29 (jay 2026.09.30): the site's rocket is the button (orange = tappable, teal flame). accessible name "liftoff" (v1.30 (jay 2026.09.30): was "count me in"). round 27: was "[ count me in ]", before that "notify me" -->
         </form>
         <p class="status" role="status" aria-live="polite"></p>
       </div>
@@ -265,6 +276,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
     </nav>
+    <p class="day"></p>   <!-- v1.30 (jay 2026.09.30): "🗓️ <COPY.dayDate>", the day the song + quote below went up -->
     <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/song-of-the-day/) then "🎙️ quote →" (/quote-of-the-day/), the very last line -->
   </div>
 </main>
@@ -287,12 +299,13 @@ const COPY = {
     ["i let it take me so far from myself that i didn't know who jay was"],
     [{text: "because i hadn't found my ikigai", teal: true}],   // round 27 (jay 2026.09.30): was "didn't have"
     [{text: "but now... i have", teal: true}],   // round 27 (jay 2026.09.30): was "i do"
-    ["and i hope what i build helps you find yours"],   // round 27 (jay 2026.09.30): was "and one day, i hope you will benefit from my life's work"
+    ["i hope what we are building helps you find yours"],   // v1.30 (jay 2026.09.30): was "and i hope what i build helps you find yours". round 27 (jay 2026.09.30): was "and one day, i hope you will benefit from my life's work"
     ["the journey ahead is long, but we have space𝕏 to help us now"],   // v1.29 (jay 2026.09.30): was "the road ahead is long, but i'm in ludicrous mode 🚀". the rocket moved to the signup button (no duplicate). 𝕏 (U+1D54F) isn't in JetBrains Mono, so it falls back like any missing glyph
   ],
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
   thanks: "please confirm via email",   // v1.29 (jay 2026.09.30): typed (teal) after the heart burns teal -> orange, in the form's slot, one line. was "almost there, check your email and tap confirm"
+  dayDate: "2026.09.30",   // v1.30 (jay 2026.09.30): THE DAY'S DATE, yyyy.mm.dd, shown in white as "🗓️ <date>" above the egg lines. the daily 5am song + quote routine sets it together with lyric (the day the song + quote were published, america/chicago; never the viewer's clock). "" hides the line.
   lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
                                           // v1.26: always one line at the normal size; if it doesn't fit the column it's cut at a word with "… →" (the full lyric stays in the link's title + aria-label; see fitEgg)
   lyricHref: "/song-of-the-day/",   // v1.27 (jay 2026.09.30): was "/songs/" (the old url is now a redirect stub)
@@ -416,6 +429,13 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
    one column per letter (a scrambling head + a short fading trail, stepping row by row like the rain), resolves as it lands, and stays.
    laid out up front (hidden) so the landing never reflows; letters start above the viewport, so nothing adds scroll height or width */
 const eggEl = $('.egg');
+/* v1.30 (jay 2026.09.30): the date line. it shows whenever the egg does (a class watch on .egg, so the rain, the dump, reduced motion and the full load all carry it); it fades in only while the egg rains or fades */
+const dayEl = $('.day');
+if (COPY.dayDate){
+  const d = mk('span'); d.setAttribute('aria-hidden', 'true'); d.textContent = '🗓️'; dayEl.append(d, ' ' + COPY.dayDate);
+  const showDay = () => { if (dayEl.classList.contains('on') || !eggEl.classList.contains('on')) return; dayEl.classList.add('on'); if (state.egg === 'falling' || eggEl.classList.contains('fade')) dayEl.classList.add('in'); };
+  new MutationObserver(showDay).observe(eggEl, {attributes: true, attributeFilter: ['class']});
+} else dayEl.remove();
 /* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
    every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
 /* v1.26 (jay 2026.09.30): line 1 = "🎧 <COPY.lyric> →" (/song-of-the-day/), line 2 = "🎙️ <today's quote> →" (/quote-of-the-day/), the very last line. the quote comes from quotes.json (see loadQuote below).
@@ -518,7 +538,7 @@ function egg(){
   if (reduced || !eggEl.animate){ eggSettle(); eggEl.classList.add('on', 'fade'); return; }
   const fs = parseFloat(getComputedStyle(eggEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep;
   let left = eggChars.length, last = 0, settled = false;
-  const settleOnce = () => { if (settled) return; settled = true; eggSettle(); };
+  const settleOnce = () => { if (settled) return; settled = true; eggSettle(); introEnd(); };   // v1.30: the egg landing ends the intro (if the icons are in)
   const t0 = performance.now(); eggRun = {anims: [], timers: [], scr: 0};
   for (const c of eggChars){
     const top = c.el.getBoundingClientRect().top;
@@ -562,8 +582,14 @@ formTaps.forEach(gateTap);
 const showForm = () => { form.classList.add('in'); setTimeout(() => formTaps.forEach(revealTap), reduced ? 0 : 500); };
 /* v1.29: the rocket ignites once the email looks complete (the browser's email check + a dot in the domain). visual only: submitting still goes through the browser's own validation */
 const emailIn = form.querySelector('input[type=email]');
-const looksDone = () => emailIn.validity.valid && /@[^@\s]+\.[^@\s.]{2,}$/.test(emailIn.value.trim());
-const syncOk = () => form.classList.toggle('ok', looksDone());
+const nativeOk = v => !(v.valueMissing || v.typeMismatch || v.patternMismatch || v.tooLong || v.tooShort || v.badInput);   // v1.30: the browser's own checks (our custom message aside)
+const looksDone = () => nativeOk(emailIn.validity) && /@[^@\s]+\.[^@\s.]{2,}$/.test(emailIn.value.trim());
+const INCOMPLETE = 'Please enter a complete email address (like you@email.com).';
+const syncOk = () => {
+  const ok = looksDone(); form.classList.toggle('ok', ok);
+  // v1.30 (jay 2026.09.30): an address the browser accepts but looksDone doesn't (e.g. "jay@example", no dot) is blocked natively too, with its own bubble, so it never posts
+  emailIn.setCustomValidity(!ok && emailIn.value.trim() && nativeOk(emailIn.validity) ? INCOMPLETE : '');
+};
 ['input', 'change', 'keyup'].forEach(ev => emailIn.addEventListener(ev, syncOk)); addEventListener('pageshow', syncOk); syncOk();
 /* v1.29 (jay 2026.09.30): the success heart. our own drawing, three stacked copies: teal (start), orange (the burnt heart, revealed bottom to top) and a white-hot band riding the burn line.
    it pops in like the ninja, holds a beat, burns upward with orange embers (rain glyphs) coming off the flame line, and settles orange. reduced motion: a plain teal -> orange crossfade */
@@ -656,8 +682,47 @@ const launchRocket = () => new Promise(done => {
     });
   });
 });
+/* v1.30 (jay 2026.09.30): failed liftoff. a tap, click or Enter without a valid email (empty, or not looksDone): the browser keeps its validation bubble and sends nothing;
+   the engine coughs 2-3 times, the rocket hops a few px, wobbles + shakes, drops back with a small bump, a grey-teal puff + two dim rain glyphs drift off the nozzle, then idle again.
+   ~0.9s. transforms only (the button box never changes), smoke in a throwaway fixed sky layer. taps while it plays are ignored (no stacking). reduced motion: only a brief flame flicker */
+const FAIL = {ms: 900, reducedMs: 360};
+function failLiftoff(){
+  const btn = form.querySelector('.rkb'), svg = btn && btn.querySelector('.rk'), fl = svg && svg.querySelector('.rk-fl');
+  if (!fl || !svg.animate || form.classList.contains('gone') || btn.disabled) return;
+  const f = state.fail = state.fail || {count: 0, ignored: 0};
+  if (f.playing){ f.ignored++; return; }
+  f.playing = true; f.count++; f.t0 = performance.now();
+  const end = () => { f.playing = false; f.took = Math.round(performance.now() - f.t0); };
+  if (reduced){
+    fl.animate([{opacity: .85}, {opacity: .25, offset: .3}, {opacity: 1, offset: .6}, {opacity: .85}], {duration: FAIL.reducedMs, easing: 'linear'}).finished.then(end, end);
+    return;
+  }
+  const o = 'transform-origin', n = FAIL.ms;
+  fl.animate([   // the cough: on, off, on, off, sputter back to the idle pilot flame
+    {opacity: .85, transform: 'scaleY(.92)'}, {opacity: 0, transform: 'scaleY(.3)', offset: .08}, {opacity: 1, transform: 'scale(1.1,1.35)', offset: .16}, {opacity: .15, transform: 'scaleY(.4)', offset: .27},
+    {opacity: 1, transform: 'scale(1.05,1.25)', offset: .37}, {opacity: 0, transform: 'scaleY(.3)', offset: .5}, {opacity: .7, transform: 'scaleY(.8)', offset: .62}, {opacity: .1, transform: 'scaleY(.35)', offset: .72},
+    {opacity: .85, transform: 'scaleY(.92)'}], {duration: n, easing: 'linear'});
+  svg.animate([   // hop up a few px, wobble + shake, drop back, a small bump, settle
+    {transform: 'none'}, {transform: 'translate(0,-1px) rotate(-2deg)', offset: .12}, {transform: 'translate(-1px,-5px) rotate(3deg)', offset: .22}, {transform: 'translate(1.5px,-7px) rotate(-4deg)', offset: .32},
+    {transform: 'translate(-1.5px,-6px) rotate(4deg)', offset: .42}, {transform: 'translate(1px,-4px) rotate(-2.5deg)', offset: .52}, {transform: 'translate(0,0) rotate(1deg)', offset: .62, easing: 'ease-in'},
+    {transform: 'translate(0,1.5px) rotate(0deg) scale(1.03,.96)', offset: .7}, {transform: 'translate(0,-1px) rotate(-.5deg)', offset: .8}, {transform: 'translate(.5px,0) rotate(.5deg)', offset: .9}, {transform: 'none'}],
+    {duration: n, easing: 'ease-out'}).finished.then(end, end);
+  // smoke: a throwaway fixed layer (no layout), removed once it has faded
+  const r = fl.getBoundingClientRect(), x = r.left + r.width*.3, y = r.bottom - r.height*.3, sky = mk('div', 'rk-sky'); sky.setAttribute('aria-hidden', 'true'); document.body.appendChild(sky);
+  [[.12, 1], [.4, .75]].forEach(([at, k]) => {
+    const puff = mk('span', 'puff smoke'), ps = btn.offsetWidth*.9*k; Object.assign(puff.style, {left: (x - ps/2) + 'px', top: (y - ps/2) + 'px', width: ps + 'px', height: ps + 'px', opacity: 0}); sky.appendChild(puff);
+    puff.animate([{opacity: 0, transform: 'translate(0,0) scale(.3)'}, {opacity: .85, transform: 'translate(-3px,2px) scale(.8)', offset: .25}, {opacity: 0, transform: 'translate(-10px,-6px) scale(1.5)'}], {duration: 560, delay: n*at, easing: 'ease-out', fill: 'backwards'});
+  });
+  [[.18, -14, 16], [.46, -6, 22]].forEach(([at, dx, dy]) => {
+    const w = mk('span', 'wk dim'); w.textContent = rg(); w.style.opacity = 0; w.style.transform = `translate(${x}px,${y}px)`; sky.appendChild(w);
+    w.animate([{transform: `translate(${x}px,${y}px) scale(1)`, opacity: .8}, {transform: `translate(${x + dx}px,${y + dy}px) scale(.7)`, opacity: 0}], {duration: 520, delay: n*at, easing: 'ease-out', fill: 'backwards'});
+  });
+  setTimeout(() => sky.remove(), n + 300);
+}
+emailIn.addEventListener('invalid', failLiftoff);   // fires on a blocked submit (click, tap or Enter); the browser still shows its bubble
 form.addEventListener('submit', async e => {
   e.preventDefault();
+  if (!looksDone()){ syncOk(); failLiftoff(); emailIn.reportValidity(); return; }   // v1.30: belt and braces; never posts without a valid email
   const btn = form.querySelector('button'); btn.disabled = true;
   form.classList.add('ign');   // v1.29: engine lights while the request is out
   try { await fetch(form.action, {method: 'POST', mode: 'no-cors', body: new FormData(form)}); }
@@ -691,7 +756,8 @@ const rain = JayRain.Rain(document.getElementById('rain'), {
   tint: T, paleTint: PALE_TEAL, paleOrange: PALE_ORANGE   // both teal-family entries follow the typing speed
 });
 /* jay 2026.09.30 v1.25: tap flow while the intro types: at 1x a tap is the usual 2x switch (rain.js); going 2x mid-intro turns the hint to ››| (same tick, so hand, glyph and rain change together);
-   at 2x mid-intro a tap is the terminal dump (taps during the dump are swallowed). once fully loaded, finishUp() drops ››| and taps are the 1x/2x toggle, as before. reduced motion never types, so never ››| */
+   at 2x mid-intro a tap is the terminal dump (taps during the dump are swallowed). once fully loaded, finishUp() drops ››| and taps are the 1x/2x toggle, as before. reduced motion never types, so never ››|.
+   v1.30 (jay 2026.09.30): "mid-intro" lasts until the egg has landed (see introEnd), so ››| and the dump stay live while the song + quote rain */
 const fastNow = () => document.documentElement.dataset.mode === 'fast';
 window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; state.pace = pace; setHintMode(fast); if (!state.done && !reduced) JayRain.dump(fast); },
   () => { if (state.done || reduced || !fastNow()) return false; dump(); return true; });
@@ -699,14 +765,21 @@ window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; 
 let current = null, skipped = false, lineAt = 0;   // jay 2026.09.30 v1.25: lineAt = the line the intro is on (the dump picks up from there)
 const iconTimers = [], icons = [...ul.children].filter(li => li !== curLi);
 /* jay 2026.09.30 v1.25: the page is fully loaded (naturally, after the dump, or at once). round 16: the cursor comes back for good at the end of the icon row.
-   the hint goes back to the 1x/2x toggle, and this tab remembers it has shown the homepage (see the back-navigation rule below) */
+   the hint goes back to the 1x/2x toggle, and this tab remembers it has shown the homepage (see the back-navigation rule below).
+   v1.30 (jay 2026.09.30): "fully loaded" now means the egg has landed too (the 🎙️ quote line is the last thing to finish). the cursor still comes home when the icons are in (cursorHome),
+   but ››| and the two-tap skip stay live until the egg lands (introEnd); was: finishUp() as soon as the last icon popped, while the egg was still raining */
+function cursorHome(){
+  document.body.classList.add('revealed');
+  curHold.remove(); if (cursor.parentNode !== curLi) curLi.appendChild(cursor); if (ul.lastChild !== curLi) ul.appendChild(curLi); curLi.classList.add('in');
+}
 function finishUp(){
   if (state.done) return;
-  document.body.classList.add('revealed');
-  curHold.remove(); curLi.appendChild(cursor); ul.appendChild(curLi); curLi.classList.add('in'); state.done = true; hint.classList.add('ready'); JayRain.dump(false); markSeen();
+  cursorHome(); state.done = true; hint.classList.add('ready'); JayRain.dump(false); markSeen();
 }
+let iconsIn = false;
+const introEnd = () => { if (iconsIn && (!eggText || state.egg === 'landed')) finishUp(); };   // v1.30: the natural end = icons in AND egg landed (either order)
 function popIcons(instant){
-  const done = () => { finishUp(); egg(); };   // round 23: the egg is already raining by now (egg() is a no-op here; reduced motion: it fades in here)
+  const done = () => { iconsIn = true; cursorHome(); egg(); introEnd(); };   // round 23: the egg is already raining by now (egg() is a no-op here; reduced motion: it fades in + lands here). v1.30: was finishUp() first
   icons.forEach((li, i) => {
     const a = li.querySelector('a');
     if (instant){ li.classList.add('in'); revealTap(a); state.icons = i + 1; return; }
@@ -773,7 +846,7 @@ function dump(){
     const t = lines[j];
     for (let h = (j === lineAt ? state.head : 0) + 1; h <= t.n + win; h++) tape.push(() => render(t, h, win));
     if (j === LAST - 1) tape.push(() => { cursor.remove(); ninja.classList.add('in'); });
-    if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); cursor.remove(); if (!form.classList.contains('in')) showForm(); });
+    if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); if (!iconsIn) cursor.remove(); if (!form.classList.contains('in')) showForm(); });   // v1.30: after the icons the cursor is already home; leave it
   }
   icons.forEach(li => { if (li.classList.contains('in')) return; const a = li.querySelector('a');
     tape.push(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); }, () => {}); });
