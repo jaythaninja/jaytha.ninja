@@ -200,6 +200,12 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .rk-sky .rk .rk-fl{opacity:1;animation:rk-flick-long .1s linear infinite}
 .rk-sky .wk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:var(--teal);text-shadow:0 0 8px rgba(26,173,179,.9);will-change:transform,opacity}
 .rk-sky .wk.hot{color:#E6FBFB;text-shadow:0 0 8px #fff,0 0 14px rgba(26,173,179,.95)}
+/* v1.35 (jay 2026.10.01): the fake-out (failed liftoff) wake follows the rain's colour at that moment: teal #1AADB3 at 1x, orange #FF4D1A at 2x (it flips live if the mode flips mid-flight) */
+[data-mode="fast"] .rk-sky.fake .wk{color:var(--orange);text-shadow:0 0 8px rgba(255,77,26,.9)}
+[data-mode="fast"] .rk-sky.fake .wk.hot{color:#FFE6DC;text-shadow:0 0 8px #fff,0 0 14px rgba(255,77,26,.95)}
+/* v1.35 (jay 2026.10.01): super golden mode, the real (successful) liftoff only: a really bright gold wake with a white-gold core and glow, 4x the glyphs (see LIFTOFF.goldPer) */
+.rk-sky.gold .wk{color:#FFD700;text-shadow:0 0 4px #FFF6C2,0 0 10px rgba(255,215,0,.95),0 0 22px rgba(255,190,0,.65)}
+.rk-sky.gold .wk.hot{color:#FFFBE8;text-shadow:0 0 6px #fff,0 0 12px #FFE766,0 0 26px rgba(255,215,0,.9)}
 .rk-sky .puff{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(26,173,179,.55),rgba(26,173,179,.18) 55%,rgba(26,173,179,0));will-change:transform,opacity}
 @keyframes rk-rumble{0%,100%{transform:translate(0,0)}25%{transform:translate(.6px,-.4px)}50%{transform:translate(-.5px,.5px)}75%{transform:translate(.4px,.6px)}}
 @keyframes rk-flick-hot{0%,100%{transform:scale(1.05,1.45)}50%{transform:scale(.95,1.75)}}
@@ -660,7 +666,7 @@ const burnHeart = hb => new Promise(done => {
   setTimeout(finish, start + HEART.burn + 60);
 });
 /* v1.29 (jay 2026.09.30): lift-off. timings in ms; the success line (heart + words) starts once the rocket is off the top of the screen */
-const LIFTOFF = {turn: 180, climbMin: 820, climbMax: 1100, perPx: 1, wakeEvery: 26, puff: 650};
+const LIFTOFF = {turn: 180, climbMin: 820, climbMax: 1100, perPx: 1, wakeEvery: 26, puff: 650, goldPer: 4, goldHot: .35};   // v1.35: golden mode = goldPer glyphs per wake tick (was 1), goldHot of them white-gold (was .22)
 const launchRocket = () => new Promise(done => {
   const btn = form.querySelector('.rkb'), svg = btn && btn.querySelector('.rk');
   state.rocket = {phase: 'turn', t0: performance.now()};
@@ -670,7 +676,7 @@ const launchRocket = () => new Promise(done => {
     const f = svg.animate ? svg.animate([{opacity: 1}, {opacity: 0}], {duration: 220, fill: 'forwards'}) : null;
     return f ? f.finished.then(() => { state.rocket.phase = 'gone'; done(); }) : done();
   }
-  const r = btn.getBoundingClientRect(), sky = mk('div', 'rk-sky'); sky.setAttribute('aria-hidden', 'true'); document.body.appendChild(sky);
+  const r = btn.getBoundingClientRect(), sky = mk('div', 'rk-sky gold'); sky.setAttribute('aria-hidden', 'true'); document.body.appendChild(sky);   // v1.35: gold = super golden mode wake
   Object.assign(svg.style, {left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px'});
   sky.appendChild(svg);   // out of the form (which fades) into the sky; the button keeps its size, so nothing moves
   const dist = r.bottom + r.height*2.5 + 40;   // clear the top edge, flame included
@@ -685,12 +691,12 @@ const launchRocket = () => new Promise(done => {
     form.inert = true; form.classList.add('gone');   // the form fades out under the exhaust
     const fly = svg.animate([{transform: 'translateY(0) rotate(-45deg)'}, {transform: `translateY(${-dist}px) rotate(-45deg)`}], {duration: climb, easing: 'cubic-bezier(.5,0,.85,.35)', fill: 'forwards'});
     let lastWake = 0, raf = 0;
-    const wake = now => {   // rain glyphs shed from the flame tip: teal, a few white-hot, drifting down + out and fading
+    const wake = now => {   // rain glyphs shed from the flame tip, drifting down + out and fading. v1.35: super golden mode, gold with ~1 in 3 white-gold, 4 per tick (was teal + a few white-hot, 1 per tick)
       if (now - lastWake >= LIFTOFF.wakeEvery){
         lastWake = now;
         const b = svg.getBoundingClientRect();
-        if (b.bottom > -40){
-          const w = mk('span', Math.random() < .22 ? 'wk hot' : 'wk'); w.textContent = rg();
+        if (b.bottom > -40) for (let g = 0; g < LIFTOFF.goldPer; g++){   // v1.35: was one glyph per tick
+          const w = mk('span', Math.random() < LIFTOFF.goldHot ? 'wk hot' : 'wk'); w.textContent = rg();
           const x = b.left + b.width/2 + (Math.random() - .5)*b.width*.35, y = b.bottom + b.height*.35;
           w.style.transform = `translate(${x}px,${y}px)`; sky.appendChild(w);
           const dx = (Math.random() - .5)*34, dy = 26 + Math.random()*46;
@@ -732,7 +738,7 @@ function failLiftoff(){
     return;
   }
   const r = btn.getBoundingClientRect(), W = innerWidth, H = innerHeight, sz = r.width, S = [r.left + sz/2, r.top + r.height/2];
-  const sky = mk('div', 'rk-sky'); sky.setAttribute('aria-hidden', 'true'); document.body.appendChild(sky);
+  const sky = mk('div', 'rk-sky fake'); sky.setAttribute('aria-hidden', 'true'); document.body.appendChild(sky);   // v1.35: .fake = its wake takes the rain's colour (css)
   const ghost = svg.cloneNode(true); ghost.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));   // the copy paints with the button rocket's own gradients
   Object.assign(ghost.style, {left: r.left + 'px', top: r.top + 'px', width: sz + 'px', height: r.height + 'px', transformOrigin: '50% 50%'}); sky.appendChild(ghost);
   svg.style.transition = 'none'; svg.style.opacity = '0';
@@ -800,7 +806,7 @@ function failLiftoff(){
       target = a + (diving ? Math.sin(t/38)*7 : Math.sin(t/fly.wobRate)*fly.wobAmp);   // v1.34: each flight wobbles its own way in the loops
       if (diving && !ghost.classList.contains('sput')) ghost.classList.add('sput');
       const hd = (rot - 45)*Math.PI/180, tx = x - Math.cos(hd)*sz*.42, ty = y - Math.sin(hd)*sz*.42;   // the nozzle, behind the nose
-      if (!diving && now - lastWake >= FAIL.wakeEvery){ lastWake = now;   // the normal teal rain wake while it still "works"
+      if (!diving && now - lastWake >= FAIL.wakeEvery){ lastWake = now;   // the rain wake while it still "works" (v1.35: teal at 1x, orange at 2x, like the rain)
         const dx = -Math.cos(hd)*30 + (Math.random() - .5)*20, dy = -Math.sin(hd)*30 + (Math.random() - .5)*20;
         const w = bit(Math.random() < .22 ? 'wk hot' : 'wk', tx, ty, 0, [{transform: `translate(${tx}px,${ty}px) scale(1)`, opacity: .95}, {transform: `translate(${tx + dx}px,${ty + dy}px) scale(.7)`, opacity: 0}], 560 + Math.random()*300); w.textContent = rg(); }
       if (diving && now - lastSmoke >= FAIL.smokeEvery){ lastSmoke = now;   // white smoke trail, puffing out and up as it falls
