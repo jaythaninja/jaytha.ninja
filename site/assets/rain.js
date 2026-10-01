@@ -136,7 +136,26 @@ function Rain(cv, o){
   // jay 2026.09.30 v1.25: back-navigation note. off the homepage (/song-of-the-day/, /quote-of-the-day/), a plain same-tab click on a link home ("← jaytha.ninja") leaves a one-shot sessionStorage note; the homepage reads + clears it and opens fully loaded
   const HOME=/^\/(index\.html)?$/;
   if(!HOME.test(location.pathname))document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(a.target&&a.target!=='_self'))return;const u=new URL(a.href,location.href);if(u.origin===location.origin&&HOME.test(u.pathname)){try{sessionStorage.setItem('jtn.back','1')}catch(_){}}},true);
+  // jay 2026.10.01 v1.41: the homepage's terminal state for the other typed pages (/song-of-the-day/, /quote-of-the-day/). the homepage keeps its own copy and never calls these.
+  // returning(ver): true when this tab has already shown this page's current content (ver = the entry's date) AND this load is a back/forward navigation or a same-tab click on an
+  // in-site link to it (a one-shot "jtn.via" note, like the homepage's "jtn.back"). the page then opens fully loaded. a new tab, a new visit, a reload or a new day's entry still types.
+  // seen(ver) is set when the page finishes and whenever it is left (pagehide), as on the homepage.
+  // burst(tape, done): the homepage's terminal dump: every remaining typing step plays in one ~1.2s burst (14ms a step at most) while the rain runs at 6x, then the rain eases back to the mode's speed
+  const PATH=p=>p.replace(/index\.html$/,'').replace(/([^/])$/,'$1/'), HERE=PATH(location.pathname);
+  const ss=(()=>{try{return window.sessionStorage}catch(_){return null}})(), ssGet=k=>{try{return ss&&ss.getItem(k)}catch(_){return null}}, ssSet=(k,v)=>{try{ss&&ss.setItem(k,v)}catch(_){}};
+  const via=ssGet('jtn.via')===HERE; try{ss&&ss.removeItem('jtn.via')}catch(_){}
+  const navType=((performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{}).type||'';
+  document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(a.target&&a.target!=='_self'))return;const u=new URL(a.href,location.href);if(u.origin===location.origin&&!HOME.test(u.pathname))ssSet('jtn.via',PATH(u.pathname))},true);
+  let seenVer=null; const seen=ver=>{if(ver!=null)seenVer=String(ver);if(seenVer!=null)ssSet('jtn.seen:'+HERE,seenVer)};
+  const returning=ver=>{const back=ssGet('jtn.seen:'+HERE)===String(ver)&&(navType==='back_forward'||via);seenVer=String(ver);return back};
+  addEventListener('pagehide',()=>seen());
+  const burst=(tape,done,o={})=>{const total=tape.length,D=Math.max(1,Math.min(o.ms||1200,total*(o.perStep||14))),t0=performance.now();let at=0,raf=0,live=true;
+    const back=ms=>{if(rain)rain.setSpeed(modeName()==='fast'?2:1,ms)};
+    if(rain)rain.setSpeed(o.rain||6,o.rainUp||220);
+    const frame=now=>{const k=Math.min(total,Math.ceil((now-t0)/D*total));while(at<k)tape[at++]();if(at<total){raf=requestAnimationFrame(frame);return}raf=0;live=false;back(o.rainDown||1100);if(done)done()};
+    raf=requestAnimationFrame(frame);
+    return {stop(){if(!live)return;live=false;cancelAnimationFrame(raf);back(250)}};};
   document.documentElement.dataset.mode=document.documentElement.dataset.mode==='fast'?'fast':'normal';
-  window.JayRain={Rain,register,mode,dump,smooth:sm};
+  window.JayRain={Rain,register,mode,dump,smooth:sm,returning,seen,burst};
   if(document.readyState!=='loading')boot();else addEventListener('DOMContentLoaded',boot,{once:true});
 })();
