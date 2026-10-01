@@ -110,9 +110,10 @@ function Rain(cv, o){
     <path d="M163 214h17v12c0 7-4 11-9 11s-9-4-9-11v-7c0-2 0-4 1-5Z" fill="#FFE8A0" opacity=".82"/>
     </g>
   </svg>`;
-  const arrows=n=>`<svg class="speed-arrows" data-count="${n}" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="${n===1?'one':'two'} speed arrow${n===1?'':'s'}"><path d="${n===1?'M2.5 3.5L9.5 12 2.5 20.5':'M2.5 3.5L9.5 12 2.5 20.5M10.5 3.5L17.5 12 10.5 20.5'}"/></svg>`;
+  const arrows=n=>`<svg class="speed-arrows" data-count="${n}" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="${n===1?'one':'two'} speed arrow${n===1?'':'s'}"><path d="${n===1?'M1.5 8.5L10 15.5 18.5 8.5':'M1.5 4.5L10 11.5 18.5 4.5M1.5 12.5L10 19.5 18.5 12.5'}"/></svg>`;
+  // jay 2026.09.30 v1.32: the chevrons point DOWN, with the rain (were ›› / ›). the old ones rotated 90deg about the box centre; same box, stroke and colour, so nothing moves
   // jay 2026.09.30 v1.25: "finish the dump" glyph ››| (fast-forward to the end). same 20x24 box, stroke, and caps as the chevrons, so the hint never changes width; orange (see rain.css)
-  const DUMP_GLYPH=`<svg class="speed-arrows dump" data-count="end" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="skip to the end"><path d="M1.6 3.5L8.1 12 1.6 20.5M8.6 3.5L15.1 12 8.6 20.5M18.4 3.5V20.5"/></svg>`;
+  const DUMP_GLYPH=`<svg class="speed-arrows dump" data-count="end" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="skip to the end"><path d="M1.5 3.6L10 10.1 18.5 3.6M1.5 10.6L10 17.1 18.5 10.6M1.5 20.4H18.5"/></svg>`;   // v1.32: two down chevrons over a bar (was ››|)
   let rain=null,hint=null,down=null,booted=false,onMode=null,onTap=null,dumpHint=false;
   // jay 2026.09.30 v1.25: while a page has the dump state on (only the homepage intro turns it on, at 2x), the hint shows ››| instead of the 1x/2x chevrons
   const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`anywhere for${dumpHint?DUMP_GLYPH:arrows(fast?1:2)}`;}};
