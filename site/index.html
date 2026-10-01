@@ -82,7 +82,7 @@ a:hover{color:var(--teal)}
 .elsewhere{margin-top:30px}
 .social{margin-left:-8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;list-style:none}
 .social li{opacity:0;transform:scale(.55) translateY(6px);transition:opacity .28s ease-out,transform .38s cubic-bezier(.34,1.56,.64,1)}
-.social li.in{opacity:1;transform:none}.revealed .social li.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .sig .ninja.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .notify.in:not(.gone){opacity:1!important;transform:none!important;visibility:visible;transition:none!important}.revealed .egg.fade{opacity:1!important;animation:none!important}
+.social li.in{opacity:1;transform:none}.revealed .social li.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .sig .ninja.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .notify.in:not(.gone){opacity:1!important;transform:none!important;visibility:visible;transition:none!important}.revealed .egg.fade,.revealed .social.fade{opacity:1!important;animation:none!important}
 /* jay 2026.09.30 v1.25: :not(.gone) so a signup sent before the page is fully loaded stays gone (the thank-you line isn't covered by the form when .revealed lands) */
 .social a{display:flex;align-items:center;justify-content:center;width:42px;height:40px;border-radius:8px}
 .social a:hover{background:rgba(26,173,179,.08)}
@@ -91,16 +91,16 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify input:focus-visible{outline:none}
 @media (prefers-reduced-motion:reduce){.notify{transition:none!important}}
 .ic{width:28px;height:22px}
-/* v1.37 (jay 2026.10.01): when the intro reaches the icon row, each icon rains down into its (already reserved) spot, left to right ~100ms apart: it drops in from above,
-   tinted the rain's colour at that moment (teal at 1x, orange at 2x) with a glow, then settles to its normal orange. skip to end / back navigation: they just appear (no .drop).
-   reduced motion: a plain fade. was: a scale pop (scale .55 + 6px, springy) */
-.social{--rain-c:var(--teal);--rain-g:rgba(26,173,179,.9)}[data-mode="fast"] .social{--rain-c:var(--orange);--rain-g:rgba(255,77,26,.9)}
-.social li.drop{transition:none}
-.social li.drop a{animation:icon-rain .46s cubic-bezier(.2,.75,.3,1) both,icon-tint .95s ease-out both}
-@keyframes icon-rain{0%{opacity:0;transform:translateY(-34px)}35%{opacity:1}100%{opacity:1;transform:none}}
-@keyframes icon-tint{0%,45%{color:var(--rain-c);filter:drop-shadow(0 0 6px var(--rain-g))}100%{color:var(--orange);filter:none}}
-@media (prefers-reduced-motion:reduce){.social li{transform:none}.social li.drop a{animation:icon-fade .3s ease-out both}}
-@keyframes icon-fade{0%{opacity:0}100%{opacity:1}}
+/* v1.38 (jay 2026.10.01): the icons rain in exactly like the 🗓️ / 🎧 / 🎙️ egg lines (all orange links): each icon is one rain column, a scrambling hot head + a short
+   fading trail (the egg's own .tr) stepping row by row from just above the screen into its reserved slot, at the egg's step timing. the real icon shows just before it
+   lands, then it lands with the egg's white-hot glow. reduced motion: the row fades in like the egg (egg-fade). was (v1.37): a 34px drop-in, tinted the rain colour */
+.social li{position:relative}
+.social li.rain{transition:none}
+.social li.rain:not(.shown) a{visibility:hidden}
+.social .hd{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);line-height:1.25;font-weight:400;white-space:pre;pointer-events:none;color:#ffd9cc;text-shadow:0 0 8px rgba(255,77,26,.95),0 0 20px rgba(255,77,26,.7)}   /* = .egg .c.fall */
+.social li.land a{animation:icon-land 1.1s ease-out}
+@keyframes icon-land{0%{color:#fff;filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px rgba(255,77,26,.95))}100%{color:var(--orange);filter:drop-shadow(0 0 0 rgba(255,77,26,0))}}   /* = egg-land, for an svg */
+.social.fade{animation:egg-fade 1.4s ease-out both}
 /* round 16: the cursor stays after everything renders, blinking at the end of the icon row (teal at 1x, orange at 2x) (jay 2026.09.29) */
 .social li.cur{display:flex;align-items:center;height:40px;pointer-events:none}
 .social li.cur .cursor{margin:0 0 0 7px;vertical-align:0}
@@ -117,9 +117,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .egg .w{white-space:nowrap}   /* if it ever has to wrap, it wraps between words (the emoji stays with the first word, the arrow with the last) */
 .egg .c{display:inline-block;position:relative}
 .egg .c.fall{color:#ffd9cc;text-shadow:0 0 8px rgba(255,77,26,.95),0 0 20px rgba(255,77,26,.7)}   /* the falling head: hot orange-white, like the rain's white tips */
-.egg .tr{position:absolute;left:0;bottom:100%;white-space:pre;line-height:1.25;color:var(--orange);text-shadow:0 0 10px rgba(255,77,26,.55);pointer-events:none;
+.egg .tr,.social .tr{position:absolute;left:0;bottom:100%;white-space:pre;line-height:1.25;color:var(--orange);text-shadow:0 0 10px rgba(255,77,26,.55);pointer-events:none;
   -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,0));mask-image:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,0));transition:opacity .7s ease-out}
-.egg .tr.off{opacity:0}
+.egg .tr.off,.social .tr.off{opacity:0}
 .egg .c.land{animation:egg-land 1.1s ease-out}
 @keyframes egg-land{0%{color:#fff;text-shadow:0 0 10px #fff,0 0 22px rgba(255,77,26,.95)}100%{color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6)}}
 .egg.fade{animation:egg-fade 1.4s ease-out both}   /* reduced motion: no falling, the line just fades in */
@@ -391,8 +391,9 @@ const TIMING = {
   afterHello: 550,       // pause after the first line
   betweenParas: 450,     // pause between paragraphs
   afterEllipsis: 850,    // longer beat after a paragraph ending in "..." (so "but now, i do" lands)
-  beforeSignoff: 300, beforeIcons: 250, iconStagger: 100,   /* v1.37: was 150 (the icons rain down now, ~100ms apart) */
-  eggLead: 250,         // round 23: the egg starts raining ~this many ms (real time) before the first icon pops in (was: after the last icon)
+  beforeSignoff: 300, beforeIcons: 250, iconStagger: 150,   /* v1.38: back to 150; only the fallback pop uses it now (the icons rain like the egg, see iconRain) */
+  eggAfterIcons: 600,   // v1.38: the egg starts raining this many ms (real time) after the icons start (they're the line above, so they rain first). was eggLead: 250 (egg ~250ms BEFORE the first icon)
+  iconRainStagger: 110, iconRainJitter: 120,   // v1.38: icon columns start left to right this far apart (+ up to jitter ms at random)
   eggTotal: 8500,        // round 16: the whole egg rain lasts about this long (ms). each letter falls ~3-4.6s, starts staggered at random
   eggStep: [95, 150],    // round 16: ms per row a letter drops (matrix-style stepping, like the rain); random per letter
   eggDaySpread: 1500,    // v1.31: the date line's letters start falling at random within this window (so they rain, not drop as a block)
@@ -1003,9 +1004,51 @@ function popIcons(instant){
   icons.forEach((li, i) => {
     const a = li.querySelector('a');
     if (instant){ li.classList.add('in'); revealTap(a); state.icons = i + 1; return; }
-    iconTimers.push(setTimeout(() => { li.classList.add('drop', 'in'); setTimeout(() => revealTap(a), 300); setTimeout(() => li.classList.remove('drop'), 1000);   /* v1.37: .drop = rain down (css), dropped once it has settled so hover etc. work as before */ state.icons = i + 1; if (i === icons.length - 1) iconTimers.push(setTimeout(done, 400)); }, i*TIMING.iconStagger));
+    if (i === 0 && iconRain(done)) return;   // v1.38: the egg-style rain (below); the old pop only if it can't run
+    if (iconRun) return;
+    iconTimers.push(setTimeout(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); state.icons = i + 1; if (i === icons.length - 1) iconTimers.push(setTimeout(done, 400)); }, i*TIMING.iconStagger));
   });
-  if (instant) done();
+  if (instant){ if (reduced) ul.classList.add('fade'); done(); }   // v1.38: reduced motion fades the row in, like the egg
+}
+/* v1.38 (jay 2026.10.01): the icons rain in the same way as the egg lines (see egg()): one column per icon, same rows / step timing / trail / scramble / land glow.
+   left to right (iconRainStagger + a little jitter), and before the egg (eggAfterIcons), so it reads icons -> date -> song -> quote. done() when the last one lands */
+let iconRun = null;
+function iconRain(onDone){
+  if (reduced || !ul.animate) return false;
+  const fs = parseFloat(getComputedStyle(eggEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep, t0 = performance.now();
+  const run = iconRun = {anims: [], cols: [], scr: 0}; let left = icons.length;
+  icons.forEach((li, i) => {
+    const a = li.querySelector('a'), top = li.getBoundingClientRect().top;
+    const rows = Math.max(8, Math.ceil((top + row*2)/row));   // start just above the viewport, drop row by row into the slot (= egg)
+    const dur = Math.min(4600, Math.max(3000, rows*(s0 + Math.random()*(s1 - s0))));
+    const delay = i*TIMING.iconRainStagger + Math.random()*TIMING.iconRainJitter;
+    const hd = mk('span', 'hd'), tr = mk('span', 'tr'), c = {li, a, hd, tr, trail: Array.from({length: 4 + Math.floor(Math.random()*4)}, rg), end: t0 + delay + dur, shown: false, done: false};
+    hd.setAttribute('aria-hidden', 'true'); hd.style.fontSize = fs + 'px'; hd.textContent = rg(); tr.textContent = c.trail.join('\n'); hd.appendChild(tr); li.appendChild(hd);
+    li.classList.add('rain', 'in');
+    const an = li.animate([{transform: `translateY(${-rows*row}px)`}, {transform: 'translateY(0)'}], {duration: dur, delay, easing: `steps(${rows}, end)`, fill: 'backwards'});
+    run.anims.push(an); run.cols.push(c);
+    an.finished.then(() => { landIcon(c, true); state.icons = icons.length - --left; if (!left){ clearInterval(run.scr); if (iconRun === run) iconRun = null; onDone(); } }, () => {});
+  });
+  run.scr = setInterval(() => {   // = the egg's scramble: heads flicker, trails shift; the real icon shows just before it lands
+    const now = performance.now();
+    for (const c of run.cols){
+      if (c.done) continue;
+      if (!c.shown && c.end - now < 260){ c.shown = true; c.li.classList.add('shown'); c.hd.firstChild.textContent = ' '; }
+      else if (!c.shown && Math.random() < .7) c.hd.firstChild.textContent = rg();
+      c.trail.pop(); c.trail.unshift(rg()); c.tr.textContent = c.trail.join('\n');
+    }
+  }, 90);
+  return true;
+}
+function landIcon(c, glow){
+  if (c.done) return; c.done = true;
+  c.li.classList.add('shown'); c.li.classList.remove('rain'); revealTap(c.a);
+  if (glow){ c.li.classList.add('land'); setTimeout(() => c.li.classList.remove('land'), 1150); c.hd.firstChild.textContent = ' '; c.tr.classList.add('off'); setTimeout(() => c.hd.remove(), 750); }
+  else c.hd.remove();
+}
+function iconStop(){   // skip to end / dump / back navigation: whatever is still raining lands at once (no glow)
+  const run = iconRun; if (!run) return; iconRun = null;
+  clearInterval(run.scr); run.anims.forEach(a => a.cancel()); run.cols.forEach(c => landIcon(c, false)); state.icons = icons.length;
 }
 async function intro(){
   if (skipped) return;   // v1.25: a tap before the fonts were ready already dumped the page
@@ -1019,8 +1062,8 @@ async function intro(){
     if (skipped) return;
     if (i === LAST){
       document.body.classList.remove('typing'); cursor.remove(); showForm();
-      const toIcons = (520 + TIMING.beforeIcons)/pace;   // round 23: the first icon pops in this many ms from now; start the egg rain TIMING.eggLead before it
-      setTimeout(egg, Math.max(0, toIcons - TIMING.eggLead));
+      const toIcons = (520 + TIMING.beforeIcons)/pace;   // round 23: the icons start this many ms from now. v1.38: the egg starts TIMING.eggAfterIcons after them (was eggLead before)
+      setTimeout(egg, toIcons + TIMING.eggAfterIcons);
       await wait(520);
     }
     if (i === LAST - 1){ cursor.remove(); ninja.classList.add('in'); await wait(420); }
@@ -1038,7 +1081,7 @@ function skip(){
 }
 /* jay 2026.09.30 v1.25: the whole page at once, no typing, no pops, no egg fall (back navigation + bfcache restores). safe to call at any point, mid-intro or mid-dump */
 function complete(){
-  skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); stopDump();
+  skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); iconStop(); stopDump();   // v1.38: iconStop lands a mid-rain icon row at once
   document.body.classList.add('revealed'); document.body.classList.remove('typing');   // .revealed first, so nothing below transitions in
   lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window)); cursor.remove();
   ninja.classList.add('in');
@@ -1061,7 +1104,7 @@ function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; du
 function dump(){
   if (dumping || state.done) return;
   if (reduced) return complete();
-  dumping = true; skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout);
+  dumping = true; skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); iconStop();   // v1.38: icons still raining land at once
   if (document.documentElement.dataset.mode !== 'fast') JayRain.mode(true);   // always already 2x via the tap flow; kept so the dump can never end in a teal/orange mismatch
   rainBoost = true; rain.setSpeed(DUMP.rain, DUMP.rainUp); state.rainBoost = 'on';   // v1.33: the rain fast-forwards with the text (colour stays the orange 2x)
   const tape = [], win = TIMING.window;
