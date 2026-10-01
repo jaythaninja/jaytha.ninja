@@ -212,12 +212,13 @@ const ID = /^[A-Za-z0-9]{22}$/;
 const trackUrl = e => 'https://open.spotify.com/track/' + e.id;   // always built from the id, so a bad url in the data can't point somewhere else
 const credit = e => COPY.credit.replace('{artist}', e.artist).replace('{track}', e.track);
 const lyricOf = e => typeof e.lyric === 'string' ? e.lyric.trim() : '';   // null / "" = jay hasn't sent it yet
+const spaced = t => t.replace(/\r?\n/g, '\n\n');   // v1.34 (jay 2026.10.01): a blank line between lyric lines (display only; songs.json keeps jay's single line breaks). .qt/.aq are pre-line, so a long line that wraps stays tight
 function creditLink(e){ const a = mk('a'); a.href = trackUrl(e); a.target = '_blank'; a.rel = 'noopener'; a.textContent = credit(e); return a; }
 function archiveItem(e){
   const li = mk('li'), d = mk('p', 'd'), b = mk('p', 'ab');
   const t = mk('time'); t.dateTime = e.date; t.textContent = dots(e.date); d.appendChild(t);
   li.appendChild(d);
-  if (lyricOf(e)){ const q = mk('blockquote', 'aq'); q.textContent = lyricOf(e); li.appendChild(q); }
+  if (lyricOf(e)){ const q = mk('blockquote', 'aq'); q.textContent = spaced(lyricOf(e)); li.appendChild(q); }
   b.appendChild(creditLink(e)); li.appendChild(b); return li;
 }
 async function load(){
@@ -248,7 +249,7 @@ async function main(){
   const kick = prepare($('.kicker'), e ? COPY.kicker.replace('{date}', dots(e.date)) : 'song of the day');
   const lines = [kick];
   if (e){
-    if (lyricOf(e)) lines.push(prepare($('.qt'), lyricOf(e)));
+    if (lyricOf(e)) lines.push(prepare($('.qt'), spaced(lyricOf(e))));
     else { $('.qt').remove(); $('.today').classList.add('nolyric'); }   // no lyric yet: just the credit (no empty quote)
     lines.push(prepare($('.by'), {text: credit(e), href: trackUrl(e)}));
   }

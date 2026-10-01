@@ -164,6 +164,16 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify .rkb:active .rk{transform:scale(.92)}
 .notify .rkb[disabled]{background:transparent}
 @media (max-width:760px){.notify .rkb{width:48px;height:48px;margin:-7px -6px -7px -4px;border-radius:11px}}
+/* v1.34 (jay 2026.10.01): once the intro has finished typing, the cursor doesn't come back at the end of the icon row; instead a bigger copy of the tap hint's finger,
+   pointing left at the rocket, + "touch it" sit just right of the rocket and blink exactly like the cursor did (teal at 1x, orange at 2x, same 1.05s blink).
+   it's in the form row from the first paint (hidden), so turning it on moves nothing; it goes with the form on a real liftoff. phones: the email field is narrower
+   (14ch, still fits you@email.com) and the dare text small, so field + rocket + finger + text stay on one row at 390px */
+.dare{flex:none;display:flex;align-items:center;gap:6px;margin-left:-2px;font-size:13px;line-height:1;letter-spacing:-.02em;white-space:nowrap;color:var(--teal);text-shadow:0 0 10px rgba(26,173,179,.75);pointer-events:none;visibility:hidden}
+.dare svg{width:34px;height:34px;display:block;flex:none;transform:rotate(90deg);filter:drop-shadow(0 0 6px rgba(26,173,179,.75))}   /* the hint's 👇 turned a quarter clockwise: points left */
+.dare.on{visibility:visible;animation:blink 1.05s infinite}
+[data-mode="fast"] .dare{color:var(--orange);text-shadow:0 0 10px rgba(255,77,26,.75)}
+[data-mode="fast"] .dare svg{filter:drop-shadow(0 0 6px rgba(255,77,26,.75))}
+@media (max-width:760px){.notify input{flex:0 1 14ch}.dare{gap:4px;font-size:11px}.dare svg{width:28px;height:28px}}
 /* v1.29 (jay 2026.09.30): idle until the email looks real; a valid email (form.ok) ignites it: full orange, a slow glow pulse, the flame flickers.
    v1.30 (jay 2026.09.30): idle is only slightly dimmed, full color, near-full flame (was opacity .42 + saturate(.55), flame .4 at 55% length, hover .62); hover while idle = full */
 .notify:not(.ok) .rkb .rk{opacity:.8}
@@ -287,6 +297,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
           <input id="notify-email" type="email" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
           <input type="hidden" name="embed" value="1">
           <button type="submit" class="rkb" aria-label="liftoff" title="liftoff"><svg class="rk" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><defs><linearGradient id="rk-b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF8A5E"/><stop offset=".45" stop-color="#FF4D1A"/><stop offset="1" stop-color="#B8300A"/></linearGradient><linearGradient id="rk-w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#c9d3d5"/></linearGradient><linearGradient id="rk-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5FD6DA"/><stop offset=".55" stop-color="#1AADB3"/><stop offset="1" stop-color="#0E7C81" stop-opacity="0"/></linearGradient><linearGradient id="rk-n" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b7478"/><stop offset="1" stop-color="#1c2124"/></linearGradient><radialGradient id="rk-g" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#2b7e83"/><stop offset=".6" stop-color="#0c3b3e"/><stop offset="1" stop-color="#051a1c"/></radialGradient></defs><g transform="rotate(45 128 128) translate(0 6)"><g class="rk-fl"><path d="M112 196 C112 214 120 228 128 244 C136 228 144 214 144 196 Z" fill="url(#rk-f)"/><path d="M121 196 C121 206 124 213 128 222 C132 213 135 206 135 196 Z" fill="#C9F3F4" opacity=".85"/></g><path d="M104 180 L152 180 L146 198 L110 198 Z" fill="url(#rk-n)"/><path d="M90 132 L56 170 C52 175 54 186 60 190 L92 176 Z" fill="url(#rk-w)"/><path d="M166 132 L200 170 C204 175 202 186 196 190 L164 176 Z" fill="url(#rk-w)"/><path d="M128 14 C164 40 178 88 176 138 C175 158 170 172 164 184 L92 184 C86 172 81 158 80 138 C78 88 92 40 128 14 Z" fill="url(#rk-b)"/><path d="M128 14 C144 25 156 40 164 56 C142 49 114 49 92 56 C100 40 112 25 128 14 Z" fill="url(#rk-w)"/><rect x="122" y="150" width="12" height="44" rx="6" fill="url(#rk-w)"/><circle cx="128" cy="104" r="24" fill="#fff"/><circle cx="128" cy="104" r="17" fill="url(#rk-g)"/><path d="M117 99 A12 12 0 0 1 127 92" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="4" stroke-linecap="round"/><path d="M128 15 C163 41 177 88 175 138 C174 158 169 172 163 183 L93 183 C87 172 82 158 81 138 C79 88 93 41 128 15 Z" fill="none" stroke="#FFC2A8" stroke-opacity=".45" stroke-width="2.5"/><path d="M100 70 C96 92 95 118 98 146" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="7" stroke-linecap="round"/></g></svg></button>   <!-- v1.29 (jay 2026.09.30): the site's rocket is the button (orange = tappable, teal flame). accessible name "liftoff" (v1.30 (jay 2026.09.30): was "count me in"). round 27: was "[ count me in ]", before that "notify me" -->
+          <span class="dare" aria-hidden="true"><span class="dt">touch it</span></span>   <!-- v1.34: the finger (a copy of the tap hint's svg) goes in front of the text at load -->
         </form>
         <p class="status" role="status" aria-live="polite"></p>
       </div>
@@ -702,7 +713,10 @@ const launchRocket = () => new Promise(done => {
    in one loose loop and a half, then the "descent to destruction": the flame sputters, it noses over and dives into the bottom-right corner trailing white smoke, and poofs at the edge.
    then the button's rocket pops back in place. ~2.6-3s. the flight is a copy of the rocket in a throwaway fixed sky layer (the button keeps its box, nothing on the page moves),
    the button's own rocket is only hidden meanwhile. taps while it flies are ignored; a real (valid) submit mid-flight cancels it at once. reduced motion: only the brief flame flicker.
-   was (v1.30): a 0.9s sputter + hop + wobble in place */
+   was (v1.30): a 0.9s sputter + hop + wobble in place.
+   v1.34 (jay 2026.10.01, "ship it with the random rocket"): every fake-out flight is its own. 1 to 2.5 loose loops, either way round, with its own wobble, somewhere on
+   screen (never over the email box), then the dive into a random edge or corner (any of the 4 edges or 4 corners). the clock is the old flight's (worked out from the
+   old fixed path on this screen), so the crash, the reset and the teal pulses land exactly when they always did. if no random path fits (tiny screen), it flies the old one */
 const FAIL = {reducedMs: 360, turn: 180, swirlMin: 1150, swirlMax: 1450, swirlPerPx: .7, dive: 700, crash: 340, back: 280, wakeEvery: 34, smokeEvery: 22};
 function failLiftoff(){
   const btn = form.querySelector('.rkb'), svg = btn && btn.querySelector('.rk'), fl = svg && svg.querySelector('.rk-fl');
@@ -722,17 +736,48 @@ function failLiftoff(){
   const ghost = svg.cloneNode(true); ghost.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));   // the copy paints with the button rocket's own gradients
   Object.assign(ghost.style, {left: r.left + 'px', top: r.top + 'px', width: sz + 'px', height: r.height + 'px', transformOrigin: '50% 50%'}); sky.appendChild(ghost);
   svg.style.transition = 'none'; svg.style.opacity = '0';
-  // the flight path: straight up off the pad, one loose loop and a half in the space above the form, then a dive into the bottom-right corner
+  // the old fixed path (v1.31): straight up off the pad, one loose loop and a half above the form, a dive into the bottom-right corner. v1.34: it now only sets the clock
+  // (so the timing is exactly what it was on this screen) and is the fallback if no random path fits
   const Lx = Math.max(sz, S[0] - .8*Math.min(W, 700)), Rx = Math.min(W - sz, S[0] + .35*Math.min(W, 700)), Ty = .12*H, By = .56*H;
   const at = (u, v) => [Lx + u*(Rx - Lx), Ty + v*(By - Ty)];
-  const P = [S, [S[0], S[1] - Math.min(.2*H, 170)], at(.8, .05), at(.2, .12), at(.05, .6), at(.5, .85), at(.85, .45), at(.55, .15), [W*.78, H*.6], [W - sz*.35, H - sz*.35]];
+  const lift = [S[0], S[1] - Math.min(.2*H, 170)];
+  const P0 = [S, lift, at(.8, .05), at(.2, .12), at(.05, .6), at(.5, .85), at(.85, .45), at(.55, .15), [W*.78, H*.6], [W - sz*.35, H - sz*.35]];
   const cr = (p0, p1, p2, p3, t) => { const t2 = t*t, t3 = t2*t; return [0, 1].map(k => .5*((2*p1[k]) + (-p0[k] + p2[k])*t + (2*p0[k] - 5*p1[k] + 4*p2[k] - p3[k])*t2 + (-p0[k] + 3*p1[k] - 3*p2[k] + p3[k])*t3)); };
-  const pts = [], seg = [];   // dense samples along a catmull-rom through P, with the arc length at each, so speed can be set by time
-  for (let i = 0; i < P.length - 1; i++){ const p0 = P[Math.max(0, i - 1)], p3 = P[Math.min(P.length - 1, i + 2)]; seg[i] = pts.length; for (let j = 0; j < 40; j++) pts.push(cr(p0, P[i], P[i + 1], p3, j/40)); }
-  pts.push(P[P.length - 1]);
-  const len = [0]; for (let i = 1; i < pts.length; i++) len.push(len[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
-  const L7 = len[seg[7]], Lend = len[len.length - 1];
-  const swirl = Math.round(Math.min(FAIL.swirlMax, Math.max(FAIL.swirlMin, L7*FAIL.swirlPerPx)));
+  const sample = P => {   // dense samples along a catmull-rom through P, with the arc length at each, so speed can be set by time
+    const pts = [], seg = [];
+    for (let i = 0; i < P.length - 1; i++){ const p0 = P[Math.max(0, i - 1)], p3 = P[Math.min(P.length - 1, i + 2)]; seg[i] = pts.length; for (let j = 0; j < 40; j++) pts.push(cr(p0, P[i], P[i + 1], p3, j/40)); }
+    pts.push(P[P.length - 1]);
+    const len = [0]; for (let i = 1; i < pts.length; i++) len.push(len[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+    return {P, pts, seg, len};
+  };
+  const clock = sample(P0);
+  const swirl = Math.round(Math.min(FAIL.swirlMax, Math.max(FAIL.swirlMin, clock.len[clock.seg[7]]*FAIL.swirlPerPx)));   // same clock as v1.31
+  // v1.34: the random flight. loops, direction, size, centre, wobble and crash spot are new every time; a candidate is thrown away if any point after the
+  // straight-up launch comes within ~3/4 of a rocket of the email box or leaves the screen
+  const R = (a, b) => a + Math.random()*(b - a), m = sz*.6, ce = sz*.35;
+  const box = emailIn.getBoundingClientRect(), bp = sz*.75;   // .75: clear of the box even when the rocket is tilted 45deg
+  const bad = (x, y) => x < sz*.3 || x > W - sz*.3 || y < sz*.3 || y > H - sz*.3 || (x > box.left - bp && x < box.right + bp && y > box.top - bp && y < box.bottom + bp);
+  const EDGES = ['top', 'right', 'bottom', 'left', 'top-left', 'top-right', 'bottom-right', 'bottom-left'];
+  const crashAt = edge => { const u = R(.15, .85), ix = m + u*(W - 2*m), iy = m + u*(H - 2*m);
+    return {top: [ix, ce], right: [W - ce, iy], bottom: [ix, H - ce], left: [ce, iy], 'top-left': [ce, ce], 'top-right': [W - ce, ce], 'bottom-right': [W - ce, H - ce], 'bottom-left': [ce, H - ce]}[edge]; };
+  const randomFlight = () => {
+    const loops = R(1, 2.5), dir = Math.random() < .5 ? 1 : -1, wob = R(.04, .16), k = Math.min(1, 1.6/(loops + .4));   // more loops = tighter loops, so the speed stays sane
+    const rx = Math.min(R(.16, .3)*Math.min(W, 700)*k, (W - 2*m)/2 - 1), ry = Math.min(R(.09, .17)*H*k, (H - 2*m)/2 - 1);
+    if (rx < sz || ry < sz) return null;
+    const cx = R(m + rx, W - m - rx), cy = R(m + ry, H - m - ry);
+    const a0 = Math.atan2((lift[1] - cy)/ry, (lift[0] - cx)/rx), n = Math.max(6, Math.round(loops*8)), L = [];
+    for (let i = 0; i <= n; i++){ const a = a0 + dir*2*Math.PI*loops*i/n, q = 1 + (Math.random() - .5)*2*wob; L.push([cx + Math.cos(a)*rx*q, cy + Math.sin(a)*ry*q]); }
+    const edge = EDGES[Math.floor(Math.random()*EDGES.length)], T = crashAt(edge), E = L[L.length - 1];
+    const dx = T[0] - E[0], dy = T[1] - E[1], bend = R(-.15, .15);   // the dive bends a little, one way or the other
+    const mid = [Math.min(W - m, Math.max(m, E[0] + dx*.55 - dy*bend)), Math.min(H - m, Math.max(m, E[1] + dy*.55 + dx*bend))];
+    const c = sample([S, lift, ...L, mid, T]);
+    for (let i = c.seg[1]; i < c.pts.length; i++) if (bad(c.pts[i][0], c.pts[i][1])) return null;
+    return Object.assign(c, {loops: +loops.toFixed(2), dir: dir > 0 ? 'cw' : 'ccw', edge, swirlEnd: 2 + n, wobAmp: R(2, 8), wobRate: R(26, 52)});
+  };
+  let fly = null, tries = 0; while (!fly && tries < 60){ tries++; fly = randomFlight(); }
+  if (!fly) fly = Object.assign(clock, {loops: 1.5, dir: 'fixed', edge: 'bottom-right', swirlEnd: 7, wobAmp: 0, wobRate: 40});
+  const {P, pts, len} = fly;
+  const L7 = len[fly.seg[fly.swirlEnd]], Lend = len[len.length - 1];   // L7: where the loops end and the dive begins (point 7 on the old path)
   const tSwirl = FAIL.turn, tDive = tSwirl + swirl, tCrash = tDive + FAIL.dive, tBack = tCrash + FAIL.crash, tEnd = tBack + FAIL.back;
   const posAt = s => { let lo = 0, hi = len.length - 1; while (lo < hi){ const m = (lo + hi) >> 1; if (len[m] < s) lo = m + 1; else hi = m; } const i = Math.max(1, lo), k = (s - len[i - 1])/Math.max(1e-6, len[i] - len[i - 1]);
     return {x: pts[i - 1][0] + (pts[i][0] - pts[i - 1][0])*k, y: pts[i - 1][1] + (pts[i][1] - pts[i - 1][1])*k, a: Math.atan2(pts[i][1] - pts[i - 1][1], pts[i][0] - pts[i - 1][0])*180/Math.PI}; };
@@ -752,7 +797,7 @@ function failLiftoff(){
       const s = diving ? L7 + (Lend - L7)*Math.pow((t - tDive)/FAIL.dive, 1.7) : L7*ease((t - tSwirl)/swirl);
       const p = posAt(Math.min(Lend, s)); x = p.x; y = p.y;
       let a = p.a + 45; while (a - rot > 180) a -= 360; while (a - rot < -180) a += 360;
-      target = a + (diving ? Math.sin(t/38)*7 : 0);
+      target = a + (diving ? Math.sin(t/38)*7 : Math.sin(t/fly.wobRate)*fly.wobAmp);   // v1.34: each flight wobbles its own way in the loops
       if (diving && !ghost.classList.contains('sput')) ghost.classList.add('sput');
       const hd = (rot - 45)*Math.PI/180, tx = x - Math.cos(hd)*sz*.42, ty = y - Math.sin(hd)*sz*.42;   // the nozzle, behind the nose
       if (!diving && now - lastWake >= FAIL.wakeEvery){ lastWake = now;   // the normal teal rain wake while it still "works"
@@ -764,12 +809,12 @@ function failLiftoff(){
     } else {
       const p = posAt(Lend); x = p.x; y = p.y;
       if (!crashed){ crashed = true; f.phase = 'crash';   // poof at the edge: the rocket blinks out in a burst of white smoke, an orange flash and a few orange sparks
-        const cx = Math.min(W - 18, x), cy = Math.min(H - 18, y);
+        const cx = Math.max(18, Math.min(W - 18, x)), cy = Math.max(18, Math.min(H - 18, y)), ai = Math.atan2(H/2 - cy, W/2 - cx);   // v1.34: the debris sprays back into the screen, whatever edge it hit
         ghost.animate([{opacity: 1}, {opacity: 0}], {duration: 110, fill: 'forwards'});
         const fb = sz*1.6; bit('smk hot', cx - fb/2, cy - fb/2, fb, [{transform: `translate(${cx - fb/2}px,${cy - fb/2}px) scale(.3)`, opacity: 1}, {transform: `translate(${cx - fb/2}px,${cy - fb/2}px) scale(1.2)`, opacity: 0}], 380);
-        for (let i = 0; i < 6; i++){ const a = Math.PI*(1 + .5*i/5) + (Math.random() - .5)*.3, d = sz*(.5 + Math.random()*.5), k = sz*(.7 + Math.random()*.5);
+        for (let i = 0; i < 6; i++){ const a = ai - Math.PI/4 + Math.PI*.5*i/5 + (Math.random() - .5)*.3, d = sz*(.5 + Math.random()*.5), k = sz*(.7 + Math.random()*.5);
           bit(i % 3 ? 'smk' : 'smk grey', cx - k/2, cy - k/2, k, [{transform: `translate(${cx - k/2}px,${cy - k/2}px) scale(.3)`, opacity: .95}, {transform: `translate(${cx - k/2 + Math.cos(a)*d}px,${cy - k/2 + Math.sin(a)*d}px) scale(1.5)`, opacity: 0}], 620 + Math.random()*260); }
-        for (let i = 0; i < 5; i++){ const a = Math.PI*(1.05 + .4*Math.random()), d = sz*(.8 + Math.random()*.9);
+        for (let i = 0; i < 5; i++){ const a = ai + Math.PI*(.4*Math.random() - .2), d = sz*(.8 + Math.random()*.9);
           const e = bit('spk', cx, cy, 0, [{transform: `translate(${cx}px,${cy}px)`, opacity: 1}, {transform: `translate(${cx + Math.cos(a)*d}px,${cy + Math.sin(a)*d}px)`, opacity: 0}], 420 + Math.random()*200); e.textContent = rg(); }
       }
       if (t >= tBack && svg.style.opacity === '0'){ f.phase = 'back'; restore();   // the button's rocket pops back in place, idle again
@@ -780,7 +825,7 @@ function failLiftoff(){
     ghost.style.transform = `translate(${x - S[0]}px,${y - S[1]}px) rotate(${rot}deg)`;
     raf = requestAnimationFrame(frame);
   };
-  f.plan = {swirl, total: tEnd, pathPx: Math.round(Lend), crash: P[P.length - 1].map(Math.round), glowAt: Math.round(tCrash - GLOW.lead*GLOW.pulseMs), glowEnd: Math.round(tCrash - GLOW.lead*GLOW.pulseMs + GLOW.pulses*GLOW.pulseMs), crashAt: tCrash};
+  f.plan = {swirl, total: tEnd, pathPx: Math.round(Lend), crash: P[P.length - 1].map(Math.round), loops: fly.loops, dir: fly.dir, edge: fly.edge, tries, glowAt: Math.round(tCrash - GLOW.lead*GLOW.pulseMs), glowEnd: Math.round(tCrash - GLOW.lead*GLOW.pulseMs + GLOW.pulses*GLOW.pulseMs), crashAt: tCrash};
   failGlow(tCrash - GLOW.lead*GLOW.pulseMs, true);   // teal pulses: the 2nd peaks as it crashes, the tail runs ~2s past the reset; the refocus comes when it ends
   raf = requestAnimationFrame(frame);
 }
@@ -847,6 +892,8 @@ form.addEventListener('submit', async e => {
 });
 const state = window.__intro = {line: -1, para: -1, head: 0, icons: 0, done: false};   // line: 0 hello, 1 paragraphs, 2 sign-off, 3 icons
 const hint = $('.tap-hint'), hintSpeed = hint.querySelector('b');
+const dare = form.querySelector('.dare');   // v1.34 (jay 2026.10.01): the finger is the tap hint's own drawing, copied (ids dropped so nothing is duplicated)
+{ const fs = hint.querySelector('svg').cloneNode(true); fs.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); fs.removeAttribute('role'); fs.removeAttribute('aria-label'); fs.setAttribute('aria-hidden', 'true'); fs.setAttribute('focusable', 'false'); dare.prepend(fs); }
 const setHintMode = fast => { hintSpeed.textContent = fast ? '1x' : '2x'; };
 
 const T = [26,173,179], PALE_TEAL = [121,205,207], W = [214,222,222], HEAD = [255,255,255];
@@ -879,7 +926,9 @@ const iconTimers = [], icons = [...ul.children].filter(li => li !== curLi);
    but ››| and the two-tap skip stay live until the egg lands (introEnd); was: finishUp() as soon as the last icon popped, while the egg was still raining */
 function cursorHome(){
   document.body.classList.add('revealed');
-  curHold.remove(); if (cursor.parentNode !== curLi) curLi.appendChild(cursor); if (ul.lastChild !== curLi) ul.appendChild(curLi); curLi.classList.add('in');
+  cursor.remove(); dare.classList.add('on');   // v1.34 (jay 2026.10.01): the cursor is done for good; the blinking finger + "touch it" by the rocket take over.
+  // was (round 16): curHold.remove(); if (cursor.parentNode !== curLi) curLi.appendChild(cursor); if (ul.lastChild !== curLi) ul.appendChild(curLi); curLi.classList.add('in');
+  // curLi (+ its hidden placeholder) stays in the icon row as it was, so the row is exactly as wide as before
 }
 function finishUp(){
   if (state.done) return;
