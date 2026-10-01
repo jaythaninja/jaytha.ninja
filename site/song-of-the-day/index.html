@@ -63,6 +63,7 @@ a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .js .late{opacity:0;transition:opacity .9s ease-out}   /* archive is static; it just fades in once the data is there */
 .js .late.in{opacity:1}
+.js .late.now{transition:none}   /* v1.41: skip to end / back navigation: the archive is just there, no fade */
 
 @media (max-width:760px){
   /* same mobile rhythm as /quote-of-the-day/ */
@@ -199,6 +200,7 @@ function type(t, opt){
     tick();
   });
   p.finish = () => { cancelled = true; render(t, t.n + win, win); };
+  p.stop = () => { cancelled = true; };   // v1.41: halt where it is (the skip to end picks up from state.head)
   return p;
 }
 const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms/pace));
@@ -241,13 +243,39 @@ const rain = JayRain.Rain(document.getElementById('rain'), {
   alphaAt: (x, y, R) => 1 - .45*JayRain.smooth(R.H*.55, R.H, y),
   partSel: '.copy', partPad: 50, partFloor: .3
 });
-window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; state.pace = pace; });
+/* v1.41 (jay 2026.10.01): the homepage's terminal state, here too. a first tap is the usual faster pace (orange); at the faster pace while the page still types, the hint shows
+   ››| (two down chevrons over a bar) and the next tap skips to the end: everything left types out in one ~1.2s burst while the rain runs fast, links usable as they land.
+   taps during the skip are swallowed; once the page is done, taps toggle the pace as before. back navigation / a return in this tab to the same day's entry / a bfcache
+   restore open the page fully loaded (JayRain.returning, see assets/rain.js). reduced motion never types, so never ››| */
+const fastNow = () => document.documentElement.dataset.mode === 'fast';
+let lines = [], ready = false, skipped = false, dumping = false, current = null, lineAt = 0, burst = null, wantNow = false;
+window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; state.pace = pace; if (ready && !state.done && !reduced) JayRain.dump(fast); },
+  () => { if (!ready || state.done || reduced || !fastNow()) return false; skipToEnd(); return true; });
+function finishUp(){
+  if (state.done) return;
+  lines[lines.length - 1].el.appendChild(cursor);   // the cursor stays, blinking at the end (teal; orange at the faster pace)
+  state.done = true; JayRain.dump(false); JayRain.seen();
+}
+function complete(){   // the whole page at once (back navigation, bfcache, reduced motion)
+  skipped = true; current && current.stop(); burst && burst.stop(); burst = null; dumping = false;
+  document.querySelectorAll('.late').forEach(x => x.classList.add('now', 'in'));
+  lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window)); finishUp();
+}
+function skipToEnd(){
+  if (dumping || state.done) return;
+  dumping = true; skipped = true; current && current.stop(); state.skip = {from: {line: lineAt, head: state.head}};
+  const win = TIMING.window, tape = [];
+  for (let j = lineAt; j < lines.length; j++){ const t = lines[j]; for (let h = (j === lineAt ? state.head : 0) + 1; h <= t.n + win; h++) tape.push(() => render(t, h, win)); }
+  const t0 = performance.now(); state.skip.steps = tape.length;
+  burst = JayRain.burst(tape, () => { burst = null; dumping = false; state.skip.took = Math.round(performance.now() - t0); finishUp(); });
+}
+addEventListener('pageshow', e => { if (!e.persisted || state.done) return; if (ready) complete(); else wantNow = true; });
 
 async function main(){
   const [data] = await Promise.all([load(), document.fonts.ready]);
   const e = data.top;
   const kick = prepare($('.kicker'), e ? COPY.kicker.replace('{date}', dots(e.date)) : 'song of the day');
-  const lines = [kick];
+  lines = [kick];
   if (e){
     if (lyricOf(e)) lines.push(prepare($('.qt'), spaced(lyricOf(e))));
     else { $('.qt').remove(); $('.today').classList.add('nolyric'); }   // no lyric yet: just the credit (no empty quote)
@@ -259,16 +287,16 @@ async function main(){
   lines.forEach(t => render(t, 0, TIMING.window)); cursor.remove();   // reserve the final layout (nothing visible yet), then size the rain to the full page
   rain.build(); requestAnimationFrame(rain.frame);
   requestAnimationFrame(() => document.querySelectorAll('.late').forEach(x => x.classList.add('in')));
-  if (reduced){ lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window)); }
-  else {
-    await wait(350);
-    for (let i = 0; i < lines.length; i++){
-      await type(lines[i], {speed: i === 0 ? TIMING.kickerSpeed : TIMING.lyricSpeed, window: TIMING.window});
-      if (i < lines.length - 1) await wait(i === 0 ? TIMING.afterKicker : TIMING.beforeBy);
-    }
+  state.instant = JayRain.returning(e ? e.date : 'none');   // v1.41: back here for the same entry -> fully loaded at once
+  if (reduced || state.instant || wantNow){ complete(); return; }
+  ready = true; if (fastNow()) JayRain.dump(true);
+  await wait(350); if (skipped) return;
+  for (let i = 0; i < lines.length; i++){
+    lineAt = i; state.head = 0; current = type(lines[i], {speed: i === 0 ? TIMING.kickerSpeed : TIMING.lyricSpeed, window: TIMING.window});
+    await current; if (skipped) return;
+    if (i < lines.length - 1){ await wait(i === 0 ? TIMING.afterKicker : TIMING.beforeBy); if (skipped) return; }
   }
-  lines[lines.length - 1].el.appendChild(cursor);   // the cursor stays, blinking at the end (teal; orange at the faster pace)
-  state.done = true;
+  finishUp();
 }
 /* shared rain.js owns tap-anywhere mode and the single mode state. */
 main();
