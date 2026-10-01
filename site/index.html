@@ -73,6 +73,7 @@ a:hover{color:var(--teal)}
 /* typing internals: resolved text, scrambling window, and the not-yet-typed text held invisibly so lines never reflow */
 .scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(127,218,221,.9)}
 .ghost{visibility:hidden}
+.glue{white-space:nowrap}   /* v1.33: holds the typing cursor between two word joiners (see render) */
 .cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--teal);box-shadow:0 0 14px rgba(26,173,179,.75);animation:blink 1.05s infinite}
 [data-mode="fast"] .cursor{background:var(--orange);box-shadow:0 0 14px rgba(255,77,26,.75)}   /* round 13: at 2x the cursor (+ its glow) goes brand orange */
 /* v1.15 preview: fixed, non-interactive hint; safe-area aware and outside the copy column */
@@ -127,12 +128,12 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 @media (max-width:760px){
   /* round 17: tighter vertical rhythm so the whole page (egg included) fits one iphone 17 screen in ios 26 safari (402x718 visible, compact tab bar), no scrolling (jay 2026.09.29).
      was: stage 56/64, paras 20, para gap 16, sig 18, cta 42, icons 24, egg 42. body font + line-height unchanged; the sign-off + egg keep their extra gap */
-  .stage{padding:24px 0 22px}
+  .stage{padding:22px 0 18px}   /* v1.33 (jay 2026.09.30): was 24px 0 22px (the new last paragraph is a line longer on phones; see below) */
   .copy{margin-left:24px;width:calc(100vw - 48px)}
   .hello{font-size:17px}
   .paras{margin-top:14px}
   .para{font-size:16px;line-height:1.7}
-  .para + .para{margin-top:12px}
+  .para + .para{margin-top:10px}   /* v1.33: was 12px */
   .sig{margin-top:15px;font-size:16px}
   .cta{margin-top:32px;font-size:16px}
   .signup{margin-top:4px}
@@ -149,6 +150,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .egg{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}
   .egg.has-day{margin-top:30px}   /* v1.31: phones keep the egg's 30px gap with or without the date */
 }
+/* v1.33 (jay 2026.09.30): "and while the journey ahead is long... we have space𝕏 to help us now" needs 3 lines below ~413px (16px mono, 38 chars to "long..."),
+   so there it's balanced (and while the journey / ahead is long... we have / space𝕏 to help us now) instead of leaving "now" alone on the last line. wider phones keep 2 lines, broken after "long..." */
+@media (max-width:412px){.para:last-child{text-wrap:balance}}
 
 /* v1.29 (jay 2026.09.30): the submit button is the site's rocket (orange body = tappable, teal flame), bigger than the text so it reads as the button.
    48px square on phones, 54px on desktop (>= 44px tap target); negative block margins let it overhang the email row, so the row (and everything below) keeps its v1.28 height */
@@ -312,8 +316,8 @@ const COPY = {
     ["i let it take me so far from myself that i didn't know who jay was"],
     [{text: "because i hadn't found my ikigai", teal: true}],   // round 27 (jay 2026.09.30): was "didn't have"
     [{text: "but now... i have", teal: true}],   // round 27 (jay 2026.09.30): was "i do"
-    ["i hope what we are building helps you find yours"],   // v1.30 (jay 2026.09.30): was "and i hope what i build helps you find yours". round 27 (jay 2026.09.30): was "and one day, i hope you will benefit from my life's work"
-    ["the journey ahead is long, but we have space𝕏 to help us now"],   // v1.29 (jay 2026.09.30): was "the road ahead is long, but i'm in ludicrous mode 🚀". the rocket moved to the signup button (no duplicate). 𝕏 (U+1D54F) isn't in JetBrains Mono, so it falls back like any missing glyph
+    ["i hope the cool stuff we're building helps you find yours"],   // v1.33 (jay 2026.09.30): was "i hope what we are building helps you find yours". v1.30 (jay 2026.09.30): was "and i hope what i build helps you find yours". round 27 (jay 2026.09.30): was "and one day, i hope you will benefit from my life's work"
+    ["and while the journey ahead is long... we have space𝕏 to help us now"],   // v1.33 (jay 2026.09.30): was "the journey ahead is long, but we have space𝕏 to help us now". v1.29 (jay 2026.09.30): was "the road ahead is long, but i'm in ludicrous mode 🚀". the rocket moved to the signup button (no duplicate). 𝕏 (U+1D54F) isn't in JetBrains Mono, so it falls back like any missing glyph
   ],
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
@@ -369,6 +373,7 @@ const ICONS = {
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const RAIN_GLYPHS = '0123456789{}[]<>/\\=+*:;.-_#$%&@abcdefhjknrstuvxyz'.split('');
 const rg = () => RAIN_GLYPHS[Math.floor(Math.random()*RAIN_GLYPHS.length)];
+const ALNUM = RAIN_GLYPHS.filter(c => /[a-z0-9]/.test(c)), scrambleOf = c => /^[a-z0-9]$/i.test(c) ? ALNUM[Math.floor(Math.random()*ALNUM.length)] : c;   // v1.33 (jay 2026.09.30): the typing scramble swaps letters/digits for letters/digits only; spaces, punctuation and 𝕏 show as themselves, so the break opportunities and widths never change and a wrapped paragraph never re-wraps mid-typing
 
 
 /* ---- typing: every line uses the hello line's decode effect ---- */
@@ -394,6 +399,7 @@ function prepare(el, pieces){
   }
   return {el, runs, n};
 }
+const glue = mk('span', 'glue'), wjA = document.createTextNode('\u2060'), wjB = document.createTextNode('\u2060');   // v1.33 (jay 2026.09.30): the cursor is an inline-block, i.e. a wrap point on both sides; while it types mid-line it sits in this nowrap span between two word joiners, so a line never breaks mid-word at the cursor
 function render(t, head, win){
   const resolved = Math.max(0, head - win), top = Math.min(head, t.n);
   let active = t.runs[0];
@@ -401,11 +407,12 @@ function render(t, head, win){
     const L = r.g.length, a = Math.min(L, Math.max(0, resolved - r.start)), b = Math.min(L, Math.max(0, top - r.start));
     if (r.node.tagName === 'A' && resolved >= r.start + L) revealTap(r.node);
     r.res.textContent = r.g.slice(0, a).join('');
-    r.scr.textContent = r.g.slice(a, b).map(c => /\s/.test(c) ? c : rg()).join('');
+    r.scr.textContent = r.g.slice(a, b).map(scrambleOf).join('');   // v1.33: was c => /\s/.test(c) ? c : rg() (any glyph, so "-" "/" "[" could add a wrap point mid-word)
     r.ghost.textContent = r.g.slice(b).join('');
     if (b > 0) active = r;
   }
-  active.node.insertBefore(cursor, active.ghost);   // v1.29 (jay 2026.09.30): the round-20 inline-icon runs are gone (the copy rocket became the signup button)
+  if (top < t.n){ glue.replaceChildren(wjA, cursor, wjB); active.node.insertBefore(glue, active.ghost); } else { glue.remove(); active.node.insertBefore(cursor, active.ghost); }   // v1.33 (jay 2026.09.30): no wrap point at the cursor mid-word (see glue)
+  // v1.29 (jay 2026.09.30): the round-20 inline-icon runs are gone (the copy rocket became the signup button)
 }
 function type(t, opt){
   const win = opt.window, base = opt.speed, all = t.runs.flatMap(r => r.g);
@@ -935,14 +942,17 @@ function complete(){
    everything left types out REALLY fast in order (the same decode typing, a few scrambling characters ahead of what's resolved), then the icons pop,
    then the egg types out in its own orange, the 🎧 lyric first and the 🎙️ quote last of all. one step per character, spread over ~1.2s whatever is left.
    the dump only ever starts from 2x, so the rain is already fast orange and stays there: the page lands on orange › (2x), and the next tap is 1x */
-const DUMP = {ms: 1200, perStep: 14, eggWindow: 3};   // total budget (ms); per-step cap so a short remainder still reads as a burst; egg letters that scramble at once
-let dumping = false, dumpRaf = 0;
-function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; dumping = false; }
+const DUMP = {ms: 1200, perStep: 14, eggWindow: 3,   // total budget (ms); per-step cap so a short remainder still reads as a burst; egg letters that scramble at once
+  rain: 6, rainUp: 220, rainDown: 1100};   // v1.33 (jay 2026.09.30): while the dump fast-forwards, the rain runs at 6x (3x the orange 2x), ramping up over rainUp ms; when the page lands it eases back to 2x over rainDown ms
+let dumping = false, dumpRaf = 0, rainBoost = false;
+const unboost = ms => { if (!rainBoost) return; rainBoost = false; rain.setSpeed(fastNow() ? 2 : 1, ms); state.rainBoost = 'easing'; };   // v1.33: back to the mode's speed (always 2x after a dump)
+function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; dumping = false; unboost(250); }
 function dump(){
   if (dumping || state.done) return;
   if (reduced) return complete();
   dumping = true; skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout);
   if (document.documentElement.dataset.mode !== 'fast') JayRain.mode(true);   // always already 2x via the tap flow; kept so the dump can never end in a teal/orange mismatch
+  rainBoost = true; rain.setSpeed(DUMP.rain, DUMP.rainUp); state.rainBoost = 'on';   // v1.33: the rain fast-forwards with the text (colour stays the orange 2x)
   const tape = [], win = TIMING.window;
   for (let j = lineAt; j < lines.length; j++){
     const t = lines[j];
@@ -971,7 +981,7 @@ function dump(){
     while (at < k) tape[at++]();
     for (const c of scrambling) c.el.firstChild.textContent = rg();
     if (at < total){ dumpRaf = requestAnimationFrame(frame); return; }
-    dumpRaf = 0; dumping = false; state.dump.took = Math.round(performance.now() - t0);
+    dumpRaf = 0; dumping = false; state.dump.took = Math.round(performance.now() - t0); unboost(DUMP.rainDown);   // v1.33: landed, so the rain eases back to the orange 2x
     state.line = 3; state.icons = icons.length;
     if (eggText && state.egg === 'dumping') eggSettle();
     finishUp();

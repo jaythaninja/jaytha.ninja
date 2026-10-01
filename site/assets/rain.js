@@ -54,7 +54,8 @@ function Rain(cv, o){
   const part = (x, y) => { let f = 1; for (const q of R.rects){ const dx = Math.max(q.l - x, 0, x - q.r), dy = Math.max(q.t - y, 0, y - q.b); const d = Math.hypot(dx, dy); f = Math.min(f, o.partFloor + (1 - o.partFloor)*sm(0, o.partPad, d)); } return f; };
   R.frame = (now) => {
     requestAnimationFrame(R.frame);
-    if (now - R.last < 50) return; R.last = now;
+    const sp = R.speedAt(now);   // jay 2026.09.30 v1.33: 20fps up to 2x as before; faster rain (the homepage's skip-to-end, up to 6x) draws up to 60fps so drops glide instead of skipping rows
+    if (now - R.last < (sp > 2 ? Math.max(16, 100/sp) : 50)) return; R.last = now;
     const all = window.__rainAll, vt = all ? 0 : Math.max(0, scrollY - 60), vb = all ? R.H : Math.min(R.H, scrollY + innerHeight + 60), ctx = R.ctx, lh = R.lh;
     ctx.clearRect(0, vt, R.w, vb - vt);
     const speed = R.speedAt(now);
