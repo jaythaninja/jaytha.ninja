@@ -108,7 +108,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify input:focus-visible{outline:none}
 @media (prefers-reduced-motion:reduce){.notify{transition:none!important}}
 .ic{width:28px;height:22px}
-/* v1.38 (jay 2026.10.01): the icons rain in exactly like the 🗓️ / 🎧 / 🎙️ egg lines (all orange links): each icon is one rain column, a scrambling hot head + a short
+/* v1.38 (jay 2026.10.01): the icons rain in exactly like the 🗓️ / 🎧 / 💭 egg lines (all orange links): each icon is one rain column, a scrambling hot head + a short
    fading trail (the egg's own .tr) stepping row by row from just above the screen into its reserved slot, at the egg's step timing. the real icon shows just before it
    lands, then it lands with the egg's white-hot glow. reduced motion: the row fades in like the egg (egg-fade). was (v1.37): a 34px drop-in, tinted the rain colour */
 .social li{position:relative}
@@ -354,7 +354,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
     </nav>
-    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/song-of-the-day/) then "🎙️ quote →" (/quote-of-the-day/), the very last line -->
+    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/song-of-the-day/) then "💭 quote →" (/quote-of-the-day/), the very last line -->
   </div>
 </main>
 
@@ -387,8 +387,8 @@ const COPY = {
   lyric: "if you love me, let me go back to that bar in Tokyo\nwhere the demons from my past leave me in peace\ni'll be animated every night\nthe grass'll be greener on the other side\nand the vampires and wolves won't sink their teeth\ni'm sick of dancing with the beast",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
                                           // v1.26: always one line at the normal size; if it doesn't fit the column it's cut at a word with "… →" (the full lyric stays in the link's title + aria-label; see fitEgg)
   lyricHref: "/song-of-the-day/",   // v1.27 (jay 2026.09.30): was "/songs/" (the old url is now a redirect stub)
-  egg: "today's quote",   // v1.26 (jay 2026.09.30): the last line is TODAY'S quote, read from eggData (the same quotes.json /quote-of-the-day/ types at the top: the newest entry dated today or earlier, america/chicago). shown as "🎙️ <quote> →", lowercase, no author, one line (cut with "… →" if long). THIS text is only the fallback if quotes.json can't be read.
-  eggData: "/quote-of-the-day/quotes.json",   // v1.26: the daily 5:10am routine updates only this file (it already does for /quote-of-the-day/); nothing on the homepage needs editing. was (<= v1.25): egg: "🎙️ the clearest view of a man is from below →"
+  egg: "today's quote",   // v1.26 (jay 2026.09.30): the last line is TODAY'S quote, read from eggData (the same quotes.json /quote-of-the-day/ types at the top: the newest entry dated today or earlier, america/chicago). shown as "💭 <quote> →", lowercase, no author, one line (cut with "… →" if long). THIS text is only the fallback if quotes.json can't be read.
+  eggData: "/quote-of-the-day/quotes.json",   // v1.26: the daily 5:10am routine updates only this file (it already does for /quote-of-the-day/); nothing on the homepage needs editing. was (<= v1.25): egg: "💭 the clearest view of a man is from below →"
   eggHref: "/quote-of-the-day/",   // v1.27: was "/quotes/" (now a redirect stub). round 16: leave "" for plain text; put a url here and the landed line becomes a link   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all out front, all orange. round 24: instagram 3rd, + telegram 4th. v1.26 (jay 2026.09.30): tiktok removed
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
@@ -516,11 +516,11 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
 const eggEl = $('.egg');
 /* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
    every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
-/* v1.26 (jay 2026.09.30): line 1 = "🎧 <COPY.lyric> →" (/song-of-the-day/), line 2 = "🎙️ <today's quote> →" (/quote-of-the-day/), the very last line. the quote comes from quotes.json (see loadQuote below).
+/* v1.26 (jay 2026.09.30): line 1 = "🎧 <COPY.lyric> →" (/song-of-the-day/), line 2 = "💭 <today's quote> →" (/quote-of-the-day/), the very last line. the quote comes from quotes.json (see loadQuote below).
    both lines are lowercase and always ONE line at the normal size: fitEgg measures each line with the real font at the real column width and, if it would wrap,
    cuts it at a word boundary and ends it with "… →" so it fits exactly (the arrow always shows). the full text stays in the link's title + aria-label */
 const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
-const EGG = [{icon: '🗓️', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '🎙️', body: lc(COPY.egg), href: COPY.eggHref, quote: true}];   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
+const EGG = [{icon: '🗓️', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}];   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
 const quoteLine = EGG.find(l => l.quote);
 const lineText = (l, body) => l.day ? `${l.icon} ${body}` : `${l.icon} ${body} →`;   // v1.31: the date line has no link, so no arrow
 eggEl.classList.toggle('has-day', !!COPY.dayDate);
@@ -1003,7 +1003,7 @@ let current = null, skipped = false, lineAt = 0;   // jay 2026.09.30 v1.25: line
 const iconTimers = [], icons = [...ul.children].filter(li => li !== curLi);
 /* jay 2026.09.30 v1.25: the page is fully loaded (naturally, after the dump, or at once). round 16: the cursor comes back for good at the end of the icon row.
    the hint goes back to the 1x/2x toggle, and this tab remembers it has shown the homepage (see the back-navigation rule below).
-   v1.30 (jay 2026.09.30): "fully loaded" now means the egg has landed too (the 🎙️ quote line is the last thing to finish). the cursor still comes home when the icons are in (cursorHome),
+   v1.30 (jay 2026.09.30): "fully loaded" now means the egg has landed too (the 💭 quote line is the last thing to finish). the cursor still comes home when the icons are in (cursorHome),
    but ››| and the two-tap skip stay live until the egg lands (introEnd); was: finishUp() as soon as the last icon popped, while the egg was still raining */
 function cursorHome(){
   document.body.classList.add('revealed');
@@ -1167,7 +1167,7 @@ function complete(){
 /* jay 2026.09.30 v1.25: terminal dump. round 8's "no skip" is retired. three taps: the intro loads like today (teal ››); a first tap is the usual 2x (typing + rain go fast, orange);
    once in 2x while the intro still types, the hint shows an orange ››| and the next tap dumps the rest. after that, taps toggle 1x/2x as before.
    everything left types out REALLY fast in order (the same decode typing, a few scrambling characters ahead of what's resolved), then the icons pop,
-   then the egg types out in its own orange, the 🎧 lyric first and the 🎙️ quote last of all. one step per character, spread over ~1.2s whatever is left.
+   then the egg types out in its own orange, the 🎧 lyric first and the 💭 quote last of all. one step per character, spread over ~1.2s whatever is left.
    the dump only ever starts from 2x, so the rain is already fast orange and stays there: the page lands on orange › (2x), and the next tap is 1x */
 const DUMP = {ms: 1200, perStep: 14, eggWindow: 3,   // total budget (ms); per-step cap so a short remainder still reads as a burst; egg letters that scramble at once
   rain: 6, rainUp: 220, rainDown: 1100};   // v1.33 (jay 2026.09.30): while the dump fast-forwards, the rain runs at 6x (3x the orange 2x), ramping up over rainUp ms; when the page lands it eases back to 2x over rainDown ms
