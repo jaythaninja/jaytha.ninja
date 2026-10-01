@@ -58,6 +58,10 @@ a:hover{color:var(--teal)}
 .js .notify.gone{opacity:0;transform:translateY(-4px);visibility:hidden;transition:opacity .2s ease-in,transform .2s ease-in,visibility 0s .2s}
 .notify input{flex:0 1 23ch;min-width:0;font:inherit;font-size:18px;line-height:1.5;color:var(--white);background:transparent;border:0;border-bottom:1px solid rgba(26,173,179,.55);border-radius:0;padding:4px 0 5px;caret-color:var(--teal);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s ease,box-shadow .2s ease}
 .notify input::placeholder{color:rgba(246,239,233,.34);opacity:1}
+/* v1.31 PREVIEW (jay 2026.09.30): no browser validation bubble (the form is novalidate). a failed liftoff makes the placeholder "you@email.com" (or the partial email typed)
+   glow + pulse in brand teal instead (failGlow sets these three custom properties per frame). colour + text-shadow only, so nothing ever moves */
+.notify input{color:var(--eg-c,var(--white));text-shadow:var(--eg-s,none)}
+.notify input::placeholder{color:var(--eg-pc,rgba(246,239,233,.34));text-shadow:var(--eg-s,none)}
 .notify input:hover{border-bottom-color:rgba(26,173,179,.8)}
 .notify input:focus{border-bottom-color:var(--teal);box-shadow:0 1px 0 var(--teal),0 10px 18px -12px rgba(26,173,179,.9)}
 .notify input:-webkit-autofill{-webkit-text-fill-color:var(--white);-webkit-box-shadow:0 0 0 60px #000 inset;caret-color:var(--teal);transition:background-color 9999s}
@@ -109,12 +113,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 @keyframes egg-land{0%{color:#fff;text-shadow:0 0 10px #fff,0 0 22px rgba(255,77,26,.95)}100%{color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6)}}
 .egg.fade{animation:egg-fade 1.4s ease-out both}   /* reduced motion: no falling, the line just fades in */
 @keyframes egg-fade{from{opacity:0}to{opacity:1}}
-/* v1.30 (jay 2026.09.30): the daily drop's date, "🗓️ yyyy.mm.dd" in white, right above the two egg lines (same font + size as them). COPY.dayDate, set by the 5am song + quote routine.
-   hidden until the egg shows (fades in as the egg starts to rain; at once when the page loads fully). it takes the egg's gap below the icons (desktop 52 -> 36px so 1440x900 still fits with ~5px to spare); the egg sits 4px under it */
-.day{margin-top:36px;font-size:20px;line-height:1.5;font-weight:400;color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45);white-space:nowrap;visibility:hidden}
-.day.on{visibility:visible}
-.day.in{animation:egg-fade 1.4s ease-out both}
-.day + .egg{margin-top:4px}
+/* v1.30 (jay 2026.09.30): the daily drop's date, "🗓️ yyyy.mm.dd" in white, right above the two egg lines (same font + size). COPY.dayDate, set by the 5am song + quote routine.
+   v1.31 PREVIEW (jay 2026.09.30): it's the egg's first line now, so it stays hidden (space reserved) until the egg rains, falls letter by letter in white (landing a little ahead of the 🎧 line),
+   and the dump types it first; was a separate line that faded in as a block. with a date the egg sits 36px under the icons (desktop; 52px without); lines stay 4px apart */
+.egg.has-day{margin-top:36px}
+.egg p.day{color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45)}
+.egg p.day .c.fall{color:#fff;text-shadow:0 0 8px #fff,0 0 20px rgba(255,255,255,.65)}
+.egg p.day .tr{color:rgba(255,255,255,.72);text-shadow:0 0 10px rgba(255,255,255,.4)}
+.egg p.day .c.land{animation:day-land 1.1s ease-out}
+@keyframes day-land{0%{text-shadow:0 0 10px #fff,0 0 22px rgba(255,255,255,.95)}100%{text-shadow:0 0 12px rgba(255,255,255,.45)}}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 
 @media (max-width:760px){
@@ -140,7 +147,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .social li.cur{font-size:16px}
   .social li.cur .cursor{margin-left:6px}
   .egg{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}
-  .day{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}   /* v1.30: same size as the egg lines; the egg's 30px gap below the icons moves to the date */   /* songs preview: "🎙️ " + 42 chars in one line (~26.9em incl. the emoji): 12.8px at 402, 12.4px at 390, 11.3px at 360. v1.26: never shrunk by js any more; a line that doesn't fit is truncated with "… →" (fitEgg). was /25.9 for 42 chars */
+  .egg.has-day{margin-top:30px}   /* v1.31: phones keep the egg's 30px gap with or without the date */
 }
 
 /* v1.29 (jay 2026.09.30): the submit button is the site's rocket (orange body = tappable, teal flame), bigger than the text so it reads as the button.
@@ -187,6 +194,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 /* v1.30 (jay 2026.09.30): failed liftoff (no valid email yet): smoke + a couple of dim rain glyphs, in a throwaway sky layer so nothing on the page moves */
 .rk-sky .puff.smoke{background:radial-gradient(closest-side,rgba(170,186,188,.5),rgba(26,173,179,.16) 60%,rgba(26,173,179,0))}
 .rk-sky .wk.dim{color:#8fa9aa;text-shadow:0 0 6px rgba(26,173,179,.5)}
+/* v1.31 PREVIEW (jay 2026.09.30): failed liftoff 2.0: the fake launch's sputtering flame, white smoke trail and the crash poof at the screen edge */
+.rk-sky .rk.sput .rk-fl{animation:rk-sputter .3s steps(1,end) infinite}
+@keyframes rk-sputter{0%{opacity:1;transform:scale(1,1.7)}22%{opacity:0}40%{opacity:.85;transform:scale(.9,1.15)}62%{opacity:0}78%{opacity:.5;transform:scale(.8,.8)}90%{opacity:0}}
+.rk-sky .smk{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.75),rgba(255,255,255,.28) 55%,rgba(255,255,255,0));will-change:transform,opacity;pointer-events:none}
+.rk-sky .smk.grey{background:radial-gradient(closest-side,rgba(190,198,199,.6),rgba(190,198,199,.2) 55%,rgba(190,198,199,0))}
+.rk-sky .smk.hot{background:radial-gradient(closest-side,rgba(255,236,224,.95),rgba(255,77,26,.55) 45%,rgba(255,77,26,0))}
+.rk-sky .spk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:#FF4D1A;text-shadow:0 0 8px rgba(255,77,26,.9);will-change:transform,opacity}
 /* v1.29 (jay 2026.09.30): the success line = a heart (teal, burns to orange) + "please confirm via email". one line, never wraps, never taller than the form row it replaces */
 .status{white-space:nowrap}
 .status .hb{position:relative;display:inline-block;width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:.5em;filter:drop-shadow(0 0 5px rgba(255,77,26,.7))}
@@ -264,7 +278,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
       <p class="prompt"></p>
       <div class="signup">
         <!-- buttondown (double opt-in): subscribers get a confirm email -->
-        <form class="notify" action="https://buttondown.com/api/emails/embed-subscribe/jaythaninja" method="post">
+        <form class="notify" action="https://buttondown.com/api/emails/embed-subscribe/jaythaninja" method="post" novalidate>
           <label class="sr" for="notify-email">your email</label>
           <input id="notify-email" type="email" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
           <input type="hidden" name="embed" value="1">
@@ -276,7 +290,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
     </nav>
-    <p class="day"></p>   <!-- v1.30 (jay 2026.09.30): "🗓️ <COPY.dayDate>", the day the song + quote below went up -->
     <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/song-of-the-day/) then "🎙️ quote →" (/quote-of-the-day/), the very last line -->
   </div>
 </main>
@@ -304,6 +317,7 @@ const COPY = {
   ],
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
   cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
+  failNote: "that email isn't complete yet. try again (like you@email.com)",   // v1.31 PREVIEW: screen readers only (visually hidden), replaces the browser bubble's message
   thanks: "please confirm via email",   // v1.29 (jay 2026.09.30): typed (teal) after the heart burns teal -> orange, in the form's slot, one line. was "almost there, check your email and tap confirm"
   dayDate: "2026.09.30",   // v1.30 (jay 2026.09.30): THE DAY'S DATE, yyyy.mm.dd, shown in white as "🗓️ <date>" above the egg lines. the daily 5am song + quote routine sets it together with lyric (the day the song + quote were published, america/chicago; never the viewer's clock). "" hides the line.
   lyric: "but the beat goes on and on",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
@@ -333,7 +347,9 @@ const TIMING = {
   beforeSignoff: 300, beforeIcons: 250, iconStagger: 150,
   eggLead: 250,         // round 23: the egg starts raining ~this many ms (real time) before the first icon pops in (was: after the last icon)
   eggTotal: 8500,        // round 16: the whole egg rain lasts about this long (ms). each letter falls ~3-4.6s, starts staggered at random
-  eggStep: [95, 150]     // round 16: ms per row a letter drops (matrix-style stepping, like the rain); random per letter
+  eggStep: [95, 150],    // round 16: ms per row a letter drops (matrix-style stepping, like the rain); random per letter
+  eggDaySpread: 1500,    // v1.31: the date line's letters start falling at random within this window (so they rain, not drop as a block)
+  eggDayLead: 900        // v1.31: the song + quote letters start this much later, so the date lands right before the 🎧 line
 };
 /* ===================================================================== */
 
@@ -429,22 +445,17 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
    one column per letter (a scrambling head + a short fading trail, stepping row by row like the rain), resolves as it lands, and stays.
    laid out up front (hidden) so the landing never reflows; letters start above the viewport, so nothing adds scroll height or width */
 const eggEl = $('.egg');
-/* v1.30 (jay 2026.09.30): the date line. it shows whenever the egg does (a class watch on .egg, so the rain, the dump, reduced motion and the full load all carry it); it fades in only while the egg rains or fades */
-const dayEl = $('.day');
-if (COPY.dayDate){
-  const d = mk('span'); d.setAttribute('aria-hidden', 'true'); d.textContent = '🗓️'; dayEl.append(d, ' ' + COPY.dayDate);
-  const showDay = () => { if (dayEl.classList.contains('on') || !eggEl.classList.contains('on')) return; dayEl.classList.add('on'); if (state.egg === 'falling' || eggEl.classList.contains('fade')) dayEl.classList.add('in'); };
-  new MutationObserver(showDay).observe(eggEl, {attributes: true, attributeFilter: ['class']});
-} else dayEl.remove();
 /* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
    every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
 /* v1.26 (jay 2026.09.30): line 1 = "🎧 <COPY.lyric> →" (/song-of-the-day/), line 2 = "🎙️ <today's quote> →" (/quote-of-the-day/), the very last line. the quote comes from quotes.json (see loadQuote below).
    both lines are lowercase and always ONE line at the normal size: fitEgg measures each line with the real font at the real column width and, if it would wrap,
    cuts it at a word boundary and ends it with "… →" so it fits exactly (the arrow always shows). the full text stays in the link's title + aria-label */
 const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
-const EGG = [{icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '🎙️', body: lc(COPY.egg), href: COPY.eggHref, quote: true}];
-const quoteLine = EGG[1];
-const lineText = (l, body) => `${l.icon} ${body} →`;
+const EGG = [{icon: '🗓️', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '🎙️', body: lc(COPY.egg), href: COPY.eggHref, quote: true}];   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
+const quoteLine = EGG.find(l => l.quote);
+const lineText = (l, body) => l.day ? `${l.icon} ${body}` : `${l.icon} ${body} →`;   // v1.31: the date line has no link, so no arrow
+eggEl.classList.toggle('has-day', !!COPY.dayDate);
+const lineClass = l => l.day ? 'day' : l.song ? 'song' : 'quote';
 const isDeco = w => w === '→' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
 const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], ..., [last word, →]
   const words = text.split(' ').filter(Boolean), groups = [];
@@ -508,7 +519,7 @@ function fitAll(){   // -> the lines as they fit the column right now
 function buildEgg(){   // the falling letters, laid out (hidden) up front, so the landing never reflows
   const fitted = fitAll();
   eggEl.textContent = ''; eggChars = [];
-  eggLines = fitted.map(f => { const p = mk('p', f.l.song ? 'song' : 'quote'); fillChars(p, f.text, eggChars); eggEl.appendChild(p); return {p, l: f.l, text: f.text}; });
+  eggLines = fitted.map(f => { const p = mk('p', lineClass(f.l)); fillChars(p, f.text, eggChars); eggEl.appendChild(p); return {p, l: f.l, text: f.text}; });
   eggText = eggLines.map(x => x.text).join('\n');
 }
 let fitW = -1;
@@ -523,7 +534,7 @@ function eggSettle(){   // the final lines: plain links (same no-wrap groups, so
   const fitted = fitAll();
   eggEl.textContent = ''; eggChars = [];
   eggLines = fitted.map(f => {
-    const {l} = f, p = mk('p', l.song ? 'song' : 'quote'); eggEl.appendChild(p);
+    const {l} = f, p = mk('p', lineClass(l)); eggEl.appendChild(p);
     const label = el => { el.title = l.body; el.setAttribute('aria-label', l.body); };   // v1.26: the full (untruncated) text
     if (l.href){ const a = gateTap(mk('a')); a.setAttribute('href', l.href); if (/^https?:/.test(l.href)){ a.target = '_blank'; a.rel = 'noopener'; } fillPlain(a, f.text); label(a); p.appendChild(a); revealTap(a); }
     else { fillPlain(p, f.text); label(p); }
@@ -544,7 +555,8 @@ function egg(){
     const top = c.el.getBoundingClientRect().top;
     const rows = Math.max(8, Math.ceil((top + row*2)/row));   // start just above the viewport, drop row by row into the slot
     const dur = Math.min(4600, Math.max(3000, rows*(s0 + Math.random()*(s1 - s0))));
-    const delay = Math.random()*Math.max(0, TIMING.eggTotal - dur);
+    const isDay = !!c.el.closest('p.day'), lead = eggEl.classList.contains('has-day') ? TIMING.eggDayLead : 0;   // v1.31: the date rains first (its letters staggered over eggDaySpread), the song + quote letters start eggDayLead later, same overall length
+    const delay = isDay ? Math.random()*TIMING.eggDaySpread : lead + Math.random()*Math.max(0, TIMING.eggTotal - dur - lead);
     last = Math.max(last, delay + dur);
     const tr = mk('span', 'tr'); c.trail = Array.from({length: 4 + Math.floor(Math.random()*4)}, rg); tr.textContent = c.trail.join('\n');
     c.tr = tr; c.el.appendChild(tr); c.el.firstChild.textContent = rg(); c.el.classList.add('fall');
@@ -584,12 +596,7 @@ const showForm = () => { form.classList.add('in'); setTimeout(() => formTaps.for
 const emailIn = form.querySelector('input[type=email]');
 const nativeOk = v => !(v.valueMissing || v.typeMismatch || v.patternMismatch || v.tooLong || v.tooShort || v.badInput);   // v1.30: the browser's own checks (our custom message aside)
 const looksDone = () => nativeOk(emailIn.validity) && /@[^@\s]+\.[^@\s.]{2,}$/.test(emailIn.value.trim());
-const INCOMPLETE = 'Please enter a complete email address (like you@email.com).';
-const syncOk = () => {
-  const ok = looksDone(); form.classList.toggle('ok', ok);
-  // v1.30 (jay 2026.09.30): an address the browser accepts but looksDone doesn't (e.g. "jay@example", no dot) is blocked natively too, with its own bubble, so it never posts
-  emailIn.setCustomValidity(!ok && emailIn.value.trim() && nativeOk(emailIn.validity) ? INCOMPLETE : '');
-};
+const syncOk = () => { form.classList.toggle('ok', looksDone()); };   // v1.31 PREVIEW (jay 2026.09.30): no custom validity message or native bubble any more (form is novalidate); looksDone() alone gates the post
 ['input', 'change', 'keyup'].forEach(ev => emailIn.addEventListener(ev, syncOk)); addEventListener('pageshow', syncOk); syncOk();
 /* v1.29 (jay 2026.09.30): the success heart. our own drawing, three stacked copies: teal (start), orange (the burnt heart, revealed bottom to top) and a white-hot band riding the burn line.
    it pops in like the ninja, holds a beat, burns upward with orange embers (rain glyphs) coming off the flame line, and settles orange. reduced motion: a plain teal -> orange crossfade */
@@ -682,47 +689,142 @@ const launchRocket = () => new Promise(done => {
     });
   });
 });
-/* v1.30 (jay 2026.09.30): failed liftoff. a tap, click or Enter without a valid email (empty, or not looksDone): the browser keeps its validation bubble and sends nothing;
-   the engine coughs 2-3 times, the rocket hops a few px, wobbles + shakes, drops back with a small bump, a grey-teal puff + two dim rain glyphs drift off the nozzle, then idle again.
-   ~0.9s. transforms only (the button box never changes), smoke in a throwaway fixed sky layer. taps while it plays are ignored (no stacking). reduced motion: only a brief flame flicker */
-const FAIL = {ms: 900, reducedMs: 360};
+/* v1.30 (jay 2026.09.30): failed liftoff. a tap, click or Enter without a valid email (empty, or not looksDone): sends nothing.
+   v1.31 PREVIEW (jay 2026.09.30 18:11 ct): no browser bubble any more (off brand). the cue is the field itself glowing teal (failGlow), timed around the crash.
+   v1.31 PREVIEW (jay 2026.09.30): it plays like the launch worked and then crashes: the rocket turns straight up and lifts off with its normal teal flame + rain wake, swirls round
+   in one loose loop and a half, then the "descent to destruction": the flame sputters, it noses over and dives into the bottom-right corner trailing white smoke, and poofs at the edge.
+   then the button's rocket pops back in place. ~2.6-3s. the flight is a copy of the rocket in a throwaway fixed sky layer (the button keeps its box, nothing on the page moves),
+   the button's own rocket is only hidden meanwhile. taps while it flies are ignored; a real (valid) submit mid-flight cancels it at once. reduced motion: only the brief flame flicker.
+   was (v1.30): a 0.9s sputter + hop + wobble in place */
+const FAIL = {reducedMs: 360, turn: 180, swirlMin: 1150, swirlMax: 1450, swirlPerPx: .7, dive: 700, crash: 340, back: 280, wakeEvery: 34, smokeEvery: 22};
 function failLiftoff(){
   const btn = form.querySelector('.rkb'), svg = btn && btn.querySelector('.rk'), fl = svg && svg.querySelector('.rk-fl');
   if (!fl || !svg.animate || form.classList.contains('gone') || btn.disabled) return;
   const f = state.fail = state.fail || {count: 0, ignored: 0};
   if (f.playing){ f.ignored++; return; }
-  f.playing = true; f.count++; f.t0 = performance.now();
-  const end = () => { f.playing = false; f.took = Math.round(performance.now() - f.t0); };
+  f.playing = true; f.count++; f.t0 = performance.now(); f.phase = 'turn';
+  failAnnounce();
   if (reduced){
+    failGlow(0, true);   // one gentle teal highlight
+    const end = () => { f.playing = false; f.phase = 'idle'; f.took = Math.round(performance.now() - f.t0); };
     fl.animate([{opacity: .85}, {opacity: .25, offset: .3}, {opacity: 1, offset: .6}, {opacity: .85}], {duration: FAIL.reducedMs, easing: 'linear'}).finished.then(end, end);
     return;
   }
-  const o = 'transform-origin', n = FAIL.ms;
-  fl.animate([   // the cough: on, off, on, off, sputter back to the idle pilot flame
-    {opacity: .85, transform: 'scaleY(.92)'}, {opacity: 0, transform: 'scaleY(.3)', offset: .08}, {opacity: 1, transform: 'scale(1.1,1.35)', offset: .16}, {opacity: .15, transform: 'scaleY(.4)', offset: .27},
-    {opacity: 1, transform: 'scale(1.05,1.25)', offset: .37}, {opacity: 0, transform: 'scaleY(.3)', offset: .5}, {opacity: .7, transform: 'scaleY(.8)', offset: .62}, {opacity: .1, transform: 'scaleY(.35)', offset: .72},
-    {opacity: .85, transform: 'scaleY(.92)'}], {duration: n, easing: 'linear'});
-  svg.animate([   // hop up a few px, wobble + shake, drop back, a small bump, settle
-    {transform: 'none'}, {transform: 'translate(0,-1px) rotate(-2deg)', offset: .12}, {transform: 'translate(-1px,-5px) rotate(3deg)', offset: .22}, {transform: 'translate(1.5px,-7px) rotate(-4deg)', offset: .32},
-    {transform: 'translate(-1.5px,-6px) rotate(4deg)', offset: .42}, {transform: 'translate(1px,-4px) rotate(-2.5deg)', offset: .52}, {transform: 'translate(0,0) rotate(1deg)', offset: .62, easing: 'ease-in'},
-    {transform: 'translate(0,1.5px) rotate(0deg) scale(1.03,.96)', offset: .7}, {transform: 'translate(0,-1px) rotate(-.5deg)', offset: .8}, {transform: 'translate(.5px,0) rotate(.5deg)', offset: .9}, {transform: 'none'}],
-    {duration: n, easing: 'ease-out'}).finished.then(end, end);
-  // smoke: a throwaway fixed layer (no layout), removed once it has faded
-  const r = fl.getBoundingClientRect(), x = r.left + r.width*.3, y = r.bottom - r.height*.3, sky = mk('div', 'rk-sky'); sky.setAttribute('aria-hidden', 'true'); document.body.appendChild(sky);
-  [[.12, 1], [.4, .75]].forEach(([at, k]) => {
-    const puff = mk('span', 'puff smoke'), ps = btn.offsetWidth*.9*k; Object.assign(puff.style, {left: (x - ps/2) + 'px', top: (y - ps/2) + 'px', width: ps + 'px', height: ps + 'px', opacity: 0}); sky.appendChild(puff);
-    puff.animate([{opacity: 0, transform: 'translate(0,0) scale(.3)'}, {opacity: .85, transform: 'translate(-3px,2px) scale(.8)', offset: .25}, {opacity: 0, transform: 'translate(-10px,-6px) scale(1.5)'}], {duration: 560, delay: n*at, easing: 'ease-out', fill: 'backwards'});
-  });
-  [[.18, -14, 16], [.46, -6, 22]].forEach(([at, dx, dy]) => {
-    const w = mk('span', 'wk dim'); w.textContent = rg(); w.style.opacity = 0; w.style.transform = `translate(${x}px,${y}px)`; sky.appendChild(w);
-    w.animate([{transform: `translate(${x}px,${y}px) scale(1)`, opacity: .8}, {transform: `translate(${x + dx}px,${y + dy}px) scale(.7)`, opacity: 0}], {duration: 520, delay: n*at, easing: 'ease-out', fill: 'backwards'});
-  });
-  setTimeout(() => sky.remove(), n + 300);
+  const r = btn.getBoundingClientRect(), W = innerWidth, H = innerHeight, sz = r.width, S = [r.left + sz/2, r.top + r.height/2];
+  const sky = mk('div', 'rk-sky'); sky.setAttribute('aria-hidden', 'true'); document.body.appendChild(sky);
+  const ghost = svg.cloneNode(true); ghost.querySelectorAll('[id]').forEach(e => e.removeAttribute('id'));   // the copy paints with the button rocket's own gradients
+  Object.assign(ghost.style, {left: r.left + 'px', top: r.top + 'px', width: sz + 'px', height: r.height + 'px', transformOrigin: '50% 50%'}); sky.appendChild(ghost);
+  svg.style.transition = 'none'; svg.style.opacity = '0';
+  // the flight path: straight up off the pad, one loose loop and a half in the space above the form, then a dive into the bottom-right corner
+  const Lx = Math.max(sz, S[0] - .8*Math.min(W, 700)), Rx = Math.min(W - sz, S[0] + .35*Math.min(W, 700)), Ty = .12*H, By = .56*H;
+  const at = (u, v) => [Lx + u*(Rx - Lx), Ty + v*(By - Ty)];
+  const P = [S, [S[0], S[1] - Math.min(.2*H, 170)], at(.8, .05), at(.2, .12), at(.05, .6), at(.5, .85), at(.85, .45), at(.55, .15), [W*.78, H*.6], [W - sz*.35, H - sz*.35]];
+  const cr = (p0, p1, p2, p3, t) => { const t2 = t*t, t3 = t2*t; return [0, 1].map(k => .5*((2*p1[k]) + (-p0[k] + p2[k])*t + (2*p0[k] - 5*p1[k] + 4*p2[k] - p3[k])*t2 + (-p0[k] + 3*p1[k] - 3*p2[k] + p3[k])*t3)); };
+  const pts = [], seg = [];   // dense samples along a catmull-rom through P, with the arc length at each, so speed can be set by time
+  for (let i = 0; i < P.length - 1; i++){ const p0 = P[Math.max(0, i - 1)], p3 = P[Math.min(P.length - 1, i + 2)]; seg[i] = pts.length; for (let j = 0; j < 40; j++) pts.push(cr(p0, P[i], P[i + 1], p3, j/40)); }
+  pts.push(P[P.length - 1]);
+  const len = [0]; for (let i = 1; i < pts.length; i++) len.push(len[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1]));
+  const L7 = len[seg[7]], Lend = len[len.length - 1];
+  const swirl = Math.round(Math.min(FAIL.swirlMax, Math.max(FAIL.swirlMin, L7*FAIL.swirlPerPx)));
+  const tSwirl = FAIL.turn, tDive = tSwirl + swirl, tCrash = tDive + FAIL.dive, tBack = tCrash + FAIL.crash, tEnd = tBack + FAIL.back;
+  const posAt = s => { let lo = 0, hi = len.length - 1; while (lo < hi){ const m = (lo + hi) >> 1; if (len[m] < s) lo = m + 1; else hi = m; } const i = Math.max(1, lo), k = (s - len[i - 1])/Math.max(1e-6, len[i] - len[i - 1]);
+    return {x: pts[i - 1][0] + (pts[i][0] - pts[i - 1][0])*k, y: pts[i - 1][1] + (pts[i][1] - pts[i - 1][1])*k, a: Math.atan2(pts[i][1] - pts[i - 1][1], pts[i][0] - pts[i - 1][0])*180/Math.PI}; };
+  const ease = t => t < .5 ? 2*t*t : 1 - Math.pow(-2*t + 2, 2)/2;
+  let rot = 0, lastWake = 0, lastSmoke = 0, raf = 0, crashed = false, done = false; const t0 = performance.now();
+  const bit = (cls, x, y, size, kf, dur) => { const e = mk('span', cls); if (size) Object.assign(e.style, {width: size + 'px', height: size + 'px'}); e.style.transform = `translate(${x}px,${y}px)`; sky.appendChild(e);
+    e.animate(kf, {duration: dur, easing: 'ease-out', fill: 'forwards'}).finished.then(() => e.remove(), () => {}); return e; };
+  const finish = () => { if (done) return; done = true; cancelAnimationFrame(raf); f.playing = false; f.phase = 'idle'; f.abort = null; f.took = Math.round(performance.now() - f.t0); };
+  const restore = () => { svg.style.transition = ''; svg.style.opacity = ''; };
+  f.abort = () => { cancelAnimationFrame(raf); sky.remove(); restore(); svg.getAnimations().forEach(a => a.cancel()); glowStop(); finish(); f.aborted = (f.aborted || 0) + 1; };
+  const frame = now => {
+    const t = now - t0;
+    let x = S[0], y = S[1], target = rot;
+    if (t < tSwirl){ target = -45*ease(t/FAIL.turn); f.phase = 'turn'; }   // turn to straight up on the pad, flame lit
+    else if (t < tCrash){
+      const diving = t >= tDive; f.phase = diving ? 'dive' : 'swirl';
+      const s = diving ? L7 + (Lend - L7)*Math.pow((t - tDive)/FAIL.dive, 1.7) : L7*ease((t - tSwirl)/swirl);
+      const p = posAt(Math.min(Lend, s)); x = p.x; y = p.y;
+      let a = p.a + 45; while (a - rot > 180) a -= 360; while (a - rot < -180) a += 360;
+      target = a + (diving ? Math.sin(t/38)*7 : 0);
+      if (diving && !ghost.classList.contains('sput')) ghost.classList.add('sput');
+      const hd = (rot - 45)*Math.PI/180, tx = x - Math.cos(hd)*sz*.42, ty = y - Math.sin(hd)*sz*.42;   // the nozzle, behind the nose
+      if (!diving && now - lastWake >= FAIL.wakeEvery){ lastWake = now;   // the normal teal rain wake while it still "works"
+        const dx = -Math.cos(hd)*30 + (Math.random() - .5)*20, dy = -Math.sin(hd)*30 + (Math.random() - .5)*20;
+        const w = bit(Math.random() < .22 ? 'wk hot' : 'wk', tx, ty, 0, [{transform: `translate(${tx}px,${ty}px) scale(1)`, opacity: .95}, {transform: `translate(${tx + dx}px,${ty + dy}px) scale(.7)`, opacity: 0}], 560 + Math.random()*300); w.textContent = rg(); }
+      if (diving && now - lastSmoke >= FAIL.smokeEvery){ lastSmoke = now;   // white smoke trail, puffing out and up as it falls
+        const k = sz*(.45 + Math.random()*.35);
+        bit(Math.random() < .3 ? 'smk grey' : 'smk', tx - k/2, ty - k/2, k, [{transform: `translate(${tx - k/2}px,${ty - k/2}px) scale(.35)`, opacity: .9}, {transform: `translate(${tx - k/2 + (Math.random() - .5)*16}px,${ty - k/2 - 10 - Math.random()*14}px) scale(1.7)`, opacity: 0}], 700 + Math.random()*350); }
+    } else {
+      const p = posAt(Lend); x = p.x; y = p.y;
+      if (!crashed){ crashed = true; f.phase = 'crash';   // poof at the edge: the rocket blinks out in a burst of white smoke, an orange flash and a few orange sparks
+        const cx = Math.min(W - 18, x), cy = Math.min(H - 18, y);
+        ghost.animate([{opacity: 1}, {opacity: 0}], {duration: 110, fill: 'forwards'});
+        const fb = sz*1.6; bit('smk hot', cx - fb/2, cy - fb/2, fb, [{transform: `translate(${cx - fb/2}px,${cy - fb/2}px) scale(.3)`, opacity: 1}, {transform: `translate(${cx - fb/2}px,${cy - fb/2}px) scale(1.2)`, opacity: 0}], 380);
+        for (let i = 0; i < 6; i++){ const a = Math.PI*(1 + .5*i/5) + (Math.random() - .5)*.3, d = sz*(.5 + Math.random()*.5), k = sz*(.7 + Math.random()*.5);
+          bit(i % 3 ? 'smk' : 'smk grey', cx - k/2, cy - k/2, k, [{transform: `translate(${cx - k/2}px,${cy - k/2}px) scale(.3)`, opacity: .95}, {transform: `translate(${cx - k/2 + Math.cos(a)*d}px,${cy - k/2 + Math.sin(a)*d}px) scale(1.5)`, opacity: 0}], 620 + Math.random()*260); }
+        for (let i = 0; i < 5; i++){ const a = Math.PI*(1.05 + .4*Math.random()), d = sz*(.8 + Math.random()*.9);
+          const e = bit('spk', cx, cy, 0, [{transform: `translate(${cx}px,${cy}px)`, opacity: 1}, {transform: `translate(${cx + Math.cos(a)*d}px,${cy + Math.sin(a)*d}px)`, opacity: 0}], 420 + Math.random()*200); e.textContent = rg(); }
+      }
+      if (t >= tBack && svg.style.opacity === '0'){ f.phase = 'back'; restore();   // the button's rocket pops back in place, idle again
+        svg.animate([{transform: 'scale(.55)', opacity: 0}, {transform: 'scale(1.08)', opacity: 1, offset: .7}, {transform: 'none'}], {duration: FAIL.back, easing: 'ease-out'}); }
+      if (t >= tEnd){ finish(); setTimeout(() => sky.remove(), 900); return; }   // let the last smoke fade
+    }
+    rot += (target - rot)*(t < tSwirl ? 1 : .35);
+    ghost.style.transform = `translate(${x - S[0]}px,${y - S[1]}px) rotate(${rot}deg)`;
+    raf = requestAnimationFrame(frame);
+  };
+  f.plan = {swirl, total: tEnd, pathPx: Math.round(Lend), crash: P[P.length - 1].map(Math.round), glowAt: Math.round(tCrash - GLOW.lead*GLOW.pulseMs), glowEnd: Math.round(tCrash - GLOW.lead*GLOW.pulseMs + GLOW.pulses*GLOW.pulseMs), crashAt: tCrash};
+  failGlow(tCrash - GLOW.lead*GLOW.pulseMs, true);   // teal pulses: the 2nd peaks as it crashes, the tail runs ~2s past the reset; the refocus comes when it ends
+  raf = requestAnimationFrame(frame);
 }
-emailIn.addEventListener('invalid', failLiftoff);   // fires on a blocked submit (click, tap or Enter); the browser still shows its bubble
+/* v1.31 PREVIEW (jay 2026.09.30 18:11 ct): the failed-liftoff cue, instead of the browser's bubble. the placeholder (or the partial email) glows and pulses in brand teal #1AADB3,
+   0.5s pulses from 0.75s before the crash (the 2nd peaks on the crash) until ~2s after the rocket is back on the button (7 in all), then back to normal. the user focusing the field or typing stops it at once. reduced motion: one gentle 0.7s highlight.
+   when it ends the field gets focus (preventScroll, only if focus isn't somewhere else) so the keyboard is ready. colour + text-shadow only: the layout never moves */
+const GLOW = {pulses: 7, lead: 1.5, pulseMs: 500, reducedMs: 700, reducedPeak: .55};   // (jay 18:38 ct) 7 pulses: 3 around the crash + ~4 more (~2s) after the rocket is back on the button, so nobody misses it. lead: pulses before the crash (the 2nd one peaks on it)
+let glowRaf = 0, glowFocusing = false;
+const glowSet = g => {   // 0 = normal .. 1 = full teal glow
+  if (g <= 0){ ['--eg-c', '--eg-pc', '--eg-s'].forEach(p => emailIn.style.removeProperty(p)); if (!emailIn.style.length) emailIn.removeAttribute('style'); return; }
+  const mix = a => a.map((v, i) => Math.round(v + ([26, 173, 179][i] - v)*g)).join(',');
+  emailIn.style.setProperty('--eg-c', `rgb(${mix([255, 255, 255])})`);
+  emailIn.style.setProperty('--eg-pc', `rgba(${mix([246, 239, 233])},${(.34 + .66*g).toFixed(3)})`);
+  emailIn.style.setProperty('--eg-s', `0 0 ${(3 + 7*g).toFixed(1)}px rgba(26,173,179,${(.95*g).toFixed(3)}),0 0 ${(10 + 12*g).toFixed(1)}px rgba(26,173,179,${(.6*g).toFixed(3)})`);
+};
+const glowStop = () => { if (glowRaf){ cancelAnimationFrame(glowRaf); glowRaf = 0; if (state.fail) state.fail.glow = 'stopped'; } glowSet(0); };
+/* (jay 2026.09.30 18:48 ct) touch / coarse-pointer devices: a failed liftoff never focuses the field. on an iphone that pops the keyboard over the show.
+   touchish = a coarse or hover-less primary pointer, or the rocket was tapped with a finger / pen (e.g. a touchscreen laptop) */
+let failPointer = '';
+form.querySelector('button').addEventListener('pointerdown', e => { failPointer = e.pointerType || ''; }, {passive: true});
+emailIn.addEventListener('keydown', e => { if (e.key === 'Enter') failPointer = ''; });
+const touchish = () => failPointer === 'touch' || failPointer === 'pen' || matchMedia('(pointer: coarse)').matches || matchMedia('(hover: none)').matches;
+const glowFocus = () => {   // after the fail (desktop / fine pointer only): put the caret back in the field, unless the user has gone somewhere else meanwhile
+  if (touchish()) return;
+  const a = document.activeElement;
+  if (form.classList.contains('gone') || (a && a !== document.body && a !== form.querySelector('button'))) return;
+  glowFocusing = true; emailIn.focus({preventScroll: true}); glowFocusing = false;
+};
+function failGlow(startIn, focusAfter){
+  glowStop(); const f = state.fail, t0 = performance.now() + Math.max(0, startIn), dur = reduced ? GLOW.reducedMs : GLOW.pulses*GLOW.pulseMs;
+  f.glow = 'wait';
+  const step = now => {
+    const t = now - t0;
+    if (t >= dur){ glowRaf = 0; glowSet(0); f.glow = 'done'; if (focusAfter) glowFocus(); return; }
+    if (t >= 0){ f.glow = 'on'; glowSet(reduced ? GLOW.reducedPeak*Math.sin(Math.PI*t/dur) : Math.pow(Math.sin(Math.PI*(t % GLOW.pulseMs)/GLOW.pulseMs), 2)); }
+    glowRaf = requestAnimationFrame(step);
+  };
+  glowRaf = requestAnimationFrame(step);
+}
+emailIn.addEventListener('input', glowStop);
+emailIn.addEventListener('pointerdown', glowStop);
+emailIn.addEventListener('focus', () => { if (!glowFocusing) glowStop(); });
+/* screen readers lost the bubble's message too: a polite, visually hidden live note inside the form (.sr is absolutely positioned: out of the flex row, nothing moves), cleared as soon as they type */
+const failNoteEl = mk('span', 'sr'); failNoteEl.setAttribute('aria-live', 'polite'); form.appendChild(failNoteEl);
+const failAnnounce = () => { emailIn.setAttribute('aria-invalid', 'true'); failNoteEl.textContent = ''; requestAnimationFrame(() => { failNoteEl.textContent = COPY.failNote; }); };
+const failClear = () => { emailIn.removeAttribute('aria-invalid'); failNoteEl.textContent = ''; };
+emailIn.addEventListener('input', () => { if (emailIn.hasAttribute('aria-invalid')) failClear(); });
 form.addEventListener('submit', async e => {
   e.preventDefault();
-  if (!looksDone()){ syncOk(); failLiftoff(); emailIn.reportValidity(); return; }   // v1.30: belt and braces; never posts without a valid email
+  if (!looksDone()){ syncOk(); if (touchish() && document.activeElement === emailIn) emailIn.blur(); failLiftoff(); return; }   // touch: drop the keyboard so the crash is visible (v1.31 18:48 ct)   // never posts without a valid email. v1.31 PREVIEW: the only check now (novalidate): no native bubble, no custom message
+  if (state.fail && state.fail.abort) state.fail.abort(); glowStop(); failClear();   // v1.31 PREVIEW: a valid submit mid crash-flight cancels the fake flight, then the real launch runs
   const btn = form.querySelector('button'); btn.disabled = true;
   form.classList.add('ign');   // v1.29: engine lights while the request is out
   try { await fetch(form.action, {method: 'POST', mode: 'no-cors', body: new FormData(form)}); }
