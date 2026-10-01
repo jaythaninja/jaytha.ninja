@@ -91,6 +91,16 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify input:focus-visible{outline:none}
 @media (prefers-reduced-motion:reduce){.notify{transition:none!important}}
 .ic{width:28px;height:22px}
+/* v1.37 (jay 2026.10.01): when the intro reaches the icon row, each icon rains down into its (already reserved) spot, left to right ~100ms apart: it drops in from above,
+   tinted the rain's colour at that moment (teal at 1x, orange at 2x) with a glow, then settles to its normal orange. skip to end / back navigation: they just appear (no .drop).
+   reduced motion: a plain fade. was: a scale pop (scale .55 + 6px, springy) */
+.social{--rain-c:var(--teal);--rain-g:rgba(26,173,179,.9)}[data-mode="fast"] .social{--rain-c:var(--orange);--rain-g:rgba(255,77,26,.9)}
+.social li.drop{transition:none}
+.social li.drop a{animation:icon-rain .46s cubic-bezier(.2,.75,.3,1) both,icon-tint .95s ease-out both}
+@keyframes icon-rain{0%{opacity:0;transform:translateY(-34px)}35%{opacity:1}100%{opacity:1;transform:none}}
+@keyframes icon-tint{0%,45%{color:var(--rain-c);filter:drop-shadow(0 0 6px var(--rain-g))}100%{color:var(--orange);filter:none}}
+@media (prefers-reduced-motion:reduce){.social li{transform:none}.social li.drop a{animation:icon-fade .3s ease-out both}}
+@keyframes icon-fade{0%{opacity:0}100%{opacity:1}}
 /* round 16: the cursor stays after everything renders, blinking at the end of the icon row (teal at 1x, orange at 2x) (jay 2026.09.29) */
 .social li.cur{display:flex;align-items:center;height:40px;pointer-events:none}
 .social li.cur .cursor{margin:0 0 0 7px;vertical-align:0}
@@ -173,7 +183,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .dare.on{visibility:visible;animation:blink 1.05s infinite}
 [data-mode="fast"] .dare{color:var(--orange);text-shadow:0 0 10px rgba(255,77,26,.75)}
 [data-mode="fast"] .dare svg{filter:drop-shadow(0 0 6px rgba(255,77,26,.75))}
-@media (max-width:760px){.notify input{flex:0 1 14ch}.dare{gap:4px;font-size:11px}.dare svg{width:28px;height:28px}}
+@media (max-width:760px){.notify input{flex:1 1 0}.dare{gap:4px;font-size:11px}.dare svg{width:28px;height:28px}}   /* v1.37: the field fills the row (was flex:0 1 14ch) */
+/* v1.37 (jay 2026.10.01): on phones the signup row runs out to the tap hint, so the right edge of "touch it" lines up with the right edge of the hint's chevron (⌄) at every width.
+   the row is the content column (right gutter 24px) pushed out to the chevron: --hint-r = the hint's right offset (14px, .tap-hint in assets/rain.css) + --chev-in = the gap
+   between the hint's box and the chevron's ink (~2.4px: 12px hint, 1.125em arrow box). the email field takes whatever is left, rocket + finger + text keep their size */
+@media (max-width:760px){.signup{--hint-r:14px;--chev-in:2.4px;margin-right:calc(var(--hint-r) + var(--chev-in) - 24px)}}
 /* v1.29 (jay 2026.09.30): idle until the email looks real; a valid email (form.ok) ignites it: full orange, a slow glow pulse, the flame flickers.
    v1.30 (jay 2026.09.30): idle is only slightly dimmed, full color, near-full flame (was opacity .42 + saturate(.55), flame .4 at 55% length, hover .62); hover while idle = full */
 .notify:not(.ok) .rkb .rk{opacity:.8}
@@ -377,7 +391,7 @@ const TIMING = {
   afterHello: 550,       // pause after the first line
   betweenParas: 450,     // pause between paragraphs
   afterEllipsis: 850,    // longer beat after a paragraph ending in "..." (so "but now, i do" lands)
-  beforeSignoff: 300, beforeIcons: 250, iconStagger: 150,
+  beforeSignoff: 300, beforeIcons: 250, iconStagger: 100,   /* v1.37: was 150 (the icons rain down now, ~100ms apart) */
   eggLead: 250,         // round 23: the egg starts raining ~this many ms (real time) before the first icon pops in (was: after the last icon)
   eggTotal: 8500,        // round 16: the whole egg rain lasts about this long (ms). each letter falls ~3-4.6s, starts staggered at random
   eggStep: [95, 150],    // round 16: ms per row a letter drops (matrix-style stepping, like the rain); random per letter
@@ -989,7 +1003,7 @@ function popIcons(instant){
   icons.forEach((li, i) => {
     const a = li.querySelector('a');
     if (instant){ li.classList.add('in'); revealTap(a); state.icons = i + 1; return; }
-    iconTimers.push(setTimeout(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); state.icons = i + 1; if (i === icons.length - 1) iconTimers.push(setTimeout(done, 400)); }, i*TIMING.iconStagger));
+    iconTimers.push(setTimeout(() => { li.classList.add('drop', 'in'); setTimeout(() => revealTap(a), 300); setTimeout(() => li.classList.remove('drop'), 1000);   /* v1.37: .drop = rain down (css), dropped once it has settled so hover etc. work as before */ state.icons = i + 1; if (i === icons.length - 1) iconTimers.push(setTimeout(done, 400)); }, i*TIMING.iconStagger));
   });
   if (instant) done();
 }
