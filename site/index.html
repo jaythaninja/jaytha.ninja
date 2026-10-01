@@ -210,6 +210,18 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 @keyframes rk-rumble{0%,100%{transform:translate(0,0)}25%{transform:translate(.6px,-.4px)}50%{transform:translate(-.5px,.5px)}75%{transform:translate(.4px,.6px)}}
 @keyframes rk-flick-hot{0%,100%{transform:scale(1.05,1.45)}50%{transform:scale(.95,1.75)}}
 @keyframes rk-flick-long{0%,100%{transform:scale(1.1,2.4)}33%{transform:scale(.92,2.9)}66%{transform:scale(1.02,2.1)}}
+/* v1.36 (jay 2026.10.01): the real liftoff flames up to gold as it tilts straight up (like the heart's burn): a gold copy of the rocket (.rk.au) is revealed tail to nose
+   with a white-gold band on the burn line (.rk.au-band), then it climbs on all-gold fire with a bigger, wilder flame. the fake-out keeps its orange rocket + teal flame */
+.rk-sky .rk.au{filter:drop-shadow(0 0 14px rgba(255,215,0,.95)) drop-shadow(0 0 5px rgba(255,246,194,.9))}
+.rk-sky .rk.au .rk-fl{animation:rk-flick-gold .08s linear infinite}
+.rk-sky .rk.au-band{filter:drop-shadow(0 0 10px #fff) drop-shadow(0 0 18px rgba(255,215,0,.95))}
+.rk-sky .rk.au-band .rk-fl{animation:rk-flick-gold .08s linear infinite}
+@keyframes rk-flick-gold{0%,100%{transform:scale(1.3,3.3)}25%{transform:scale(1.05,4)}50%{transform:scale(1.4,2.8)}75%{transform:scale(1.12,3.7)}}
+/* v1.36: the launch plume. soft white / grey-gold smoke clouds billow out sideways from the pad and fade (fixed sky layer, nothing on the page moves) */
+.rk-sky .plm{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(closest-side,rgba(255,252,240,.8),rgba(232,222,190,.42) 50%,rgba(210,196,150,0));will-change:transform,opacity}
+.rk-sky .plm.g{background:radial-gradient(closest-side,rgba(214,214,206,.7),rgba(190,182,160,.32) 55%,rgba(190,182,160,0))}
+.rk-sky .plm.au{background:radial-gradient(closest-side,rgba(255,240,170,.85),rgba(255,215,0,.35) 50%,rgba(255,215,0,0))}
+.rk-sky.gold .puff{background:radial-gradient(closest-side,rgba(255,236,150,.6),rgba(255,215,0,.2) 55%,rgba(255,215,0,0))}   /* v1.36: the pad flash goes gold with the rest (was teal) */
 @media (prefers-reduced-motion:reduce){.notify.ign .rkb .rk,.notify.ign .rk .rk-fl{animation:none}}
 /* v1.30 (jay 2026.09.30): failed liftoff (no valid email yet): smoke + a couple of dim rain glyphs, in a throwaway sky layer so nothing on the page moves */
 .rk-sky .puff.smoke{background:radial-gradient(closest-side,rgba(170,186,188,.5),rgba(26,173,179,.16) 60%,rgba(26,173,179,0))}
@@ -223,14 +235,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .rk-sky .spk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:#FF4D1A;text-shadow:0 0 8px rgba(255,77,26,.9);will-change:transform,opacity}
 /* v1.29 (jay 2026.09.30): the success line = a heart (teal, burns to orange) + "please confirm via email". one line, never wraps, never taller than the form row it replaces */
 .status{white-space:nowrap}
-.status .hb{position:relative;display:inline-block;width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:.5em;filter:drop-shadow(0 0 5px rgba(255,77,26,.7))}
+.status .hb{position:relative;display:inline-block;width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:.5em;filter:drop-shadow(0 0 5px rgba(255,215,0,.75))}   /* v1.36: gold glow (was orange rgba(255,77,26,.7)) */
 .status .hb svg{position:absolute;left:0;top:0;width:100%;height:100%;overflow:visible}
 .status .hb .h-o{clip-path:inset(100% 0 0 0)}
 .status .hb .h-h{clip-path:inset(100% 0 0 0);opacity:0}
 .status .hb.lit .h-o{clip-path:none}
 .status .hb.lit .h-t{opacity:0}
-.status .hb .em{position:absolute;left:0;top:0;font:500 9px/1 var(--mono);color:#FF8A5E;text-shadow:0 0 6px rgba(255,77,26,.95);pointer-events:none;will-change:transform,opacity}
-.status .hb .em.hot{color:#FFE7D6;text-shadow:0 0 6px #fff,0 0 10px rgba(255,77,26,.95)}
+.status .hb .em{position:absolute;left:0;top:0;font:500 9px/1 var(--mono);color:#FFE066;text-shadow:0 0 6px rgba(255,215,0,.95);pointer-events:none;will-change:transform,opacity}
+.status .hb .em.hot{color:#FFFBE8;text-shadow:0 0 6px #fff,0 0 10px rgba(255,215,0,.95)}   /* v1.36: gold embers (were orange) */
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
@@ -626,7 +638,7 @@ const syncOk = () => { form.classList.toggle('ok', looksDone()); };   // v1.31 P
    it pops in like the ninja, holds a beat, burns upward with orange embers (rain glyphs) coming off the flame line, and settles orange. reduced motion: a plain teal -> orange crossfade */
 const HEART = {pop: 300, hold: 160, burn: 950, emberEvery: 40, textLead: 150};   // ms. the words start typing textLead ms before the burn ends
 const HEART_D = 'M16 29C16 29 3 20.5 3 11.5C3 7 6.5 4 10.5 4C13 4 15 5.5 16 7.5C17 5.5 19 4 21.5 4C25.5 4 29 7 29 11.5C29 20.5 16 29 16 29Z';
-const HEART_FILL = {'h-t': ['#5FD6DA', '#1AADB3', '#0E7C81'], 'h-o': ['#FF8A5E', '#FF4D1A', '#B8300A'], 'h-h': ['#FFF4EC', '#FFD2B8', '#FF8A5E']};
+const HEART_FILL = {'h-t': ['#5FD6DA', '#1AADB3', '#0E7C81'], 'h-o': ['#FFF1A6', '#FFD700', '#C99A00'], 'h-h': ['#FFFFFF', '#FFF6C2', '#FFE066']};   // v1.36 (jay 2026.10.01): the heart burns teal -> GOLD #FFD700 (h-o was orange #FF8A5E/#FF4D1A/#B8300A, h-h #FFF4EC/#FFD2B8/#FF8A5E)
 const heartSvg = k => { const [a, b, c] = HEART_FILL[k];
   return `<svg class="${k}" viewBox="0 0 32 32" aria-hidden="true" focusable="false"><defs><linearGradient id="hg-${k}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset=".5" stop-color="${b}"/><stop offset="1" stop-color="${c}"/></linearGradient></defs><path d="${HEART_D}" fill="url(#hg-${k})"/>` +
     (k === 'h-h' ? '' : '<path d="M8.6 8.7C7 9.6 6.1 11 6.1 12.8" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.9" stroke-linecap="round"/>') + '</svg>'; };
@@ -647,7 +659,7 @@ const burnHeart = hb => new Promise(done => {
   orange.animate([{clipPath: 'inset(100% 0 0 0)'}, {clipPath: 'inset(0% 0 0 0)'}], opt);   // the burn climbs from the tip to the top
   hot.animate([{clipPath: 'inset(92% 0 -4% 0)', opacity: 0}, {opacity: 1, offset: .1}, {opacity: 1, offset: .82}, {clipPath: 'inset(-8% 0 96% 0)', opacity: 0}], opt);   // a thin white-hot band on the burn line
   teal.animate([{opacity: 1}, {opacity: 0}], {duration: 220, delay: start + HEART.burn - 180, fill: 'both'});   // the teal glow goes out at the very end
-  hb.animate([{filter: 'drop-shadow(0 0 5px rgba(26,173,179,.85))'}, {filter: 'drop-shadow(0 0 7px rgba(255,120,60,.9))', offset: .6}, {filter: 'drop-shadow(0 0 5px rgba(255,77,26,.7))'}], opt);
+  hb.animate([{filter: 'drop-shadow(0 0 5px rgba(26,173,179,.85))'}, {filter: 'drop-shadow(0 0 8px rgba(255,236,150,.95))', offset: .6}, {filter: 'drop-shadow(0 0 5px rgba(255,215,0,.75))'}], opt);   // v1.36: teal -> white-gold -> gold glow
   const t0 = performance.now(); let last = 0, raf = 0;
   const embers = now => {   // orange embers (rain glyphs) float up off the burn line
     const p = (now - t0 - start)/HEART.burn;
@@ -666,7 +678,8 @@ const burnHeart = hb => new Promise(done => {
   setTimeout(finish, start + HEART.burn + 60);
 });
 /* v1.29 (jay 2026.09.30): lift-off. timings in ms; the success line (heart + words) starts once the rocket is off the top of the screen */
-const LIFTOFF = {turn: 180, climbMin: 820, climbMax: 1100, perPx: 1, wakeEvery: 26, puff: 650, goldPer: 4, goldHot: .35};   // v1.35: golden mode = goldPer glyphs per wake tick (was 1), goldHot of them white-gold (was .22)
+const LIFTOFF = {turn: 180, climbMin: 820, climbMax: 1100, perPx: 1, wakeEvery: 26, puff: 650, goldPer: 4, goldHot: .35,
+  burn: 420, plume: 16, plumeMs: 1500};   // v1.36: the gold flame-up starts with the tilt and runs burn ms (into the slow first part of the climb, so the timing is unchanged); plume = smoke clouds at the pad   // v1.35: golden mode = goldPer glyphs per wake tick (was 1), goldHot of them white-gold (was .22)
 const launchRocket = () => new Promise(done => {
   const btn = form.querySelector('.rkb'), svg = btn && btn.querySelector('.rk');
   state.rocket = {phase: 'turn', t0: performance.now()};
@@ -685,11 +698,40 @@ const launchRocket = () => new Promise(done => {
   Object.assign(puff.style, {left: (r.left + r.width/2 - ps/2) + 'px', top: (r.top + r.height*.7 - ps/2) + 'px', width: ps + 'px', height: ps + 'px'});
   sky.insertBefore(puff, svg);
   puff.animate([{opacity: 0, transform: 'scale(.3)'}, {opacity: 1, transform: 'scale(.8)', offset: .25}, {opacity: 0, transform: 'scale(1.6)'}], {duration: LIFTOFF.puff, delay: LIFTOFF.turn*.6, easing: 'ease-out', fill: 'both'});
-  const turn = svg.animate([{transform: 'rotate(0deg)'}, {transform: 'rotate(-45deg)'}], {duration: LIFTOFF.turn, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards'});
+  // v1.36 (jay 2026.10.01): the gold flame-up. two copies of the rocket ride exactly on top of it (same animations, same clock): gold, revealed tail to nose by a diagonal
+  // clip (the rocket is drawn at 45deg, so its axis is the box diagonal), and a thin white-gold band on the burn line. once it's all gold, the orange original is hidden
+  const AU = {'rk-b': ['#FFF3B0', '#FFD700', '#B8860B'], 'rk-w': ['#FFFFFF', '#FFF1C4'], 'rk-f': ['#FFFBE0', '#FFE066', '#FFB800'], 'rk-n': ['#E8C860', '#7A5A10'], 'rk-g': ['#FFF0A0', '#C99A00', '#5A4200']};
+  const goldCopy = (cls, band) => { const c = svg.cloneNode(true); c.classList.add(cls); c.style.opacity = ''; c.style.transform = '';
+    c.querySelectorAll('[id]').forEach(g => { const cols = AU[g.id]; g.id = g.id + '-' + cls; if (cols) g.querySelectorAll('stop').forEach((s, i) => s.setAttribute('stop-color', band ? '#FFF8DC' : cols[Math.min(i, cols.length - 1)])); });
+    c.querySelectorAll('[fill^="url(#"]').forEach(e => e.setAttribute('fill', e.getAttribute('fill').replace(/\)$/, '-' + cls + ')')));
+    if (band) c.querySelectorAll('[fill="#fff"], [fill="#C9F3F4"]').forEach(e => e.setAttribute('fill', '#FFF8DC'));
+    else c.querySelectorAll('[fill="#C9F3F4"]').forEach(e => e.setAttribute('fill', '#FFFBE0'));   // the flame's hot core
+    c.querySelectorAll('[stroke="#FFC2A8"]').forEach(e => e.setAttribute('stroke', '#FFF3B0'));
+    sky.appendChild(c); return c; };
+  const au = goldCopy('au', false), band = goldCopy('au-band', true);
+  const cut = u => `polygon(-200% ${-200 - u}%, 300% ${300 - u}%, 300% 400%, -200% 400%)`;   // everything on the tail side of the line x - y = u (box %)
+  const strip = u => `polygon(-200% ${-200 - u}%, 300% ${300 - u}%, 300% ${314 - u}%, -200% ${-186 - u}%)`;   // a 14% band just behind that line
+  const burnOpt = {duration: LIFTOFF.burn, easing: 'cubic-bezier(.35,.1,.5,1)', fill: 'both'};
+  au.animate([{clipPath: cut(-100)}, {clipPath: cut(100)}], burnOpt);
+  band.animate([{clipPath: strip(-100), opacity: 0}, {opacity: 1, offset: .12}, {opacity: 1, offset: .8}, {clipPath: strip(114), opacity: 0}], burnOpt);
+  state.rocket.gold = 'burning';
+  setTimeout(() => { svg.style.opacity = '0'; band.remove(); state.rocket.gold = 'gold'; }, LIFTOFF.burn + 20);   // the orange original goes once the gold covers it (svg keeps its box for the wake)
+  const both = (kf, o) => [svg, au, band].map(e => e.isConnected ? e.animate(kf, o) : null)[0];   // the copies move exactly with the rocket
+  // v1.36: the launch plume at the pad, like a real starship launch: clouds billow out sideways along the ground, rise a little, swell and fade
+  const plume = () => { const px = r.left + r.width/2, py = r.bottom + r.height*.15, base = r.width;
+    for (let i = 0; i < LIFTOFF.plume; i++){
+      const side = i % 2 ? 1 : -1, k = (i >> 1)/(LIFTOFF.plume/2), s = base*(.9 + Math.random()*.9), e = mk('span', i < 3 ? 'plm au' : Math.random() < .35 ? 'plm g' : 'plm');
+      const x0 = px - s/2 + side*base*.1, y0 = py - s/2, dx = side*base*(.6 + k*2.4 + Math.random()*.6), dy = -base*(.1 + Math.random()*.45) - k*base*.2;
+      Object.assign(e.style, {width: s + 'px', height: s + 'px'}); e.style.transform = `translate(${x0}px,${y0}px) scale(.3)`; sky.insertBefore(e, svg);
+      e.animate([{transform: `translate(${x0}px,${y0}px) scale(.3)`, opacity: 0}, {opacity: .9, offset: .18}, {transform: `translate(${x0 + dx}px,${y0 + dy}px) scale(${1.8 + k*1.4})`, opacity: 0}],
+        {duration: LIFTOFF.plumeMs*(.75 + Math.random()*.4), delay: LIFTOFF.turn*.7 + k*140, easing: 'cubic-bezier(.2,.7,.3,1)', fill: 'both'}).finished.then(() => e.remove(), () => {});
+    } };
+  plume();
+  const turn = both([{transform: 'rotate(0deg)'}, {transform: 'rotate(-45deg)'}], {duration: LIFTOFF.turn, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards'});
   turn.finished.then(() => {
     state.rocket.phase = 'climb'; state.rocket.climb = climb; state.rocket.dist = Math.round(dist);
     form.inert = true; form.classList.add('gone');   // the form fades out under the exhaust
-    const fly = svg.animate([{transform: 'translateY(0) rotate(-45deg)'}, {transform: `translateY(${-dist}px) rotate(-45deg)`}], {duration: climb, easing: 'cubic-bezier(.5,0,.85,.35)', fill: 'forwards'});
+    const fly = both([{transform: 'translateY(0) rotate(-45deg)'}, {transform: `translateY(${-dist}px) rotate(-45deg)`}], {duration: climb, easing: 'cubic-bezier(.5,0,.85,.35)', fill: 'forwards'});   // v1.36: the gold copies climb with it
     let lastWake = 0, raf = 0;
     const wake = now => {   // rain glyphs shed from the flame tip, drifting down + out and fading. v1.35: super golden mode, gold with ~1 in 3 white-gold, 4 per tick (was teal + a few white-hot, 1 per tick)
       if (now - lastWake >= LIFTOFF.wakeEvery){
@@ -707,8 +749,8 @@ const launchRocket = () => new Promise(done => {
     };
     raf = requestAnimationFrame(wake);
     fly.finished.then(() => {
-      cancelAnimationFrame(raf); svg.style.visibility = 'hidden'; state.rocket.phase = 'gone'; state.rocket.took = Math.round(performance.now() - state.rocket.t0);
-      setTimeout(() => sky.remove(), 1200);   // let the last wake glyphs fade
+      cancelAnimationFrame(raf); svg.style.visibility = 'hidden'; au.style.visibility = 'hidden'; state.rocket.phase = 'gone'; state.rocket.took = Math.round(performance.now() - state.rocket.t0);
+      setTimeout(() => sky.remove(), 1600);   // let the last wake glyphs + plume fade (v1.36: was 1200)
       done();
     });
   });
