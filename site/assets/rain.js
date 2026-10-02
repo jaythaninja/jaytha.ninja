@@ -15,6 +15,7 @@ function Rain(cv, o){
   R.tint = o.tint ? {from: o.tint, to: o.tint, t0: 0, dur: 1} : null;
   R.paleTint = o.paleTint ? {from: o.paleTint, to: o.paleTint, t0: 0, dur: 1} : null;
   R.speed = {from: 1, to: 1, t0: 0, dur: 1}; R.fast = modeName()==='fast';
+  R.au = null; R.gh = [255,215,0].map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62))); R.gph = [255,236,150].map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62)));   // v1.52: gold heads
   const easeTint = (q, now) => { const k = Math.min(1, Math.max(0, (now - q.t0)/q.dur)), e = k*k*(3 - 2*k); return q.from.map((c, i) => Math.round(c + (q.to[i] - c)*e)); };
   R.tintAt = now => easeTint(R.tint, now);
   R.paleTintAt = now => easeTint(R.paleTint, now);
@@ -64,6 +65,7 @@ function Rain(cv, o){
     const pc = R.paleTint && R.paleTintAt(now);
     const th = tc && tc.map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62)));
     const ph = pc && pc.map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62)));   // family-matched tips ease with their bodies
+    const A = R.au, gk = !A ? null : A.out ? (k => () => k)(1 - clamp((now - A.out.t0)/A.out.ms)) : y => clamp((now - A.t0 - Math.min(1, Math.abs(y - A.y)/A.maxD)*A.ms)/A.fade);   // v1.52: the gold pulse (per glyph, by distance from its line) / the fade back
     for (const d of R.drops){
       if (!REDUCED){
         if (!d.last){ d.last = now; d.clock = d.every; }
@@ -81,6 +83,7 @@ function Rain(cv, o){
         let col;
         if (i === 0){ col = R.fast ? (d.pal === o.paleTint ? ph : th) : d.head; a = Math.min(1, a*1.9); }
         else { const t = i / d.len; a *= i < 3 ? 1 : Math.pow(1 - t, 1.5); col = R.fast ? (d.pal === o.paleTint ? pc : tc) : d.pal; }
+        if (gk){ const k = gk(y); if (k > 0){ const g = d.pal === o.paleTint ? (i === 0 ? R.gph : GOLD_PALE) : (i === 0 ? R.gh : GOLD); col = col.map((c, j) => Math.round(c + (g[j] - c)*k)); } }
         ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${a})`;
         ctx.fillText(boost > .4 && Math.random() < .3 ? glyph() : d.g[i], d.x, y);
       }
@@ -119,7 +122,7 @@ function Rain(cv, o){
   // jay 2026.09.30 v1.25: while a page has the dump state on (only the homepage intro turns it on, at 2x), the hint shows ››| instead of the 1x/2x chevrons
   const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`anywhere for${dumpHint?DUMP_GLYPH:arrows(fast?1:2)}`;}};
   // v1.20: each teal background glow gets an orange twin that fades in at >> speed (both pages via this shared file)
-  const glowTwins=()=>document.querySelectorAll('.glow:not(.glow-fast):not([data-twin])').forEach(g=>{g.dataset.twin='1';const t=g.cloneNode(false);t.classList.add('glow-fast');t.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,77,26,'));g.after(t);});
+  const glowTwins=()=>document.querySelectorAll('.glow:not(.glow-fast):not([data-twin])').forEach(g=>{g.dataset.twin='1';const t=g.cloneNode(false);t.classList.add('glow-fast');t.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,77,26,'));g.after(t);const u=g.cloneNode(false);u.classList.add('glow-au');u.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,215,0,'));t.after(u);});   // v1.52: + a gold twin (shown while .gld)
   const ensure=()=>{
     glowTwins();
     hint=document.querySelector('.tap-hint');
@@ -152,10 +155,43 @@ function Rain(cv, o){
   const burst=(tape,done,o={})=>{const total=tape.length,D=Math.max(1,Math.min(o.ms||1200,total*(o.perStep||14))),t0=performance.now();let at=0,raf=0,live=true;
     const back=ms=>{if(rain)rain.setSpeed(modeName()==='fast'?2:1,ms)};
     if(rain)rain.setSpeed(o.rain||6,o.rainUp||220);
-    const frame=now=>{const k=Math.min(total,Math.ceil((now-t0)/D*total));while(at<k)tape[at++]();if(at<total){raf=requestAnimationFrame(frame);return}raf=0;live=false;back(o.rainDown||1100);if(done)done()};
+    if(o.gold!==false)gold({ms:o.goldMs||260,y:o.goldY});   // v1.52: the skip-to-end gold flash
+    const frame=now=>{const k=Math.min(total,Math.ceil((now-t0)/D*total));while(at<k)tape[at++]();if(at<total){raf=requestAnimationFrame(frame);return}raf=0;live=false;back(o.rainDown||1100);if(o.gold!==false)goldOff({hold:1000,ms:700,first:true});if(done)done()};
     raf=requestAnimationFrame(frame);
-    return {stop(){if(!live)return;live=false;cancelAnimationFrame(raf);back(250)}};};
+    return {stop(){if(!live)return;live=false;cancelAnimationFrame(raf);back(250);if(o.gold!==false)goldOff({hold:1000,ms:700,first:true})}};};
   document.documentElement.dataset.mode=document.documentElement.dataset.mode==='fast'?'fast':'normal';
-  window.JayRain={Rain,register,mode,dump,smooth:sm,returning,seen,burst};
+
+  /* v1.52 (jay 2026.10.02): gold. gold(o) turns everything coloured gold in a pulse that spreads out from a line (o.y, viewport px; default the middle of the screen) up to
+     the top and down to the bottom at the same time: each element (and each rain glyph) turns gold as the pulse reaches it, over o.ms (signup: ~1.7s; the skip-to-end
+     flash: ~260ms). it works by putting .gld on each element (the gold values of --c / --f, see rain.css) in distance order, then .gld on <html> when the pulse is done.
+     white stays white (only the colour variables change), nothing moves. o.lock (the signup) keeps it gold for the rest of the visit, speed taps included.
+     goldOff(o): unless locked, hold o.hold ms (1000), then fade everything back over o.ms (700); o.first also returns to the first state (1x, teal).
+     the skip-to-end on every page (burst() here, the homepage's own dump()) flashes gold while it fast-forwards, then holds 1s and fades back to teal 1x */
+  const GOLD=[255,215,0], GOLD_PALE=[255,236,150];
+  let auLock=false, auTimers=[], auRaf=0;
+  const auClear=()=>{auTimers.forEach(clearTimeout);auTimers=[];if(auRaf)cancelAnimationFrame(auRaf);auRaf=0;};
+  const auWave=t=>{const h=document.documentElement;h.style.setProperty('--au-t',t+'ms');h.classList.add('au-wave');};
+  const gold=(o={})=>{
+    if(auLock)return Promise.resolve();
+    auClear();const h=document.documentElement;h.classList.remove('gld-out');
+    const ms=REDUCED?0:(o.ms??1700); if(o.lock)auLock=true;
+    const vh=innerHeight, y0=o.y??vh/2, maxD=Math.max(y0,vh-y0,1), fade=Math.max(120,Math.min(450,ms*.25));
+    if(rain)rain.au={y:y0+scrollY,t0:performance.now(),ms,maxD,fade:ms?fade:1,out:null};
+    if(!ms){h.classList.add('gld');return Promise.resolve();}
+    auWave(fade);
+    const els=[...document.body.querySelectorAll('*')].filter(e=>{const tg=e.tagName.toLowerCase();if(tg!=='svg'&&e.closest('svg'))return false;if(/^(script|style|canvas|br|noscript)$/.test(tg))return false;if(e.classList.contains('glow'))return true;const r=e.getBoundingClientRect();return r.height<=160&&(r.width>0||r.height>0);})
+      .map(e=>{const r=e.getBoundingClientRect(),d=r.top>y0?r.top-y0:r.bottom<y0?y0-r.bottom:0;return{e,t:Math.min(1,d/maxD)*ms};}).sort((a,b)=>a.t-b.t);
+    return new Promise(res=>{const t0=performance.now();let i=0;const step=now=>{const el=now-t0;while(i<els.length&&els[i].t<=el)els[i++].e.classList.add('gld');
+      if(i<els.length){auRaf=requestAnimationFrame(step);return;}auRaf=0;h.classList.add('gld');auTimers.push(setTimeout(()=>h.classList.remove('au-wave'),fade+60));res();};auRaf=requestAnimationFrame(step);});
+  };
+  const goldOff=(o={})=>{
+    if(auLock)return;auClear();const h=document.documentElement,hold=o.hold??1000,ms=REDUCED?0:(o.ms??700);
+    auTimers.push(setTimeout(()=>{if(auLock)return;if(ms){auWave(ms);h.classList.add('gld-out');}
+      if(o.first&&modeName()==='fast')mode(false);
+      h.classList.remove('gld');document.querySelectorAll('.gld').forEach(e=>e.classList.remove('gld'));
+      if(rain&&rain.au)rain.au.out={t0:performance.now(),ms:Math.max(1,ms)};
+      auTimers.push(setTimeout(()=>{h.classList.remove('au-wave','gld-out');if(rain)rain.au=null;},ms+60));},hold));
+  };
+  window.JayRain={Rain,register,mode,dump,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock};
   if(document.readyState!=='loading')boot();else addEventListener('DOMContentLoaded',boot,{once:true});
 })();
