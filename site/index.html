@@ -6,7 +6,7 @@
 <meta name="theme-color" content="#000000">
 <meta name="color-scheme" content="dark">
 <script>document.documentElement.classList.add('js')</script>
-<title>jay tha 🥷</title>
+<title>jay tha ninja</title>
 <!-- PREVIEW v1.13-floor75 (rain behind the text at 75%; not shipped). v1.12 base. MOCK ONLY: jaytha.ninja homepage, live-restyle round 5 (round 10: inline signup + "more +" drawer; round 14: drawer gone, all 7 icons out front) (rain behind text, new copy, teal sign-off). not deployed. previous: index-v1.html … index-v4.html
      color order: teal #1AADB3 primary, white secondary, orange #FF4D1A only as a rare accent (links + social icons). rain: teal + dim white, white tips.
      everything types out with the hello line's decode effect; the social icons pop in at the end.
@@ -48,7 +48,9 @@ a:hover{color:var(--teal)}
 .sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.08em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
 .sig .ninja.in{opacity:1;transform:none}
 .cta{margin-top:52px;font-size:20px;line-height:1.5}   /* jay 2026.09.29: one extra blank line after the sign-off */
-.prompt{color:var(--white);line-height:1.7}   /* v1.42: the invitation is a full paragraph now, so it wraps with the paragraphs' line spacing (was the .cta's 1.5) */
+.prompt{color:var(--white);line-height:1.7}
+.prompt + .prompt{margin-top:20px}   /* v1.43: the three signup lines are spaced like the paragraphs (10px on phones, below) */
+.prompt{text-wrap:balance}   /* v1.43: a signup line that wraps splits evenly (no lone "launch" / "public?" / "happens :)" on its own line); the untyped text is laid out (hidden) from the start, so the balance never changes mid-typing */   /* v1.42: the invitation is a full paragraph now, so it wraps with the paragraphs' line spacing (was the .cta's 1.5) */
 /* v1.39 (jay 2026.10.01): right after the sign-off, the prompt + everything below rains in together (see bottomRain). the prompt's letters fall like the egg's (white heads, white land glow
    settling to its normal shadow); the email field, rocket and "touch it" each get one column (.col) that lands on them, and they appear + work as it lands */
 .prompt .w{white-space:nowrap}.prompt .c{display:inline-block;position:relative}
@@ -160,7 +162,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .hello{font-size:17px}
   .paras{margin-top:14px}
   .para{font-size:16px;line-height:1.7}
-  .para + .para{margin-top:10px}   /* v1.33: was 12px */
+  .para + .para,.prompt + .prompt{margin-top:10px}   /* v1.33: was 12px. v1.43: + the signup lines */
   .sig{margin-top:15px;font-size:16px}
   .cta{margin-top:32px;font-size:16px}
   .signup{margin-top:4px}
@@ -189,6 +191,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .rk .rk-fl{transform-box:fill-box;transform-origin:50% 0}
 .notify .rkb:hover,.notify .rkb:focus-visible{background:rgba(26,173,179,.08)}
 .notify .rkb:active .rk{transform:scale(.92)}
+.notify .rkb{transition:color .15s ease,background-color .15s ease,opacity .35s ease-out}.notify.rk-wait .rkb{opacity:0;pointer-events:none}   /* v1.43: the rocket appears just after the field (opacity only, so nothing moves) */
 .notify .rkb[disabled]{background:transparent}
 @media (max-width:760px){.notify .rkb{width:48px;height:48px;margin:-7px -6px -7px -4px;border-radius:11px}}
 /* v1.34 (jay 2026.10.01): once the intro has finished typing, the cursor doesn't come back at the end of the icon row; instead a bigger copy of the tap hint's finger,
@@ -196,7 +199,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
    it's in the form row from the first paint (hidden), so turning it on moves nothing; it goes with the form on a real liftoff. phones: the email field is narrower
    (14ch, still fits you@email.com) and the dare text small, so field + rocket + finger + text stay on one row at 390px */
 /* v1.42 (jay 2026.10.02): the finger + "touch it" blinker by the rocket is gone ("people will notice the form on their own"); the typing cursor blinks after "- jay🥷" again instead (cursorSig) */
-@media (max-width:760px){.notify input{flex:1 1 0}}   /* v1.37: the field fills the row (was flex:0 1 14ch) */
+@media (max-width:760px){.notify input{flex:1 1 0}}
+@media (min-width:761px){.notify input{flex:1 1 0}.signup{margin-right:6px}}   /* v1.43 (jay 2026.10.02): desktop too: the field fills the row, so field + rocket span the text column; the 6px right margin takes back the rocket's -6px overhang, so the rocket ends exactly at the column's right edge (was flex:0 1 23ch, ~23ch wide). phones unchanged */   /* v1.37: the field fills the row (was flex:0 1 14ch) */
 /* v1.37 (jay 2026.10.01): on phones the signup row runs out to the tap hint, so the right edge of "touch it" lines up with the right edge of the hint's chevron (⌄) at every width.
    the row is the content column (right gutter 24px) pushed out to the chevron: --hint-r = the hint's right offset (14px, .tap-hint in assets/rain.css) + --chev-in = the gap
    between the hint's box and the chevron's ink (~2.4px: 12px hint, 1.125em arrow box). the email field takes whatever is left, rocket + finger + text keep their size */
@@ -280,7 +284,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="jaytha.ninja">
 <meta property="og:url" content="https://jaytha.ninja/">
-<meta property="og:title" content="jay tha 🥷">
+<meta property="og:title" content="jay tha ninja">
 <meta property="og:description" content="something human is in the works...">
 <meta property="og:image" content="https://jaytha.ninja/og-image-v128.png">
 <meta property="og:image:width" content="1200">
@@ -289,7 +293,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 <meta property="og:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@jaythaninja">
-<meta name="twitter:title" content="jay tha 🥷">
+<meta name="twitter:title" content="jay tha ninja">
 <meta name="twitter:description" content="something human is in the works...">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image-v128.png">
 <meta name="twitter:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
@@ -368,10 +372,14 @@ const COPY = {
   // jay's copy, 2026.09.28 (round 5). one [ ] per paragraph, typed in order with a pause between.
   paragraphs: [   // v1.42 (jay 2026.10.02): jay's new intro message. was (v1.33-v1.41): "for years, i "succeeded" at work that never felt like mine" / "i let it take me so far from myself that i didn't know who jay was" / "because i hadn't found my ikigai" (teal) / "but now... i have" (teal) / "i hope the cool stuff we're building helps you find yours" / "and while the journey ahead is long... we have space𝕏 to help us now"
     ["isn't it weird that the internet, a place built to connect us, has become the hardest place to make ", {text: "genuine connections", teal: true}, " with other humans?"],
-    ["my team and i think so too, and we want to change that."]
+    ["my team and i think so too, and we hope to change that."]   // v1.43 (jay 2026.10.02): was "...and we want to change that."
   ],
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
-  cta: "come back any day to watch us build. if you want early updates or a spot in our second wave of testers, drop your email and hit enter to launch:",   // v1.42 (jay 2026.10.02): the last paragraph of jay's new message takes the invitation's slot, right above the email field (white; rains in with the form, v1.39). was: "want to be part of something human?"
+  cta: [   // v1.43 (jay 2026.10.02): three white lines typed in order right above the email field, each its own line (paragraph spacing). was (v1.42): one line, "come back any day to watch us build. if you want early updates or a spot in our second wave of testers, drop your email and hit enter to launch:"
+    "want to get notified when we open testing (iPhone\u00a0only) to the public?",   // \u00a0 = a no-break space: "(iPhone only)" never splits across lines (looks the same)
+    "drop your email and hit enter to launch",
+    "you can also just touch the rocket without an email and see what happens\u00a0:)"   // ...and the ":)" stays with "happens"
+  ],
   failNote: "that email isn't complete yet. try again (like you@email.com)",   // v1.31 PREVIEW: screen readers only (visually hidden), replaces the browser bubble's message
   thanks: "please confirm via email",   // v1.29 (jay 2026.09.30): typed (teal) after the heart burns teal -> orange, in the form's slot, one line. was "almost there, check your email and tap confirm"
   dayDate: "2026.10.02",   // v1.30 (jay 2026.09.30): THE DAY'S DATE, yyyy.mm.dd, shown in white as "🗓️ <date>" above the egg lines. the daily 5am song + quote routine sets it together with lyric (the day the song + quote were published, america/chicago; never the viewer's clock). "" hides the line.
@@ -405,6 +413,7 @@ const TIMING = {
   beforeSignoff: 300, beforeIcons: 250, iconStagger: 150,   /* v1.38: back to 150; only the fallback pop uses it now (the icons rain like the egg, see iconRain) */
   eggAfterIcons: 600,   // v1.38: the egg starts raining this many ms (real time) after the icons start (they're the line above, so they rain first). was eggLead: 250 (egg ~250ms BEFORE the first icon)
   iconRainStagger: 0, iconRainJitter: 500,   // v1.38: icon columns start left to right this far apart (+ up to jitter ms at random). v1.39: all together (was 110 + 120)
+  rocketAfter: 260,     // v1.43: after the invitation is typed, the email field appears, then the rocket this many ms later (at the current pace)
   rainJitter: 500,      // v1.39: the bottom rain (prompt, signup, icons, date, song, quote) all starts at once; each column starts up to this many ms late, at random
   eggTotal: 8500,        // round 16: the whole egg rain lasts about this long (ms). each letter falls ~3-4.6s, starts staggered at random
   eggStep: [95, 150],    // round 16: ms per row a letter drops (matrix-style stepping, like the rain); random per letter
@@ -494,8 +503,9 @@ const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms/pace));
 const $ = s => document.querySelector(s);
 const parasEl = $('.paras');
 const paraLines = (COPY.paragraphs || [COPY.paragraph]).map(pieces => { const p = mk('p', 'para'); p.setAttribute('data-part', ''); parasEl.appendChild(p); return prepare(p, pieces); });
-const lines = [prepare($('.hello'), COPY.hello), ...paraLines, prepare($('.sig'), COPY.signoff), prepare($('.prompt'), COPY.cta)];
-const LAST = lines.length - 1;
+const ctaLines = [].concat(COPY.cta).map((text, k) => { const p = k ? mk('p', 'prompt') : $('.prompt'); if (k){ p.setAttribute('data-part', ''); $('.cta .signup').before(p); } return prepare(p, text); });   // v1.43: one .prompt per signup line, in order, above the form
+const lines = [prepare($('.hello'), COPY.hello), ...paraLines, prepare($('.sig'), COPY.signoff), ...ctaLines];
+const LAST = lines.length - 1, SIG = LAST - ctaLines.length;   // v1.43: LAST = the last signup line (the form follows it); SIG = the sign-off (was LAST - 1)
 const ninja = mk('img', 'ninja'); ninja.alt = '🥷'; ninja.src = NINJA; $('.sig').appendChild(ninja);
 const ul = $('.social');
 const iconLink = s => { const a = gateTap(mk('a')); a.setAttribute('href', s.href); a.setAttribute('aria-label', s.label); a.title = s.label;
@@ -1001,9 +1011,12 @@ const iconTimers = [], icons = [...ul.children].filter(li => li !== curLi);
    it's an inline-block with a negative right margin, after the ninja, so the line doesn't change. was (v1.34-v1.41): removed, and the finger + "touch it" by the rocket blinked instead */
 const sigEl = $('.sig');
 const cursorSig = () => { glue.remove(); if (cursor.parentNode !== sigEl || sigEl.lastChild !== cursor) sigEl.appendChild(cursor); };
+/* v1.43 (jay 2026.10.02): the cursor travels with the typing again: it pauses after "- jay🥷", types the invitation, then rides along the icon row as each icon pops in,
+   and rests for good right after the last icon (linkedin), in curLi (whose hidden placeholder has reserved that spot from the first paint, so nothing moves). was (v1.42): left at the sign-off */
+const cursorRow = (before) => { glue.remove(); curHold.remove(); if (cursor.parentNode !== curLi) curLi.appendChild(cursor); if (before !== undefined){ if (curLi.nextSibling !== before) ul.insertBefore(curLi, before); } else if (ul.lastChild !== curLi) ul.appendChild(curLi); curLi.classList.add('in'); };
 function cursorHome(){
-  document.body.classList.add('revealed');
-  cursorSig();   // v1.42: the cursor stays after the sign-off (was v1.34: removed for good; the finger + "touch it" by the rocket blinked instead)
+  document.body.classList.add('revealed'); form.classList.remove('rk-wait');
+  cursorRow();   // v1.43: after linkedin, for good. (v1.42: after the sign-off; v1.34-v1.41: removed, the finger + "touch it" blinked by the rocket)
   // was (round 16): curHold.remove(); if (cursor.parentNode !== curLi) curLi.appendChild(cursor); if (ul.lastChild !== curLi) ul.appendChild(curLi); curLi.classList.add('in');
   // curLi (+ its hidden placeholder) stays in the icon row as it was, so the row is exactly as wide as before
 }
@@ -1018,9 +1031,9 @@ function popIcons(instant){
   icons.forEach((li, i) => {
     const a = li.querySelector('a');
     if (instant){ li.classList.add('in'); revealTap(a); state.icons = i + 1; return; }
-    if (i === 0 && iconRain(done)) return;   // v1.38: the egg-style rain (below); the old pop only if it can't run
-    if (iconRun) return;
-    iconTimers.push(setTimeout(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); state.icons = i + 1; if (i === icons.length - 1) iconTimers.push(setTimeout(done, 400)); }, i*TIMING.iconStagger));
+    // v1.43 (jay 2026.10.02): one by one again (𝕏 ... linkedin), each popping in like a typed character, the cursor right behind it. was (v1.38-v1.42): if (i === 0 && iconRain(done)) return; (all rained in together)
+    if (i === 0) cursorRow(li);
+    iconTimers.push(setTimeout(() => { li.classList.add('in'); cursorRow(icons[i + 1] || null); setTimeout(() => revealTap(a), 300); state.icons = i + 1; if (i === icons.length - 1) iconTimers.push(setTimeout(done, 400)); }, i*TIMING.iconStagger/(pace/2)));
   });
   if (instant){ if (reduced) ul.classList.add('fade'); done(); }   // v1.38: reduced motion fades the row in, like the egg
 }
@@ -1068,18 +1081,23 @@ async function intro(){
   if (skipped) return;   // v1.25: a tap before the fonts were ready already dumped the page
   document.body.classList.add('typing');
   await wait(450);
-  for (let i=0;i<LAST;i++){   // v1.39: types up to the sign-off; the prompt (LAST) + everything below rain in together (bottomRain). was: i < lines.length, the prompt typed, then the form, icons, egg in turn
+  for (let i=0;i<=LAST;i++){   // v1.43 (jay 2026.10.02): types through the invitation again (LAST), then the field, the rocket and the icons one by one; the daily block (egg) rains after. was (v1.39-v1.42): i < LAST, then bottomRain() (all of it at once)
     if (skipped) return;
     lineAt = i; state.i = i;
     state.line = i === 0 ? 0 : 1; state.para = i === 0 ? -1 : i - 1; state.head = 0;
     current = type(lines[i], {speed: i === 0 ? TIMING.helloSpeed : TIMING.paraSpeed, window: TIMING.window}); await current;
     if (skipped) return;
-    if (i === LAST - 1){ ninja.classList.add('in'); cursorSig(); await wait(420); }
+    if (i === SIG){ ninja.classList.add('in'); cursorSig(); await wait(420); }
     const ended = lines[i].runs.flatMap(r => r.g).join('').trimEnd();
-    await wait(i === 0 ? TIMING.afterHello : i === LAST - 1 ? TIMING.beforeSignoff : ended.endsWith('...') ? TIMING.afterEllipsis : TIMING.betweenParas);
+    if (i === LAST) break;
+    await wait(i === 0 ? TIMING.afterHello : i === SIG ? TIMING.beforeSignoff : ended.endsWith('...') ? TIMING.afterEllipsis : TIMING.betweenParas);
   }
   if (skipped) return;
-  bottomRain();
+  document.body.classList.remove('typing'); form.classList.add('rk-wait'); showForm();   // the field first...
+  await wait(TIMING.rocketAfter); if (skipped) return;
+  form.classList.remove('rk-wait');                                                    // ...then the rocket
+  await wait(TIMING.beforeIcons); if (skipped) return;
+  state.line = 3; lineAt = lines.length; popIcons(false);   // the icons one by one, the cursor riding along; when the last one is in, the egg rains (popIcons -> done -> egg)
 }
 /* v1.39 (jay 2026.10.01): "let's have 'want to be part of something human?' and everything below rainfall down so people aren't needing to wait for other stuff once that is presented."
    right after the sign-off, all of it starts at once, each column up to TIMING.rainJitter late: the prompt's letters, one column each for the email field, the rocket and "touch it",
@@ -1091,7 +1109,7 @@ function bottomRain(){
   state.line = 3; lineAt = lines.length; document.body.classList.remove('typing'); cursorSig();
   const t = lines[LAST], pEl = t.el;
   render(t, t.n + TIMING.window, TIMING.window); cursorSig();   // the typed line, final (it comes back when the letters have landed)
-  const kids = [...pEl.childNodes], chars = []; pEl.replaceChildren(); fillChars(pEl, COPY.cta, chars);
+  const kids = [...pEl.childNodes], chars = []; pEl.replaceChildren(); fillChars(pEl, [].concat(COPY.cta).join(' '), chars);   // (v1.39 bottomRain: no longer called since v1.43)
   const fs = parseFloat(getComputedStyle(pEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep, t0 = performance.now();
   const run = bottom = {anims: [], timers: [], cols: [], scr: 0, left: 0, kids, pEl, t0}; state.bottom = {t0: Math.round(t0)};
   const fall = (mv, top, c) => {
@@ -1172,15 +1190,16 @@ function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; du
 function dump(){
   if (dumping || state.done) return;
   if (reduced) return complete();
-  dumping = true; skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); iconStop(); bottomStop();   // v1.39: + the bottom rain   // v1.38: icons still raining land at once
+  dumping = true; skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); iconStop(); bottomStop();
+  if (curLi.classList.contains('in')) cursorRow();   // v1.43: mid-icons, the cursor goes straight to its spot after linkedin (only not-yet-shown icons move), so the burst never shifts a visible icon   // v1.39: + the bottom rain   // v1.38: icons still raining land at once
   if (document.documentElement.dataset.mode !== 'fast') JayRain.mode(true);   // always already 2x via the tap flow; kept so the dump can never end in a teal/orange mismatch
   rainBoost = true; rain.setSpeed(DUMP.rain, DUMP.rainUp); state.rainBoost = 'on';   // v1.33: the rain fast-forwards with the text (colour stays the orange 2x)
   const tape = [], win = TIMING.window;
   for (let j = lineAt; j < lines.length; j++){
     const t = lines[j];
     for (let h = (j === lineAt ? state.head : 0) + 1; h <= t.n + win; h++) tape.push(() => render(t, h, win));
-    if (j === LAST - 1) tape.push(() => { ninja.classList.add('in'); cursorSig(); });
-    if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); cursorSig(); if (!form.classList.contains('in')) showForm(); });   // v1.30: after the icons the cursor is already home; leave it
+    if (j === SIG) tape.push(() => { ninja.classList.add('in'); cursorSig(); });
+    if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); form.classList.remove('rk-wait'); if (!form.classList.contains('in')) showForm(); });   // v1.30: after the icons the cursor is already home; leave it
   }
   icons.forEach(li => { if (li.classList.contains('in')) return; const a = li.querySelector('a');
     tape.push(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); }, () => {}); });
