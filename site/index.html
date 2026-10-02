@@ -40,7 +40,7 @@ a:hover{color:var(--teal)}
 .para{font-size:20px;line-height:1.7;color:var(--white);white-space:pre-line}
 .para + .para{margin-top:20px}
 @media (min-width:761px){.copy{width:min(70ch,calc(100vw - var(--left) - 24px))}}   /* round 23 (jay 2026.09.29): desktop column wide enough for the longest paragraph */
-@media (min-width:940px){.para{white-space:nowrap}}   /* ...and every paragraph sits on one line. 761-939px still wraps; mobile (<=760) unchanged */
+/* v1.42 (jay 2026.10.02): retired with the old copy: @media (min-width:940px){.para{white-space:nowrap}} (every paragraph on one line). the new paragraphs are longer than the column, so they wrap at every width */
 .para a{white-space:nowrap}   /* an address/link never breaks mid-way; lines wrap at the "; " separators */
 .para .bold{font-weight:700;color:var(--white)}
 .para .teal{color:var(--teal)}
@@ -48,7 +48,7 @@ a:hover{color:var(--teal)}
 .sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.08em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
 .sig .ninja.in{opacity:1;transform:none}
 .cta{margin-top:52px;font-size:20px;line-height:1.5}   /* jay 2026.09.29: one extra blank line after the sign-off */
-.prompt{color:var(--white)}
+.prompt{color:var(--white);line-height:1.7}   /* v1.42: the invitation is a full paragraph now, so it wraps with the paragraphs' line spacing (was the .cta's 1.5) */
 /* v1.39 (jay 2026.10.01): right after the sign-off, the prompt + everything below rains in together (see bottomRain). the prompt's letters fall like the egg's (white heads, white land glow
    settling to its normal shadow); the email field, rocket and "touch it" each get one column (.col) that lands on them, and they appear + work as it lands */
 .prompt .w{white-space:nowrap}.prompt .c{display:inline-block;position:relative}
@@ -179,7 +179,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 }
 /* v1.33 (jay 2026.09.30): "and while the journey ahead is long... we have space𝕏 to help us now" needs 3 lines below ~413px (16px mono, 38 chars to "long..."),
    so there it's balanced (and while the journey / ahead is long... we have / space𝕏 to help us now) instead of leaving "now" alone on the last line. wider phones keep 2 lines, broken after "long..." */
-@media (max-width:412px){.para:last-child{text-wrap:balance}}
+/* v1.42: retired with the old copy: @media (max-width:412px){.para:last-child{text-wrap:balance}} */
 
 /* v1.29 (jay 2026.09.30): the submit button is the site's rocket (orange body = tappable, teal flame), bigger than the text so it reads as the button.
    48px square on phones, 54px on desktop (>= 44px tap target); negative block margins let it overhang the email row, so the row (and everything below) keeps its v1.28 height */
@@ -195,12 +195,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
    pointing left at the rocket, + "touch it" sit just right of the rocket and blink exactly like the cursor did (teal at 1x, orange at 2x, same 1.05s blink).
    it's in the form row from the first paint (hidden), so turning it on moves nothing; it goes with the form on a real liftoff. phones: the email field is narrower
    (14ch, still fits you@email.com) and the dare text small, so field + rocket + finger + text stay on one row at 390px */
-.dare{flex:none;display:flex;align-items:center;gap:6px;margin-left:-2px;font-size:13px;line-height:1;letter-spacing:-.02em;white-space:nowrap;color:var(--teal);text-shadow:0 0 10px rgba(26,173,179,.75);pointer-events:none;visibility:hidden}
-.dare svg{width:34px;height:34px;display:block;flex:none;transform:rotate(90deg);filter:drop-shadow(0 0 6px rgba(26,173,179,.75))}   /* the hint's 👇 turned a quarter clockwise: points left */
-.dare.on{visibility:visible;animation:blink 1.05s infinite}
-[data-mode="fast"] .dare{color:var(--orange);text-shadow:0 0 10px rgba(255,77,26,.75)}
-[data-mode="fast"] .dare svg{filter:drop-shadow(0 0 6px rgba(255,77,26,.75))}
-@media (max-width:760px){.notify input{flex:1 1 0}.dare{gap:4px;font-size:11px}.dare svg{width:28px;height:28px}}   /* v1.37: the field fills the row (was flex:0 1 14ch) */
+/* v1.42 (jay 2026.10.02): the finger + "touch it" blinker by the rocket is gone ("people will notice the form on their own"); the typing cursor blinks after "- jay🥷" again instead (cursorSig) */
+@media (max-width:760px){.notify input{flex:1 1 0}}   /* v1.37: the field fills the row (was flex:0 1 14ch) */
 /* v1.37 (jay 2026.10.01): on phones the signup row runs out to the tap hint, so the right edge of "touch it" lines up with the right edge of the hint's chevron (⌄) at every width.
    the row is the content column (right gutter 24px) pushed out to the chevron: --hint-r = the hint's right offset (14px, .tap-hint in assets/rain.css) + --chev-in = the gap
    between the hint's box and the chevron's ink (~2.4px: 12px hint, 1.125em arrow box). the email field takes whatever is left, rocket + finger + text keep their size */
@@ -346,7 +342,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
           <input id="notify-email" type="email" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
           <input type="hidden" name="embed" value="1">
           <button type="submit" class="rkb" aria-label="liftoff" title="liftoff"><svg class="rk" viewBox="0 0 256 256" aria-hidden="true" focusable="false"><defs><linearGradient id="rk-b" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#FF8A5E"/><stop offset=".45" stop-color="#FF4D1A"/><stop offset="1" stop-color="#B8300A"/></linearGradient><linearGradient id="rk-w" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#c9d3d5"/></linearGradient><linearGradient id="rk-f" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#5FD6DA"/><stop offset=".55" stop-color="#1AADB3"/><stop offset="1" stop-color="#0E7C81" stop-opacity="0"/></linearGradient><linearGradient id="rk-n" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#6b7478"/><stop offset="1" stop-color="#1c2124"/></linearGradient><radialGradient id="rk-g" cx="35%" cy="30%" r="75%"><stop offset="0" stop-color="#2b7e83"/><stop offset=".6" stop-color="#0c3b3e"/><stop offset="1" stop-color="#051a1c"/></radialGradient></defs><g transform="rotate(45 128 128) translate(0 6)"><g class="rk-fl"><path d="M112 196 C112 214 120 228 128 244 C136 228 144 214 144 196 Z" fill="url(#rk-f)"/><path d="M121 196 C121 206 124 213 128 222 C132 213 135 206 135 196 Z" fill="#C9F3F4" opacity=".85"/></g><path d="M104 180 L152 180 L146 198 L110 198 Z" fill="url(#rk-n)"/><path d="M90 132 L56 170 C52 175 54 186 60 190 L92 176 Z" fill="url(#rk-w)"/><path d="M166 132 L200 170 C204 175 202 186 196 190 L164 176 Z" fill="url(#rk-w)"/><path d="M128 14 C164 40 178 88 176 138 C175 158 170 172 164 184 L92 184 C86 172 81 158 80 138 C78 88 92 40 128 14 Z" fill="url(#rk-b)"/><path d="M128 14 C144 25 156 40 164 56 C142 49 114 49 92 56 C100 40 112 25 128 14 Z" fill="url(#rk-w)"/><rect x="122" y="150" width="12" height="44" rx="6" fill="url(#rk-w)"/><circle cx="128" cy="104" r="24" fill="#fff"/><circle cx="128" cy="104" r="17" fill="url(#rk-g)"/><path d="M117 99 A12 12 0 0 1 127 92" fill="none" stroke="#fff" stroke-opacity=".8" stroke-width="4" stroke-linecap="round"/><path d="M128 15 C163 41 177 88 175 138 C174 158 169 172 163 183 L93 183 C87 172 82 158 81 138 C79 88 93 41 128 15 Z" fill="none" stroke="#FFC2A8" stroke-opacity=".45" stroke-width="2.5"/><path d="M100 70 C96 92 95 118 98 146" fill="none" stroke="#fff" stroke-opacity=".28" stroke-width="7" stroke-linecap="round"/></g></svg></button>   <!-- v1.29 (jay 2026.09.30): the site's rocket is the button (orange = tappable, teal flame). accessible name "liftoff" (v1.30 (jay 2026.09.30): was "count me in"). round 27: was "[ count me in ]", before that "notify me" -->
-          <span class="dare" aria-hidden="true"><span class="dt">touch it</span></span>   <!-- v1.34: the finger (a copy of the tap hint's svg) goes in front of the text at load -->
         </form>
         <p class="status" role="status" aria-live="polite"></p>
       </div>
@@ -371,16 +366,12 @@ const NINJA = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmc
 const COPY = {
   hello: "hello, world...",                  // first line (teal)
   // jay's copy, 2026.09.28 (round 5). one [ ] per paragraph, typed in order with a pause between.
-  paragraphs: [
-    ["for years, i \"succeeded\" at work that never felt like mine"],   // round 27 (jay 2026.09.30): was "once upon a time, i \"succeeded\" doing work…". round 18 copy (jay 2026.09.29)
-    ["i let it take me so far from myself that i didn't know who jay was"],
-    [{text: "because i hadn't found my ikigai", teal: true}],   // round 27 (jay 2026.09.30): was "didn't have"
-    [{text: "but now... i have", teal: true}],   // round 27 (jay 2026.09.30): was "i do"
-    ["i hope the cool stuff we're building helps you find yours"],   // v1.33 (jay 2026.09.30): was "i hope what we are building helps you find yours". v1.30 (jay 2026.09.30): was "and i hope what i build helps you find yours". round 27 (jay 2026.09.30): was "and one day, i hope you will benefit from my life's work"
-    ["and while the journey ahead is long... we have space𝕏 to help us now"],   // v1.33 (jay 2026.09.30): was "the journey ahead is long, but we have space𝕏 to help us now". v1.29 (jay 2026.09.30): was "the road ahead is long, but i'm in ludicrous mode 🚀". the rocket moved to the signup button (no duplicate). 𝕏 (U+1D54F) isn't in JetBrains Mono, so it falls back like any missing glyph
+  paragraphs: [   // v1.42 (jay 2026.10.02): jay's new intro message. was (v1.33-v1.41): "for years, i "succeeded" at work that never felt like mine" / "i let it take me so far from myself that i didn't know who jay was" / "because i hadn't found my ikigai" (teal) / "but now... i have" (teal) / "i hope the cool stuff we're building helps you find yours" / "and while the journey ahead is long... we have space𝕏 to help us now"
+    ["isn't it weird that the internet, a place built to connect us, has become the hardest place to make ", {text: "genuine connections", teal: true}, " with other humans?"],
+    ["my team and i think so too, and we want to change that."]
   ],
   signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
-  cta: "want to be part of something human?",   // typed (white) after the sign-off; then the email form slides in (round 10)
+  cta: "come back any day to watch us build. if you want early updates or a spot in our second wave of testers, drop your email and hit enter to launch:",   // v1.42 (jay 2026.10.02): the last paragraph of jay's new message takes the invitation's slot, right above the email field (white; rains in with the form, v1.39). was: "want to be part of something human?"
   failNote: "that email isn't complete yet. try again (like you@email.com)",   // v1.31 PREVIEW: screen readers only (visually hidden), replaces the browser bubble's message
   thanks: "please confirm via email",   // v1.29 (jay 2026.09.30): typed (teal) after the heart burns teal -> orange, in the form's slot, one line. was "almost there, check your email and tap confirm"
   dayDate: "2026.10.02",   // v1.30 (jay 2026.09.30): THE DAY'S DATE, yyyy.mm.dd, shown in white as "🗓️ <date>" above the egg lines. the daily 5am song + quote routine sets it together with lyric (the day the song + quote were published, america/chicago; never the viewer's clock). "" hides the line.
@@ -389,6 +380,8 @@ const COPY = {
   lyricHref: "/song-of-the-day/",   // v1.27 (jay 2026.09.30): was "/songs/" (the old url is now a redirect stub)
   egg: "today's quote",   // v1.26 (jay 2026.09.30): the last line is TODAY'S quote, read from eggData (the same quotes.json /quote-of-the-day/ types at the top: the newest entry dated today or earlier, america/chicago). shown as "💭 <quote> →", lowercase, no author, one line (cut with "… →" if long). THIS text is only the fallback if quotes.json can't be read.
   eggData: "/quote-of-the-day/quotes.json",   // v1.26: the daily 5:10am routine updates only this file (it already does for /quote-of-the-day/); nothing on the homepage needs editing. was (<= v1.25): egg: "💭 the clearest view of a man is from below →"
+  recapData: "/daily-recap/recaps.json",   // v1.42 (jay 2026.10.02): the third egg line, "📝 <start of today's recap> →" (/daily-recap/). shown only when the newest recaps.json entry is dated today or yesterday (america/chicago); otherwise there's no line at all
+  recapHref: "/daily-recap/",
   eggHref: "/quote-of-the-day/",   // v1.27: was "/quotes/" (now a redirect stub). round 16: leave "" for plain text; put a url here and the landed line becomes a link   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all out front, all orange. round 24: instagram 3rd, + telegram 4th. v1.26 (jay 2026.09.30): tiktok removed
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
@@ -402,6 +395,7 @@ const COPY = {
   ]
 };
 const TIMING = {
+  recapWait: 1500,   // v1.42: the most the intro waits for recaps.json (ms; it runs alongside the font load, so usually no wait at all)
   helloSpeed: 55,        // ms per character for the first line ("hello, world...")
   paraSpeed: 55,         // ms per character for the paragraphs, links + sign-off (same as the hello line)
   window: 4,             // how many characters scramble before resolving (same decode effect everywhere)
@@ -520,11 +514,11 @@ const eggEl = $('.egg');
    both lines are lowercase and always ONE line at the normal size: fitEgg measures each line with the real font at the real column width and, if it would wrap,
    cuts it at a word boundary and ends it with "… →" so it fits exactly (the arrow always shows). the full text stays in the link's title + aria-label */
 const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
-const EGG = [{icon: '🗓️', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}];   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
-const quoteLine = EGG.find(l => l.quote);
+const EGG = [{icon: '🗓️', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}, {icon: '📝', body: '', href: COPY.recapHref, recap: true}];   // v1.42: + the recap line (body "" = hidden until today's recap is known)   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
+const quoteLine = EGG.find(l => l.quote), recapLine = EGG.find(l => l.recap);
 const lineText = (l, body) => l.day ? `${l.icon} ${body}` : `${l.icon} ${body} →`;   // v1.31: the date line has no link, so no arrow
 eggEl.classList.toggle('has-day', !!COPY.dayDate);
-const lineClass = l => l.day ? 'day' : l.song ? 'song' : 'quote';
+const lineClass = l => l.day ? 'day' : l.song ? 'song' : l.recap ? 'recap' : 'quote';
 const isDeco = w => w === '→' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
 const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], ..., [last word, →]
   const words = text.split(' ').filter(Boolean), groups = [];
@@ -973,8 +967,6 @@ form.addEventListener('submit', async e => {
 });
 const state = window.__intro = {line: -1, para: -1, head: 0, icons: 0, done: false};   // line: 0 hello, 1 paragraphs, 2 sign-off, 3 icons
 const hint = $('.tap-hint'), hintSpeed = hint.querySelector('b');
-const dare = form.querySelector('.dare');   // v1.34 (jay 2026.10.01): the finger is the tap hint's own drawing, copied (ids dropped so nothing is duplicated)
-{ const fs = hint.querySelector('svg').cloneNode(true); fs.querySelectorAll('[id]').forEach(e => e.removeAttribute('id')); fs.removeAttribute('role'); fs.removeAttribute('aria-label'); fs.setAttribute('aria-hidden', 'true'); fs.setAttribute('focusable', 'false'); dare.prepend(fs); }
 const setHintMode = fast => { hintSpeed.textContent = fast ? '1x' : '2x'; };
 
 const T = [26,173,179], PALE_TEAL = [121,205,207], W = [214,222,222], HEAD = [255,255,255];
@@ -1005,9 +997,13 @@ const iconTimers = [], icons = [...ul.children].filter(li => li !== curLi);
    the hint goes back to the 1x/2x toggle, and this tab remembers it has shown the homepage (see the back-navigation rule below).
    v1.30 (jay 2026.09.30): "fully loaded" now means the egg has landed too (the 💭 quote line is the last thing to finish). the cursor still comes home when the icons are in (cursorHome),
    but ››| and the two-tap skip stay live until the egg lands (introEnd); was: finishUp() as soon as the last icon popped, while the egg was still raining */
+/* v1.42 (jay 2026.10.02): once the sign-off is typed, the cursor stays for good right after "- jay🥷" (next to the ninja, same line), blinking (teal at 1x, orange at 2x).
+   it's an inline-block with a negative right margin, after the ninja, so the line doesn't change. was (v1.34-v1.41): removed, and the finger + "touch it" by the rocket blinked instead */
+const sigEl = $('.sig');
+const cursorSig = () => { glue.remove(); if (cursor.parentNode !== sigEl || sigEl.lastChild !== cursor) sigEl.appendChild(cursor); };
 function cursorHome(){
   document.body.classList.add('revealed');
-  cursor.remove(); dare.classList.add('on');   // v1.34 (jay 2026.10.01): the cursor is done for good; the blinking finger + "touch it" by the rocket take over.
+  cursorSig();   // v1.42: the cursor stays after the sign-off (was v1.34: removed for good; the finger + "touch it" by the rocket blinked instead)
   // was (round 16): curHold.remove(); if (cursor.parentNode !== curLi) curLi.appendChild(cursor); if (ul.lastChild !== curLi) ul.appendChild(curLi); curLi.classList.add('in');
   // curLi (+ its hidden placeholder) stays in the icon row as it was, so the row is exactly as wide as before
 }
@@ -1078,7 +1074,7 @@ async function intro(){
     state.line = i === 0 ? 0 : 1; state.para = i === 0 ? -1 : i - 1; state.head = 0;
     current = type(lines[i], {speed: i === 0 ? TIMING.helloSpeed : TIMING.paraSpeed, window: TIMING.window}); await current;
     if (skipped) return;
-    if (i === LAST - 1){ cursor.remove(); ninja.classList.add('in'); await wait(420); }
+    if (i === LAST - 1){ ninja.classList.add('in'); cursorSig(); await wait(420); }
     const ended = lines[i].runs.flatMap(r => r.g).join('').trimEnd();
     await wait(i === 0 ? TIMING.afterHello : i === LAST - 1 ? TIMING.beforeSignoff : ended.endsWith('...') ? TIMING.afterEllipsis : TIMING.betweenParas);
   }
@@ -1092,9 +1088,9 @@ async function intro(){
    the prompt rains as egg-style letters over its typed (final, hidden) line, which is put back once it has landed, so nothing moves. skip / dump / back: bottomStop() lands it all at once */
 let bottom = null;
 function bottomRain(){
-  state.line = 3; lineAt = lines.length; document.body.classList.remove('typing'); cursor.remove();
+  state.line = 3; lineAt = lines.length; document.body.classList.remove('typing'); cursorSig();
   const t = lines[LAST], pEl = t.el;
-  render(t, t.n + TIMING.window, TIMING.window); cursor.remove();   // the typed line, final (it comes back when the letters have landed)
+  render(t, t.n + TIMING.window, TIMING.window); cursorSig();   // the typed line, final (it comes back when the letters have landed)
   const kids = [...pEl.childNodes], chars = []; pEl.replaceChildren(); fillChars(pEl, COPY.cta, chars);
   const fs = parseFloat(getComputedStyle(pEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep, t0 = performance.now();
   const run = bottom = {anims: [], timers: [], cols: [], scr: 0, left: 0, kids, pEl, t0}; state.bottom = {t0: Math.round(t0)};
@@ -1111,8 +1107,7 @@ function bottomRain(){
   form.classList.add('rainin', 'in');
   const sr = form.parentNode.getBoundingClientRect(), btn = form.querySelector('.rkb');
   [[emailIn, 'teal', () => { emailIn.classList.add('landed'); revealTap(emailIn); }],
-   [btn, '', () => { btn.classList.add('landed'); revealTap(btn); }],
-   [dare, 'teal', () => { dare.classList.add('on'); }]].forEach(([el, tint, show]) => {
+   [btn, '', () => { btn.classList.add('landed'); revealTap(btn); }]].forEach(([el, tint, show]) => {
     const r = el.getBoundingClientRect(), mv = mk('span', 'col' + (tint ? ' ' + tint : '')); mv.setAttribute('aria-hidden', 'true'); mv.textContent = ' ';
     Object.assign(mv.style, {left: (r.left - sr.left + r.width/2) + 'px', top: (r.top - sr.top + r.height/2) + 'px', fontSize: fs + 'px'}); form.parentNode.appendChild(mv);
     fall(mv, r.top + r.height/2, {kind: 'el', show: () => show(), drop: true});
@@ -1149,15 +1144,15 @@ function skip(){
   if (skipped || state.line >= 3) return;
   skipped = true; current && current.finish();
   lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window));
-  cursor.remove(); showForm();
-  ninja.classList.add('in'); document.body.classList.remove('typing'); state.line = 3; popIcons(true);
+  showForm();
+  ninja.classList.add('in'); cursorSig(); document.body.classList.remove('typing'); state.line = 3; popIcons(true);
 }
 /* jay 2026.09.30 v1.25: the whole page at once, no typing, no pops, no egg fall (back navigation + bfcache restores). safe to call at any point, mid-intro or mid-dump */
 function complete(){
   skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); iconStop(); bottomStop(); stopDump();   // v1.39: bottomStop lands the bottom rain at once   // v1.38: iconStop lands a mid-rain icon row at once
   document.body.classList.add('revealed'); document.body.classList.remove('typing');   // .revealed first, so nothing below transitions in
-  lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window)); cursor.remove();
-  ninja.classList.add('in');
+  lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window));
+  ninja.classList.add('in'); cursorSig();
   if (!form.classList.contains('gone')){ form.classList.add('in'); formTaps.forEach(revealTap); }
   icons.forEach(li => { li.classList.add('in'); revealTap(li.querySelector('a')); }); state.icons = icons.length;
   state.line = 3; finishUp();
@@ -1184,8 +1179,8 @@ function dump(){
   for (let j = lineAt; j < lines.length; j++){
     const t = lines[j];
     for (let h = (j === lineAt ? state.head : 0) + 1; h <= t.n + win; h++) tape.push(() => render(t, h, win));
-    if (j === LAST - 1) tape.push(() => { cursor.remove(); ninja.classList.add('in'); });
-    if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); if (!iconsIn) cursor.remove(); if (!form.classList.contains('in')) showForm(); });   // v1.30: after the icons the cursor is already home; leave it
+    if (j === LAST - 1) tape.push(() => { ninja.classList.add('in'); cursorSig(); });
+    if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); cursorSig(); if (!form.classList.contains('in')) showForm(); });   // v1.30: after the icons the cursor is already home; leave it
   }
   icons.forEach(li => { if (li.classList.contains('in')) return; const a = li.querySelector('a');
     tape.push(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); }, () => {}); });
@@ -1250,12 +1245,31 @@ fetch(COPY.eggData, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(
   try { store && store.setItem('jtn.quote', JSON.stringify({day, quote: top.quote})); } catch (e) {}
   applyQuote(top.quote, 'quotes.json');
 }).catch(() => { state.quoteError = true; });
+/* v1.42 (jay 2026.10.02): today's recap = the newest recaps.json entry, only if it is dated today or yesterday (america/chicago: jay writes it at night, the 5am drop publishes it the next morning). lowercase, one line, cut with "… →" like the others (fitEgg).
+   no entry for today = no line. the egg is laid out before anything shows: the intro waits for this fetch (at most TIMING.recapWait), and this tab's last answer for today
+   (sessionStorage "jtn.recap") is used from the first paint, so the line never pops in under the rest */
+function applyRecap(text, src){
+  const body = lc(text); state.recap = {src, text: body};
+  if (body === recapLine.body) return;
+  recapLine.body = body;
+  if (!state.egg) buildEgg(); else if (state.egg === 'landed') eggSettle();
+}
+try { const c = JSON.parse(ssGet('jtn.recap') || 'null'); if (c && c.day === chiDay()) applyRecap(c.text || '', 'session'); } catch (e) {}
+const recapReady = fetch(COPY.recapData, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(all => {
+  const day = chiDay();
+  const top = (Array.isArray(all) ? all : []).filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && typeof e.text === 'string' && e.text.trim() && e.date <= day).sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)[0];
+  const y = new Date(day + 'T12:00:00Z'); y.setUTCDate(y.getUTCDate() - 1); const yesterday = y.toISOString().slice(0, 10);   // the chicago day before (noon UTC, so no DST edge)
+  const text = top && (top.date === day || top.date === yesterday) ? top.text : '';
+  try { store && store.setItem('jtn.recap', JSON.stringify({day, text})); } catch (e) {}
+  applyRecap(text, 'recaps.json');
+}).catch(() => { state.recapError = true; });
 
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
 cursor.remove();
 lines[0].runs[0].node.insertBefore(cursor, lines[0].runs[0].ghost);
 if (cameBack) complete();   // v1.25: fully loaded from the very first paint
-document.fonts.ready.then(() => { fitEgg(true); rain.build(); requestAnimationFrame(rain.frame); if (cameBack) return; if (reduced){ skip(); } else intro(); });
+Promise.all([document.fonts.ready, Promise.race([recapReady, new Promise(r => setTimeout(r, TIMING.recapWait))])]).then(() => { fitEgg(true);   // v1.42: + the recap fetch (capped), so the egg's line count is final before anything shows
+  rain.build(); requestAnimationFrame(rain.frame); if (cameBack) return; if (reduced){ skip(); } else intro(); });
 let lastW = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(() => { fitEgg(); rain.build(); }, 150); });
 addEventListener('orientationchange', () => setTimeout(() => fitEgg(), 250));   // v1.26: the egg refits on rotation too (fitEgg skips if the column width didn't change)
 if (window.ResizeObserver){ let ro; new ResizeObserver(() => { clearTimeout(ro); ro = setTimeout(() => fitEgg(), 120); }).observe(eggEl); }   // ...and whenever the column width changes for any other reason
