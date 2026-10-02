@@ -1,9 +1,16 @@
+/* v1.51 (jay 2026.10.02): the speed tap's colour swap. every teal / orange on these pages reads from these variables (rgb triplets for the rgba() glows, plus the light / dark / pale
+   tints). normal (1x): teal = text accents + rain, orange = the tappables. swapped (2x, html[data-mode="fast"], set by mode() in rain.js): teal <-> orange everywhere, tints
+   included (each swapped tint is the same mix of white with the other brand colour). white, gold and the dim colours stay. not persisted: the speed state isn't either */
+:root{--t-rgb:26,173,179;--o-rgb:255,77,26;--t-lt:#5FD6DA;--t-dk:#0E7C81;--t-pale:#C9F3F4;--t-hot:#d2f6f7;--t-wh:#E6FBFB;--t-lt-rgb:127,218,221;
+  --o-lt:#FF8A5E;--o-dk:#B8300A;--o-pale:#FFC2A8;--o-hot:#ffd9cc;--o-wh:#FFE6DC;--o-lt2:#FF9A6E;--o-l1-rgb:255,150,100;--o-l2-rgb:255,160,110;--o-l3-rgb:255,170,120;--o-l4-rgb:255,120,70;--o-l5-rgb:255,236,224}
+:root[data-mode="fast"]{--teal:#FF4D1A;--orange:#1AADB3;--t-rgb:255,77,26;--o-rgb:26,173,179;--t-lt:#FF885F;--t-dk:#B8300A;--t-pale:#FFD7C9;--t-hot:#FFDED2;--t-wh:#FFEDE6;--t-lt-rgb:255,158,127;
+  --o-lt:#62C7CC;--o-dk:#0E7C81;--o-pale:#ABE2E4;--o-hot:#CDEDEE;--o-wh:#DDF3F4;--o-lt2:#74CED2;--o-l1-rgb:107,203,207;--o-l2-rgb:118,208,211;--o-l3-rgb:129,212,215;--o-l4-rgb:74,191,196;--o-l5-rgb:226,245,246}
 /* shared v1.16 hint */
-.tap-hint{--hint-icon:#1AADB3;position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;gap:6px;color:var(--teal);font-size:12px;line-height:1;letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px #000;transition:color .25s ease,opacity .7s ease,transform .7s ease}
-.tap-hint.ready{opacity:.7;transform:none}.tap-hint.settled{opacity:.52}[data-mode="fast"] .tap-hint{--hint-icon:#FF6A2B;color:var(--orange)}.tap-hint svg{width:1.35em;height:1.35em;display:block;flex:none;color:var(--hint-icon);transition:color .25s ease}.tap-hint b{font-weight:500}
+.tap-hint{--hint-icon:var(--teal);position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;gap:6px;color:var(--teal);font-size:12px;line-height:1;letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px #000;transition:color .25s ease,opacity .7s ease,transform .7s ease}
+.tap-hint.ready{opacity:.7;transform:none}.tap-hint.settled{opacity:.52}.tap-hint svg{width:1.35em;height:1.35em;display:block;flex:none;color:var(--hint-icon);transition:color .25s ease}.tap-hint b{font-weight:500}
 @media(prefers-reduced-motion:reduce){.tap-hint{transition:none;transform:none}.tap-hint.ready{opacity:.7}.tap-hint.settled{opacity:.52}}
 
 .speed-label{display:flex;align-items:center;gap:.3em}.speed-arrows{width:1.125em;height:1.35em;display:block;flex:none;color:currentColor;overflow:visible}.speed-arrows path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 .glow{transition:opacity .5s ease}.glow-fast{opacity:0}[data-mode="fast"] .glow{opacity:0}[data-mode="fast"] .glow-fast{opacity:.85}@media(prefers-reduced-motion:reduce){.glow{transition:none}}
 /* jay 2026.09.30 v1.25: the homepage intro's "finish the dump" glyph (››|), shown only at 2x while the intro types. the hint's orange (#FF6A2B, same as the fast-mode › and glove). same box as the chevrons, so nothing shifts */
-.tap-hint .speed-arrows.dump{color:#FF6A2B}
+.tap-hint .speed-arrows.dump{color:var(--teal)}
