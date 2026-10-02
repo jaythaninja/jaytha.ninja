@@ -269,19 +269,23 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify.cabled input:focus{box-shadow:0 10px 18px -12px rgba(26,173,179,.9)}   /* the focus glow stays; its 1px line is the track's job now */
 .notify .cbl-f{opacity:var(--fill-o);filter:drop-shadow(0 0 var(--fill-g) rgba(255,77,26,.95));transition:opacity .45s ease,filter .45s ease}
 .notify .cbl-f .fill{stroke:#FF4D1A;stroke-width:2;stroke-dasharray:var(--dash) 200;transition:stroke-dasharray .6s cubic-bezier(.22,1,.36,1)}
-.notify .cbl-f .flow{stroke:#FFE6DA;stroke-width:2;stroke-dasharray:var(--flow-l) 300;stroke-dashoffset:var(--flow-l);opacity:var(--flow-o);animation:cbl-flow var(--chg-t) linear infinite;transition:opacity .45s ease}
-.notify{--dash:10;--flow-l:9;--fill-o:.62;--fill-g:2px;--flow-o:.55;--chg-t:3.6s;--rk-s:1;--rk-g:5px;--rk-a:.38;--rk-o:.8}   /* 0: empty, a short segment */
-.notify[data-chg="1"]{--dash:34;--fill-o:.75;--fill-g:3px;--flow-o:.6;--chg-t:2.7s;--rk-s:1.01;--rk-g:8px;--rk-a:.52;--rk-o:.86}   /* 1: typing, a third */
-.notify[data-chg="2"]{--dash:67;--fill-o:.88;--fill-g:4.5px;--flow-o:.65;--chg-t:1.9s;--rk-s:1.02;--rk-g:11px;--rk-a:.7;--rk-o:.93}   /* 2: has an "@", two thirds */
-.notify[data-chg="3"]{--dash:100;--fill-o:1;--fill-g:6px;--flow-o:.5;--chg-t:2.2s;--rk-s:1.035;--rk-g:15px;--rk-a:.92;--rk-o:1}   /* 3: valid, full + pulsing */
-.notify[data-chg="3"] .cbl-f{animation:chg-full 2.2s ease-in-out infinite}
+.notify .cbl-f .flow{stroke:#FFE6DA;stroke-width:2;stroke-dasharray:var(--flow-l) 300;stroke-dashoffset:var(--flow-l);opacity:var(--flow-o);animation:cbl-flow var(--chg-t) cubic-bezier(.55,0,.85,.45) infinite;transition:opacity .45s ease}   /* v1.47: eases in, speeding up toward the rocket (was linear) */
+.notify{--dash:10;--flow-dash:10;--flow-l:9;--fill-o:.62;--fill-g:2px;--flow-o:.55;--chg-t:4s;--rk-s:1;--rk-g:5px;--rk-a:.38;--rk-o:.8}   /* 0: empty, a short segment */
+.notify[data-chg="1"]{--dash:34;--flow-dash:34;--fill-o:.75;--fill-g:3px;--flow-o:.6;--chg-t:2.4s;--rk-s:1.01;--rk-g:8px;--rk-a:.52;--rk-o:.86}   /* 1: typing, a third */
+.notify[data-chg="2"]{--dash:67;--flow-dash:67;--fill-o:.88;--fill-g:4.5px;--flow-o:.65;--chg-t:1.3s;--rk-s:1.02;--rk-g:11px;--rk-a:.7;--rk-o:.93}   /* 2: has an "@", two thirds */
+.notify[data-chg="3"]{--dash:100;--flow-dash:67;--fill-o:1;--fill-g:6px;--flow-o:.65;--chg-t:1.3s;--rk-s:1.035;--rk-g:15px;--rk-a:.92;--rk-o:1}   /* 3: valid, full + pulsing */
+/* v1.47 (jay 2026.10.02): fully charged = no moving charge. the flowing charge (speeding up per step: 4s empty, 2.4s typing, 1.3s "@", easing in toward the rocket) only
+   runs at steps 0-2. on a valid email the pulse already on its way finishes its run (step 3 keeps step 2's clock and end point), then chgStep adds .full: the flow stops
+   (it's between runs, so nothing jumps) and the whole cable, now filled to 100%, breathes as one (chg-full). was (v1.45): the flow kept running at step 3 */
+.notify.full .cbl-f{animation:chg-full 2.2s ease-in-out infinite}
+.notify.full .cbl-f .flow{animation:none;opacity:0}
 .notify:not(.ok) .rkb .rk{opacity:var(--rk-o);transform:scale(var(--rk-s));filter:drop-shadow(0 0 var(--rk-g) rgba(255,77,26,var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(255,150,100,calc(var(--rk-a)*.7)));
   animation:rk-chg var(--chg-t) ease-in-out infinite}
 .notify.ok .rkb .rk{opacity:1;animation:rk-full 2.2s ease-in-out infinite}   /* overrides the v1.29 .ok rk-pulse; the flame flicker (rk-flick) stays */
 .notify.ok .rkb:hover .rk,.notify.ok .rkb:focus-visible .rk{animation-duration:2.2s}
 .notify .rkb:active .rk{animation:none;transform:scale(.92)}   /* a press still gets the v1.29 squeeze */
 .notify .rkb[disabled] .rk{animation:none;opacity:.55}   /* (v1.29, restated so it still wins over the step glow while a request is out) */
-@keyframes cbl-flow{from{stroke-dashoffset:var(--flow-l)}to{stroke-dashoffset:calc(var(--flow-l) - var(--dash))}}   /* from just behind the cable's start to the end of the fill */
+@keyframes cbl-flow{from{stroke-dashoffset:var(--flow-l)}to{stroke-dashoffset:calc(var(--flow-l) - var(--flow-dash))}}   /* from just behind the cable's start to the end of the fill */
 @keyframes chg-full{0%,100%{opacity:1;filter:drop-shadow(0 0 6px rgba(255,77,26,.95))}50%{opacity:.84;filter:drop-shadow(0 0 9px rgba(255,77,26,1))}}
 @keyframes rk-chg{0%,100%{transform:scale(var(--rk-s));filter:drop-shadow(0 0 calc(var(--rk-g)*.82) rgba(255,77,26,calc(var(--rk-a)*.85))) drop-shadow(0 0 calc(var(--rk-g)*.3) rgba(255,150,100,calc(var(--rk-a)*.6)))}
   55%{transform:scale(calc(var(--rk-s) + .008));filter:drop-shadow(0 0 var(--rk-g) rgba(255,77,26,var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(255,150,100,calc(var(--rk-a)*.7)))}}
@@ -759,7 +763,15 @@ const placeCable = () => {
   const len = cblPaths[0].getTotalLength && cblPaths[0].getTotalLength(); if (len) form.style.setProperty('--cbl-s', (100*(xs - x0)/len).toFixed(2));   // the straight part, as a share of the cable
 };
 placeCable(); addEventListener('resize', placeCable); if (window.ResizeObserver) new ResizeObserver(placeCable).observe(form); if (document.fonts) document.fonts.ready.then(placeCable);
-const chgStep = () => { const v = emailIn.value, n = String(looksDone() ? 3 : v.includes('@') ? 2 : v.length ? 1 : 0); if (form.dataset.chg !== n) form.dataset.chg = n; };
+let fullT = 0;
+const chgStep = () => { const v = emailIn.value, n = String(looksDone() ? 3 : v.includes('@') ? 2 : v.length ? 1 : 0); if (form.dataset.chg === n) return; form.dataset.chg = n;
+  // v1.47: step 3 = .full once the charge in flight has finished its run (the flow's next animationiteration; reduced motion / no animation: at once; fallback 1.4s)
+  clearTimeout(fullT); cblPaths[2].onanimationiteration = null;
+  if (n !== '3'){ form.classList.remove('full'); return; }
+  const full = () => { clearTimeout(fullT); cblPaths[2].onanimationiteration = null; if (form.dataset.chg === '3') form.classList.add('full'); };
+  if (reduced || getComputedStyle(cblPaths[2]).animationName === 'none') return full();
+  cblPaths[2].onanimationiteration = full; fullT = setTimeout(full, 1400);
+};
 const syncOk = () => { form.classList.toggle('ok', looksDone()); chgStep(); };   // v1.31 PREVIEW (jay 2026.09.30): no custom validity message or native bubble any more (form is novalidate); looksDone() alone gates the post
 ['input', 'change', 'keyup'].forEach(ev => emailIn.addEventListener(ev, syncOk)); addEventListener('pageshow', syncOk); syncOk();
 /* v1.29 (jay 2026.09.30): the success heart. our own drawing, three stacked copies: teal (start), orange (the burnt heart, revealed bottom to top) and a white-hot band riding the burn line.
