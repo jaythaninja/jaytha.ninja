@@ -22,9 +22,9 @@
 *{box-sizing:border-box;margin:0;padding:0;font-style:normal}
 html{background:var(--bg);touch-action:manipulation}   /* taps toggle typing speed (like the homepage), so no double-tap zoom */
 body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh;min-height:100svh}
-a{color:var(--orange);text-decoration:none;transition:color .15s ease}
-a:hover{color:var(--teal)}
-::selection{background:var(--teal);color:#021213}
+a{color:var(--c);text-decoration:none;transition:color .15s ease}
+a:hover{color:var(--c)}
+::selection{background:var(--c);color:#021213}
 .glows{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}
 .glow{position:absolute;border-radius:50%;filter:blur(14px)}
 #rain{position:absolute;left:0;top:0;width:100%;z-index:1;pointer-events:none}
@@ -32,24 +32,24 @@ a:hover{color:var(--teal)}
 
 .stage{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:clamp(48px,8vh,96px) 0 clamp(56px,9vh,100px)}   /* centered while short; once the archive is long the page just scrolls */
 .copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:20px;text-shadow:0 0 8px rgba(0,0,0,.8)}
-.home{display:inline-block;margin:0 0 30px;font-size:14px;line-height:1.5;color:var(--orange);letter-spacing:.02em}   /* the way back: brand orange like every link (round 22); teal on hover */
-.home:hover,.home:focus-visible{color:var(--teal)}
-.kicker{font-size:21px;line-height:1.4;color:var(--teal)}
+.home{display:inline-block;margin:0 0 30px;font-size:14px;line-height:1.5;color:var(--c);letter-spacing:.02em}   /* the way back: brand orange like every link (round 22); teal on hover */
+.home:hover,.home:focus-visible{color:var(--c)}
+.kicker{font-size:21px;line-height:1.4;color:var(--c)}
 .today{margin-top:26px}
 .qt{font-size:20px;line-height:1.7;color:var(--white);white-space:pre-line}   /* the recap: exactly as jay typed it (his line breaks kept, not re-cased), like the lyric on /song-of-the-day/ */
 /* archive: static, quieter (smaller, dimmer), newest first */
 .archive{list-style:none;margin-top:96px}   /* round 22 (jay 2026.09.29): no divider; gap ~ the old divider's total gap */
 .archive li + li{margin-top:26px}
-.archive .d{font-size:14px;line-height:1.5;color:rgba(var(--t-rgb),.75)}
+.archive .d{font-size:14px;line-height:1.5;color:rgba(var(--c-rgb),.75)}
 .archive .aq{margin-top:4px;font-size:16px;line-height:1.65;color:var(--ink-2);white-space:pre-line}
 .none{font-size:16px;line-height:1.6;color:var(--ink-2)}
 /* typing internals (same as the homepage): resolved text, scrambling window, not-yet-typed text held invisibly so lines never reflow */
-.scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(var(--t-lt-rgb),.9)}
+.scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(var(--c-lt-rgb),.9)}
 .ghost{visibility:hidden}
-.cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--teal);box-shadow:0 0 14px rgba(var(--t-rgb),.75);animation:blink 1.05s infinite}
-/* v1.51: (the 2x orange cursor rule is gone: the cursor is var(--teal), which the speed tap's colour swap turns orange at 2x) */
+.cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--c);box-shadow:0 0 14px rgba(var(--c-rgb),.75);animation:blink 1.05s infinite}
+/* v1.51: (the 2x orange cursor rule is gone: the cursor is the state colour, var(--c)) */
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
-a:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .js .late{opacity:0;transition:opacity .9s ease-out}   /* archive is static; it just fades in once the data is there */
 .js .late.in{opacity:1}

@@ -24,9 +24,9 @@
 *{box-sizing:border-box;margin:0;padding:0;font-style:normal}
 html{background:var(--bg);touch-action:manipulation}   /* round 12: taps toggle typing speed, so no double-tap zoom (pinch zoom + scrolling still work). jay 2026.09.30 v1.25: during the intro a tap is the terminal dump; after it, the 1x/2x rain toggle */
 body{background:var(--bg);color:var(--ink);font-family:var(--mono);font-weight:500;-webkit-font-smoothing:antialiased;overflow-x:hidden;position:relative;min-height:100vh;min-height:100svh}   /* round 17: svh = the visible area between safari's bars, so a page that fits never scrolls */
-a{color:var(--orange);text-decoration:none;transition:color .15s ease}
-a:hover{color:var(--teal)}
-::selection{background:var(--teal);color:#021213}
+a{color:var(--c);text-decoration:none;transition:color .15s ease}
+a:hover{color:var(--c)}
+::selection{background:var(--c);color:#021213}
 .glows{position:absolute;inset:0;overflow:hidden;pointer-events:none;z-index:0;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}   /* round 8: glow fades out so the top + bottom are pure #000 (blends into oled black) */
 .glow{position:absolute;border-radius:50%;filter:blur(14px)}
 /* round 24 (jay 2026.09.29): orange text (egg line + its falling letters/trails/arrow, "[ count me in ]", round 27 (jay 2026.09.30): was "[ notify me ]") is regular 400; teal + white stay 500 */
@@ -41,7 +41,7 @@ a:hover{color:var(--teal)}
 :root{--fs:18px}
 @media (max-width:760px){:root{--fs:14px}}
 .copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:var(--fs);text-shadow:0 0 8px rgba(0,0,0,.8)}
-.hello{font-size:21px;line-height:1.4;color:var(--teal)}
+.hello{font-size:21px;line-height:1.4;color:var(--c)}
 /* v1.50 (jay 2026.10.02): roomier. --pgap = the gap between the 4 intro lines (para + para, and the signup line .cta): desktop 32px (was 20), phones 20px (was 10),
    i.e. text to text ~39.6px desktop (was 27.6), ~25.8px phones (was 15.8). the thank-you keeps the same gap under the signup line (.status top follows --pgap) */
 /* v1.50 / v1.51: three sections, one equal gap between them: (a) intro + signup, (b) the icons (v1.51: back in the middle; v1.50 had them last), (c) the daily lines
@@ -58,8 +58,8 @@ a:hover{color:var(--teal)}
 /* v1.42 (jay 2026.10.02): retired with the old copy: @media (min-width:940px){.para{white-space:nowrap}} (every paragraph on one line). the new paragraphs are longer than the column, so they wrap at every width */
 .para a{white-space:nowrap}   /* an address/link never breaks mid-way; lines wrap at the "; " separators */
 .para .bold{font-weight:700;color:var(--white)}
-.para .teal,.prompt .teal{color:var(--teal);white-space:nowrap}   /* v1.45: + the signup line ("want to help"); a teal phrase never splits across lines (at 390 / 430 "genuine" would otherwise end line 1) */
-.sig{margin-top:22px;font-size:20px;line-height:1.5;color:var(--teal)}
+.para .teal,.prompt .teal{color:var(--c);white-space:nowrap}   /* v1.45: + the signup line ("want to help"); a teal phrase never splits across lines (at 390 / 430 "genuine" would otherwise end line 1) */
+.sig{margin-top:22px;font-size:20px;line-height:1.5;color:var(--c)}
 .sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.08em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
 .sig .ninja.in{opacity:1;transform:none}
 .cta{margin-top:var(--pgap);font-size:var(--fs);line-height:1.5}   /* v1.44: paragraph spacing (the signup line is the 4th line of the intro). was 52px, one extra blank line after the sign-off (jay 2026.09.29) */
@@ -74,15 +74,15 @@ a:hover{color:var(--teal)}
 .prompt .c.land{animation:prompt-land 1.1s ease-out}
 @keyframes prompt-land{0%{text-shadow:0 0 10px #fff,0 0 22px rgba(255,255,255,.95)}100%{text-shadow:0 0 8px rgba(0,0,0,.8)}}
 .signup{position:relative}
-.signup .col{position:absolute;left:0;top:0;margin:-.625em 0 0 -.3em;line-height:1.25;white-space:pre;pointer-events:none;z-index:2;color:var(--o-hot);text-shadow:0 0 8px rgba(var(--o-rgb),.95),0 0 20px rgba(var(--o-rgb),.7)}
-.signup .col.teal{color:var(--t-hot);text-shadow:0 0 8px rgba(var(--t-rgb),.95),0 0 20px rgba(var(--t-rgb),.7)}
-.signup .col.teal .tr{color:var(--teal);text-shadow:0 0 10px rgba(var(--t-rgb),.55)}
+.signup .col{position:absolute;left:0;top:0;margin:-.625em 0 0 -.3em;line-height:1.25;white-space:pre;pointer-events:none;z-index:2;color:var(--c-hot);text-shadow:0 0 8px rgba(var(--c-rgb),.95),0 0 20px rgba(var(--c-rgb),.7)}
+.signup .col.teal{color:var(--c-hot);text-shadow:0 0 8px rgba(var(--c-rgb),.95),0 0 20px rgba(var(--c-rgb),.7)}
+.signup .col.teal .tr{color:var(--c);text-shadow:0 0 10px rgba(var(--c-rgb),.55)}
 .js .notify.rainin{transition:none}
 .notify.rainin > input[type=email]:not(.landed),.notify.rainin > .rkb:not(.landed){visibility:hidden}
 .notify.rainin > input[type=email].landed:not(.now){animation:in-land 1.1s ease-out}
-@keyframes in-land{0%{border-bottom-color:#fff;box-shadow:0 1px 0 #fff,0 10px 22px -8px rgba(var(--t-rgb),1)}100%{box-shadow:0 0 0 rgba(var(--t-rgb),0)}}
+@keyframes in-land{0%{border-bottom-color:#fff;box-shadow:0 1px 0 #fff,0 10px 22px -8px rgba(var(--c-rgb),1)}100%{box-shadow:0 0 0 rgba(var(--c-rgb),0)}}
 .notify.rainin > .rkb.landed:not(.now){animation:rk-land 1.1s ease-out}
-@keyframes rk-land{0%{filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 14px rgba(var(--o-rgb),.95))}100%{filter:drop-shadow(0 0 0 rgba(var(--o-rgb),0))}}
+@keyframes rk-land{0%{filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 14px rgba(var(--c-rgb),.95))}100%{filter:drop-shadow(0 0 0 rgba(var(--c-rgb),0))}}
 /* round 10: inline signup. prompt types, then the form slides in; the thank-you line types into the same slot (no reflow) */
 .signup{display:grid;grid-template-columns:minmax(0,1fr);margin-top:6px}
 .signup > *{grid-area:1/1}
@@ -90,17 +90,17 @@ a:hover{color:var(--teal)}
 .js .notify{opacity:0;transform:translateY(6px);visibility:hidden}
 .js .notify.in{opacity:1;transform:none;visibility:visible}
 .js .notify.gone{opacity:0;transform:translateY(-4px);visibility:hidden;transition:opacity .2s ease-in,transform .2s ease-in,visibility 0s .2s}
-.notify input{flex:0 1 23ch;min-width:0;font:inherit;font-size:var(--fs);line-height:1.5;color:var(--white);background:transparent;border:0;border-bottom:1px solid rgba(var(--t-rgb),.55);border-radius:0;padding:4px 0 5px;caret-color:var(--teal);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s ease,box-shadow .2s ease}
+.notify input{flex:0 1 23ch;min-width:0;font:inherit;font-size:var(--fs);line-height:1.5;color:var(--white);background:transparent;border:0;border-bottom:1px solid rgba(var(--c-rgb),.55);border-radius:0;padding:4px 0 5px;caret-color:var(--c);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s ease,box-shadow .2s ease}
 .notify input::placeholder{color:rgba(246,239,233,.34);opacity:1}
 /* v1.31 PREVIEW (jay 2026.09.30): no browser validation bubble (the form is novalidate). a failed liftoff makes the placeholder "you@email.com" (or the partial email typed)
    glow + pulse in brand teal instead (failGlow sets these three custom properties per frame). colour + text-shadow only, so nothing ever moves */
 .notify input{color:var(--eg-c,var(--white));text-shadow:var(--eg-s,none)}
 .notify input::placeholder{color:var(--eg-pc,rgba(246,239,233,.34));text-shadow:var(--eg-s,none)}
-.notify input:hover{border-bottom-color:rgba(var(--t-rgb),.8)}
-.notify input:focus{border-bottom-color:var(--teal);box-shadow:0 1px 0 var(--teal),0 10px 18px -12px rgba(var(--t-rgb),.9)}
-.notify input:-webkit-autofill{-webkit-text-fill-color:var(--white);-webkit-box-shadow:0 0 0 60px #000 inset;caret-color:var(--teal);transition:background-color 9999s}
-.notify button{flex:none;font:inherit;font-size:18px;line-height:1.5;color:var(--orange);background:transparent;border:0;border-radius:6px;padding:4px 6px;margin:0 -6px;cursor:pointer;white-space:nowrap;font-weight:400;transition:color .15s ease,background-color .15s ease}
-.notify button:hover,.notify button:focus-visible{color:var(--teal);background:rgba(var(--t-rgb),.08)}
+.notify input:hover{border-bottom-color:rgba(var(--c-rgb),.8)}
+.notify input:focus{border-bottom-color:var(--c);box-shadow:0 1px 0 var(--c),0 10px 18px -12px rgba(var(--c-rgb),.9)}
+.notify input:-webkit-autofill{-webkit-text-fill-color:var(--white);-webkit-box-shadow:0 0 0 60px #000 inset;caret-color:var(--c);transition:background-color 9999s}
+.notify button{flex:none;font:inherit;font-size:18px;line-height:1.5;color:var(--c);background:transparent;border:0;border-radius:6px;padding:4px 6px;margin:0 -6px;cursor:pointer;white-space:nowrap;font-weight:400;transition:color .15s ease,background-color .15s ease}
+.notify button:hover,.notify button:focus-visible{color:var(--c);background:rgba(var(--c-rgb),.08)}
 .notify button[disabled]{cursor:default;color:var(--ink-3);background:transparent}
 .status{align-self:center;color:#FFD700;font-size:var(--fs);line-height:1.5}
 .status:empty{display:none}
@@ -108,11 +108,11 @@ a:hover{color:var(--teal)}
    ~27.6px desktop, ~15.8px phones). nudged with position:relative, so the form slot keeps its height and nothing below moves. was: centred in the slot (~17.6px desktop) */
 .status{position:relative;top:calc(var(--pgap) - 10px)}   /* v1.50: follows --pgap (was 10px = 20px - 10px) */
 /* typing internals: resolved text, scrambling window, and the not-yet-typed text held invisibly so lines never reflow */
-.scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(var(--t-lt-rgb),.9)}
+.scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(var(--c-lt-rgb),.9)}
 .ghost{visibility:hidden}
 .glue{white-space:nowrap}   /* v1.33: holds the typing cursor between two word joiners (see render) */
-.cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--teal);box-shadow:0 0 14px rgba(var(--t-rgb),.75);animation:blink 1.05s infinite}
-/* v1.51: (the 2x orange cursor rule is gone: the cursor is var(--teal), which the speed tap's colour swap turns orange at 2x) */
+.cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--c);box-shadow:0 0 14px rgba(var(--c-rgb),.75);animation:blink 1.05s infinite}
+/* v1.51: (the 2x orange cursor rule is gone: the cursor is the state colour, var(--c)) */
 /* v1.15 preview: fixed, non-interactive hint; safe-area aware and outside the copy column */
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
@@ -121,9 +121,9 @@ a:hover{color:var(--teal)}
 .social li.in{opacity:1;transform:none}.revealed .social li.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .sig .ninja.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .notify.in:not(.gone){opacity:1!important;transform:none!important;visibility:visible;transition:none!important}.revealed .egg.fade,.revealed .social.fade{opacity:1!important;animation:none!important}
 /* jay 2026.09.30 v1.25: :not(.gone) so a signup sent before the page is fully loaded stays gone (the thank-you line isn't covered by the form when .revealed lands) */
 .social a{display:flex;align-items:center;justify-content:center;width:42px;height:40px;border-radius:8px}
-.social a:hover{background:rgba(var(--t-rgb),.08)}
+.social a:hover{background:rgba(var(--c-rgb),.08)}
 /* round 14: all 7 icons out front, same orange as the links (no "more +" drawer) */
-a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offset:2px}
+a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 .notify input:focus-visible{outline:none}
 @media (prefers-reduced-motion:reduce){.notify{transition:none!important}}
 .ic{width:28px;height:22px}
@@ -133,32 +133,32 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .social li{position:relative}
 .social li.rain{transition:none}
 .social li.rain:not(.shown) a{visibility:hidden}
-.social .hd{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);line-height:1.25;font-weight:400;white-space:pre;pointer-events:none;color:var(--o-hot);text-shadow:0 0 8px rgba(var(--o-rgb),.95),0 0 20px rgba(var(--o-rgb),.7)}   /* = .egg .c.fall */
+.social .hd{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);line-height:1.25;font-weight:400;white-space:pre;pointer-events:none;color:var(--c-hot);text-shadow:0 0 8px rgba(var(--c-rgb),.95),0 0 20px rgba(var(--c-rgb),.7)}   /* = .egg .c.fall */
 .social li.land a{animation:icon-land 1.1s ease-out}
-@keyframes icon-land{0%{color:#fff;filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px rgba(var(--o-rgb),.95))}100%{color:var(--orange);filter:drop-shadow(0 0 0 rgba(var(--o-rgb),0))}}   /* = egg-land, for an svg */
+@keyframes icon-land{0%{color:#fff;filter:drop-shadow(0 0 6px #fff) drop-shadow(0 0 12px rgba(var(--c-rgb),.95))}100%{color:var(--c);filter:drop-shadow(0 0 0 rgba(var(--c-rgb),0))}}   /* = egg-land, for an svg */
 .social.fade{animation:egg-fade 1.4s ease-out both}
 /* round 16: the cursor stays after everything renders, blinking at the end of the icon row (teal at 1x, orange at 2x) (jay 2026.09.29) */
 .social li.cur{display:flex;align-items:center;height:40px;pointer-events:none}
 .social li.cur .cursor{margin:0 0 0 7px;vertical-align:0}
 /* round 16: easter egg for people who stay. with the icons (round 23: starts ~250ms before the first one), the quote rains down in orange, one column per letter, and stays (jay 2026.09.29)
    the line is reserved in layout from the start (hidden), so nothing reflows when it lands */
-.egg{margin-top:52px;font-size:var(--fs);line-height:1.5;font-weight:400;color:var(--orange);text-shadow:0 0 12px rgba(var(--o-rgb),.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
+.egg{margin-top:52px;font-size:var(--fs);line-height:1.5;font-weight:400;color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
 .egg.on{visibility:visible}
 .egg p{margin:0}.egg p + p{margin-top:4px}   /* songs preview: two lines, a hair apart so each reads as its own link */
 .egg{position:relative}   /* v1.26: holds the (invisible) measuring line */
 .egg p.song{text-transform:lowercase}   /* v1.49 (jay 2026.10.02): the lyric line is always lowercase (lc() already lowercases COPY.lyric; this is the css safeguard) */
 .egg p{white-space:nowrap}   /* jay v1.26: BOTH egg lines never wrap and never shrink: at the normal size, a line too long for the column is cut at a word and ends in "… →" (fitEgg) */
 .egg .measure{position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap;pointer-events:none}   /* v1.26: fitEgg measures candidate lines here with the real font at the real column width */
-.egg a{color:var(--orange)}
-.egg a:hover{color:var(--teal);text-shadow:0 0 12px rgba(var(--t-rgb),.6)}
+.egg a{color:var(--c)}
+.egg a:hover{color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6)}
 .egg .w{white-space:nowrap}   /* if it ever has to wrap, it wraps between words (the emoji stays with the first word, the arrow with the last) */
 .egg .c{display:inline-block;position:relative}
-.egg .c.fall{color:var(--o-hot);text-shadow:0 0 8px rgba(var(--o-rgb),.95),0 0 20px rgba(var(--o-rgb),.7)}   /* the falling head: hot orange-white, like the rain's white tips */
-.egg .tr,.social .tr,.prompt .tr,.signup .tr{position:absolute;left:0;bottom:100%;white-space:pre;line-height:1.25;color:var(--orange);text-shadow:0 0 10px rgba(var(--o-rgb),.55);pointer-events:none;
+.egg .c.fall{color:var(--c-hot);text-shadow:0 0 8px rgba(var(--c-rgb),.95),0 0 20px rgba(var(--c-rgb),.7)}   /* the falling head: hot orange-white, like the rain's white tips */
+.egg .tr,.social .tr,.prompt .tr,.signup .tr{position:absolute;left:0;bottom:100%;white-space:pre;line-height:1.25;color:var(--c);text-shadow:0 0 10px rgba(var(--c-rgb),.55);pointer-events:none;
   -webkit-mask-image:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,0));mask-image:linear-gradient(to top,rgba(0,0,0,.85),rgba(0,0,0,0));transition:opacity .7s ease-out}
 .egg .tr.off,.social .tr.off,.prompt .tr.off,.signup .tr.off{opacity:0}
 .egg .c.land{animation:egg-land 1.1s ease-out}
-@keyframes egg-land{0%{color:#fff;text-shadow:0 0 10px #fff,0 0 22px rgba(var(--o-rgb),.95)}100%{color:var(--orange);text-shadow:0 0 12px rgba(var(--o-rgb),.6)}}
+@keyframes egg-land{0%{color:#fff;text-shadow:0 0 10px #fff,0 0 22px rgba(var(--c-rgb),.95)}100%{color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6)}}
 .egg.fade{animation:egg-fade 1.4s ease-out both}   /* reduced motion: no falling, the line just fades in */
 @keyframes egg-fade{from{opacity:0}to{opacity:1}}
 /* v1.30 (jay 2026.09.30): the daily drop's date, "// yyyy.mm.dd" (v1.50; was "🗓️ yyyy.mm.dd") in white, right above the two egg lines (same font + size). COPY.dayDate, set by the 5am song + quote routine.
@@ -216,7 +216,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify .rkb{position:relative;display:block;width:54px;height:54px;padding:0;margin:-9px -6px -9px -4px;border-radius:12px;line-height:0;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .notify .rkb .rk{display:block;width:100%;height:100%;overflow:visible;transform-origin:50% 50%;transition:opacity .35s ease,filter .35s ease,transform .25s cubic-bezier(.34,1.56,.64,1)}
 .rk .rk-fl{transform-box:fill-box;transform-origin:50% 0}
-.notify .rkb:hover,.notify .rkb:focus-visible{background:rgba(var(--t-rgb),.08)}
+.notify .rkb:hover,.notify .rkb:focus-visible{background:rgba(var(--c-rgb),.08)}
 .notify .rkb:active .rk{transform:scale(.92)}
 .notify .rkb{transition:color .15s ease,background-color .15s ease,opacity .35s ease-out}.notify.rk-wait .rkb{opacity:0;pointer-events:none}   /* v1.43: the rocket appears just after the field (opacity only, so nothing moves) */
 .notify .rkb[disabled]{background:transparent}
@@ -256,11 +256,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .rk .rk-led{opacity:0;transition:opacity .3s ease .22s}
 .notify[data-chg]:not([data-chg="0"]) .rk .rk-flap{transform:scaleX(.14);transition-delay:0s}
 .notify[data-chg]:not([data-chg="0"]) .rk .rk-led{opacity:var(--fill-o);transition-delay:.12s}
-@keyframes rk-pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px rgba(var(--o-rgb),.45))}50%{transform:scale(1.05);filter:drop-shadow(0 0 11px rgba(var(--o-rgb),.85)) drop-shadow(0 0 4px rgba(var(--t-rgb),.45))}}
+@keyframes rk-pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px rgba(var(--c-rgb),.45))}50%{transform:scale(1.05);filter:drop-shadow(0 0 11px rgba(var(--c-rgb),.85)) drop-shadow(0 0 4px rgba(var(--c-rgb),.45))}}
 @keyframes rk-flick{0%,100%{transform:scale(1,1);opacity:1}22%{transform:scale(.93,1.2);opacity:.9}48%{transform:scale(1.05,.88);opacity:1}74%{transform:scale(.96,1.13);opacity:.85}}
 @media (prefers-reduced-motion:reduce){   /* no pulse, no flicker: ignition is a plain brighten + a steady glow */
   .notify .rkb .rk,.rk .rk-fl{transition:none}
-  .notify.ok .rkb .rk{animation:none;filter:drop-shadow(0 0 8px rgba(var(--o-rgb),.7))}
+  .notify.ok .rkb .rk{animation:none;filter:drop-shadow(0 0 8px rgba(var(--c-rgb),.7))}
   .notify.ok .rk .rk-fl{animation:none}
   .notify .rkb:active .rk{transform:none}}
 /* v1.45 (jay 2026.10.02): the charge cable. the field's underline is drawn as a cable (two absolutely placed svgs, built + placed by placeCable in js): straight along the
@@ -279,17 +279,17 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify .rkb{z-index:1}
 .notify .cbl{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:0}
 .notify .cbl path{fill:none;stroke-linecap:round;stroke-linejoin:round}
-.notify .cbl-t path{stroke:rgba(var(--t-rgb),.55);stroke-width:1;stroke-dasharray:var(--trk) 200;transition:stroke .2s ease,stroke-width .2s ease,stroke-dasharray .32s ease-in-out}
+.notify .cbl-t path{stroke:rgba(var(--c-rgb),.55);stroke-width:1;stroke-dasharray:var(--trk) 200;transition:stroke .2s ease,stroke-width .2s ease,stroke-dasharray .32s ease-in-out}
 .notify{--trk:var(--cbl-s,100)}   /* empty: the cable stops where the curve would start (--cbl-s, set by placeCable), unplugged */
 .notify[data-chg]:not([data-chg="0"]){--trk:100}
 .notify[data-chg]:not([data-chg="0"]) .cbl-t path{transition-delay:0s,0s,.14s}   /* typing: the curve draws on into the (opening) port */
-.notify:has(input:hover) .cbl-t path{stroke:rgba(var(--t-rgb),.8)}
-.notify:focus-within .cbl-t path{stroke:var(--teal);stroke-width:1.6}
+.notify:has(input:hover) .cbl-t path{stroke:rgba(var(--c-rgb),.8)}
+.notify:focus-within .cbl-t path{stroke:var(--c);stroke-width:1.6}
 .notify.cabled input,.notify.cabled input:hover,.notify.cabled input:focus{border-bottom-color:transparent}
-.notify.cabled input:focus{box-shadow:0 10px 18px -12px rgba(var(--t-rgb),.9)}   /* the focus glow stays; its 1px line is the track's job now */
-.notify .cbl-f{opacity:var(--fill-o);filter:drop-shadow(0 0 var(--fill-g) rgba(var(--o-rgb),.95));transition:opacity .45s ease,filter .45s ease}
-.notify .cbl-f .fill{stroke:var(--orange);stroke-width:2;stroke-dasharray:var(--dash) 200;transition:stroke-dasharray .6s cubic-bezier(.22,1,.36,1)}
-.notify .cbl-f .flow{stroke:var(--o-wh);stroke-width:2;stroke-dasharray:var(--flow-l) 300;stroke-dashoffset:var(--flow-l);opacity:var(--flow-o);animation:cbl-flow var(--chg-t) cubic-bezier(.55,0,.85,.45) infinite;transition:opacity .45s ease}   /* v1.47: eases in, speeding up toward the rocket (was linear) */
+.notify.cabled input:focus{box-shadow:0 10px 18px -12px rgba(var(--c-rgb),.9)}   /* the focus glow stays; its 1px line is the track's job now */
+.notify .cbl-f{opacity:var(--fill-o);filter:drop-shadow(0 0 var(--fill-g) rgba(var(--f-rgb),.95));transition:opacity .45s ease,filter .45s ease}
+.notify .cbl-f .fill{stroke:var(--f);stroke-width:2;stroke-dasharray:var(--dash) 200;transition:stroke-dasharray .6s cubic-bezier(.22,1,.36,1)}
+.notify .cbl-f .flow{stroke:var(--f-wh);stroke-width:2;stroke-dasharray:var(--flow-l) 300;stroke-dashoffset:var(--flow-l);opacity:var(--flow-o);animation:cbl-flow var(--chg-t) cubic-bezier(.55,0,.85,.45) infinite;transition:opacity .45s ease}   /* v1.47: eases in, speeding up toward the rocket (was linear) */
 .notify{--dash:10;--flow-dash:10;--flow-l:9;--fill-o:.62;--fill-g:2px;--flow-o:.55;--chg-t:4s;--rk-s:1;--rk-g:5px;--rk-a:.38;--rk-o:.8}   /* 0: empty, a short segment */
 .notify[data-chg="1"]{--dash:34;--flow-dash:34;--fill-o:.75;--fill-g:3px;--flow-o:.6;--chg-t:2.4s;--rk-s:1.01;--rk-g:8px;--rk-a:.52;--rk-o:.86}   /* 1: typing, a third */
 .notify[data-chg="2"]{--dash:67;--flow-dash:67;--fill-o:.88;--fill-g:4.5px;--flow-o:.65;--chg-t:1.3s;--rk-s:1.02;--rk-g:11px;--rk-a:.7;--rk-o:.93}   /* 2: has an "@", two thirds */
@@ -302,19 +302,19 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify[data-chg="3"] .cbl-f .flow{animation:none;opacity:0;visibility:hidden;transition:none}
 .notify[data-chg="3"] .cbl-f .fill{transition:none;animation:chg-full 2.2s ease-in-out infinite}
 .notify[data-chg="3"] .cbl-f{transition:none;animation:chg-glow 2.2s ease-in-out infinite}
-.notify:not(.ok) .rkb .rk{opacity:var(--rk-o);transform:scale(var(--rk-s));filter:drop-shadow(0 0 var(--rk-g) rgba(var(--o-rgb),var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(var(--o-l1-rgb),calc(var(--rk-a)*.7)));
+.notify:not(.ok) .rkb .rk{opacity:var(--rk-o);transform:scale(var(--rk-s));filter:drop-shadow(0 0 var(--rk-g) rgba(var(--c-rgb),var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(var(--c-l1-rgb),calc(var(--rk-a)*.7)));
   animation:rk-chg var(--chg-t) ease-in-out infinite}
 .notify.ok .rkb .rk{opacity:1;animation:rk-full 2.2s ease-in-out infinite}   /* overrides the v1.29 .ok rk-pulse; the flame flicker (rk-flick) stays */
 .notify.ok .rkb:hover .rk,.notify.ok .rkb:focus-visible .rk{animation-duration:2.2s}
 .notify .rkb:active .rk{animation:none;transform:scale(.92)}   /* a press still gets the v1.29 squeeze */
 .notify .rkb[disabled] .rk{animation:none;opacity:.55}   /* (v1.29, restated so it still wins over the step glow while a request is out) */
 @keyframes cbl-flow{from{stroke-dashoffset:var(--flow-l)}to{stroke-dashoffset:calc(var(--flow-l) - var(--flow-dash))}}   /* from just behind the cable's start to the end of the fill */
-@keyframes chg-full{0%,100%{stroke:var(--orange)}50%{stroke:var(--o-lt2)}}
-@keyframes chg-glow{0%,100%{filter:drop-shadow(0 0 6px rgba(var(--o-rgb),.95))}50%{filter:drop-shadow(0 0 9px rgba(var(--o-l4-rgb),1))}}
-@keyframes rk-chg{0%,100%{transform:scale(var(--rk-s));filter:drop-shadow(0 0 calc(var(--rk-g)*.82) rgba(var(--o-rgb),calc(var(--rk-a)*.85))) drop-shadow(0 0 calc(var(--rk-g)*.3) rgba(var(--o-l1-rgb),calc(var(--rk-a)*.6)))}
-  55%{transform:scale(calc(var(--rk-s) + .008));filter:drop-shadow(0 0 var(--rk-g) rgba(var(--o-rgb),var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(var(--o-l1-rgb),calc(var(--rk-a)*.7)))}}
-@keyframes rk-full{0%,100%{transform:scale(1.035);filter:drop-shadow(0 0 15px rgba(var(--o-rgb),.92)) drop-shadow(0 0 5px rgba(var(--o-l2-rgb),.8))}
-  50%{transform:scale(1.045);filter:drop-shadow(0 0 18px rgba(var(--o-rgb),1)) drop-shadow(0 0 6px rgba(var(--o-l3-rgb),.9))}}
+@keyframes chg-full{0%,100%{stroke:var(--f)}50%{stroke:var(--f-lt2)}}
+@keyframes chg-glow{0%,100%{filter:drop-shadow(0 0 6px rgba(var(--f-rgb),.95))}50%{filter:drop-shadow(0 0 9px rgba(var(--f-l4-rgb),1))}}
+@keyframes rk-chg{0%,100%{transform:scale(var(--rk-s));filter:drop-shadow(0 0 calc(var(--rk-g)*.82) rgba(var(--c-rgb),calc(var(--rk-a)*.85))) drop-shadow(0 0 calc(var(--rk-g)*.3) rgba(var(--c-l1-rgb),calc(var(--rk-a)*.6)))}
+  55%{transform:scale(calc(var(--rk-s) + .008));filter:drop-shadow(0 0 var(--rk-g) rgba(var(--c-rgb),var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(var(--c-l1-rgb),calc(var(--rk-a)*.7)))}}
+@keyframes rk-full{0%,100%{transform:scale(1.035);filter:drop-shadow(0 0 15px rgba(var(--c-rgb),.92)) drop-shadow(0 0 5px rgba(var(--c-l2-rgb),.8))}
+  50%{transform:scale(1.045);filter:drop-shadow(0 0 18px rgba(var(--c-rgb),1)) drop-shadow(0 0 6px rgba(var(--c-l3-rgb),.9))}}
 @media (prefers-reduced-motion:reduce){
   .notify .cbl-f{animation:none!important;transition:none}
   .notify .cbl-t path,.rk .rk-flap,.rk .rk-led{transition:none!important}
@@ -322,27 +322,28 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .notify .cbl-f .flow{animation:none;opacity:0}
   .notify:not(.ok) .rkb .rk{animation:none}
   .notify .rkb:active .rk{transform:none}
-  .notify.ok .rkb .rk{animation:none;transform:scale(1.035);filter:drop-shadow(0 0 15px rgba(var(--o-rgb),.92)) drop-shadow(0 0 5px rgba(var(--o-l2-rgb),.8))}}
+  .notify.ok .rkb .rk{animation:none;transform:scale(1.035);filter:drop-shadow(0 0 15px rgba(var(--c-rgb),.92)) drop-shadow(0 0 5px rgba(var(--c-l2-rgb),.8))}}
 /* v1.29: while the request is out the engine lights (flame grows, a tiny rumble); on success the rocket leaves the form for a fixed sky layer,
    turns to straight up, and climbs off the top of the screen with a long teal flame and a wake of rain glyphs. the form fades out under it, then the thank-you types */
-.notify.ign .rkb .rk{opacity:1;animation:rk-rumble .09s linear infinite;filter:drop-shadow(0 0 12px rgba(var(--o-rgb),.9)) drop-shadow(0 0 6px rgba(var(--t-rgb),.6))}
+.notify.ign .rkb .rk{opacity:1;animation:rk-rumble .09s linear infinite;filter:drop-shadow(0 0 12px rgba(var(--c-rgb),.9)) drop-shadow(0 0 6px rgba(var(--c-rgb),.6))}
 .notify.ign .rk .rk-fl{opacity:1;animation:rk-flick-hot .13s linear infinite}
-/* v1.51 (jay 2026.10.02): the rocket's svg colours are presentation attributes; these map them onto the swappable palette (orange body, teal flame, pale core, LED + window ring).
-   the gold liftoff copy rewrites the attributes to gold, so these stop matching it */
-.rk stop[stop-color="#FF8A5E"]{stop-color:var(--o-lt)}.rk stop[stop-color="#FF4D1A"]{stop-color:var(--orange)}.rk stop[stop-color="#B8300A"]{stop-color:var(--o-dk)}
-.rk stop[stop-color="#5FD6DA"]{stop-color:var(--t-lt)}.rk stop[stop-color="#1AADB3"]{stop-color:var(--teal)}.rk stop[stop-color="#0E7C81"]{stop-color:var(--t-dk)}
-.rk [fill="#C9F3F4"]{fill:var(--t-pale)}.rk [stroke="#FFC2A8"]{stroke:var(--o-pale)}.rk [stroke="#FF4D1A"]{stroke:var(--orange)}.rk [fill="#FF4D1A"]{fill:var(--orange)}.rk [fill="#1AADB3"]{fill:var(--teal)}
+/* v1.52 (jay 2026.10.02): the rocket's svg colours are presentation attributes; these map them onto the two state colours: the body, window ring and flap edge
+   take the state colour (--c: teal at 1x, orange at 2x); the flame, its hot core and the charge port's LED ring take the flame/charge colour (--f: orange at 1x, teal at 2x).
+   the gold liftoff copy rewrites the attributes to gold, so these stop matching it. was (v1.51): orange body, teal flame, swapped at 2x */
+.rk stop[stop-color="#FF8A5E"]{stop-color:var(--c-lt)}.rk stop[stop-color="#FF4D1A"]{stop-color:var(--c)}.rk stop[stop-color="#B8300A"]{stop-color:var(--c-dk)}
+.rk stop[stop-color="#5FD6DA"]{stop-color:var(--f-lt)}.rk stop[stop-color="#1AADB3"]{stop-color:var(--f)}.rk stop[stop-color="#0E7C81"]{stop-color:var(--f-dk)}
+.rk [fill="#C9F3F4"]{fill:var(--f-pale)}.rk [stroke="#FFC2A8"]{stroke:var(--c-pale)}.rk [stroke="#FF4D1A"]{stroke:var(--f)}
 .rk-sky{position:fixed;inset:0;z-index:29;pointer-events:none;overflow:hidden}   /* under the scan lines (30), over everything else */
-.rk-sky .rk{position:absolute;display:block;overflow:visible;will-change:transform;filter:drop-shadow(0 0 12px rgba(var(--o-rgb),.85)) drop-shadow(0 0 6px rgba(var(--t-rgb),.6))}
+.rk-sky .rk{position:absolute;display:block;overflow:visible;will-change:transform;filter:drop-shadow(0 0 12px rgba(var(--c-rgb),.85)) drop-shadow(0 0 6px rgba(var(--c-rgb),.6))}
 .rk-sky .rk .rk-fl{opacity:1;animation:rk-flick-long .1s linear infinite}
-.rk-sky .wk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:var(--teal);text-shadow:0 0 8px rgba(var(--t-rgb),.9);will-change:transform,opacity}
-.rk-sky .wk.hot{color:var(--t-wh);text-shadow:0 0 8px #fff,0 0 14px rgba(var(--t-rgb),.95)}
+.rk-sky .wk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:var(--c);text-shadow:0 0 8px rgba(var(--c-rgb),.9);will-change:transform,opacity}
+.rk-sky .wk.hot{color:var(--c-wh);text-shadow:0 0 8px #fff,0 0 14px rgba(var(--c-rgb),.95)}
 /* v1.35 (jay 2026.10.01): the fake-out (failed liftoff) wake follows the rain's colour at that moment: teal #1AADB3 at 1x, orange #FF4D1A at 2x (it flips live if the mode flips mid-flight) */
 /* v1.51: the two 2x fake-wake rules are gone: .wk is var(--teal), so the colour swap already turns it orange at 2x */
 /* v1.35 (jay 2026.10.01): super golden mode, the real (successful) liftoff only: a really bright gold wake with a white-gold core and glow, 4x the glyphs (see LIFTOFF.goldPer) */
 .rk-sky.gold .wk{color:#FFD700;text-shadow:0 0 4px #FFF6C2,0 0 10px rgba(255,215,0,.95),0 0 22px rgba(255,190,0,.65)}
 .rk-sky.gold .wk.hot{color:#FFFBE8;text-shadow:0 0 6px #fff,0 0 12px #FFE766,0 0 26px rgba(255,215,0,.9)}
-.rk-sky .puff{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--t-rgb),.55),rgba(var(--t-rgb),.18) 55%,rgba(var(--t-rgb),0));will-change:transform,opacity}
+.rk-sky .puff{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--c-rgb),.55),rgba(var(--c-rgb),.18) 55%,rgba(var(--c-rgb),0));will-change:transform,opacity}
 @keyframes rk-rumble{0%,100%{transform:translate(0,0)}25%{transform:translate(.6px,-.4px)}50%{transform:translate(-.5px,.5px)}75%{transform:translate(.4px,.6px)}}
 @keyframes rk-flick-hot{0%,100%{transform:scale(1.05,1.45)}50%{transform:scale(.95,1.75)}}
 @keyframes rk-flick-long{0%,100%{transform:scale(1.1,2.4)}33%{transform:scale(.92,2.9)}66%{transform:scale(1.02,2.1)}}
@@ -360,15 +361,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .rk-sky.gold .puff{background:radial-gradient(closest-side,rgba(255,236,150,.6),rgba(255,215,0,.2) 55%,rgba(255,215,0,0))}   /* v1.36: the pad flash goes gold with the rest (was teal) */
 @media (prefers-reduced-motion:reduce){.notify.ign .rkb .rk,.notify.ign .rk .rk-fl{animation:none}}
 /* v1.30 (jay 2026.09.30): failed liftoff (no valid email yet): smoke + a couple of dim rain glyphs, in a throwaway sky layer so nothing on the page moves */
-.rk-sky .puff.smoke{background:radial-gradient(closest-side,rgba(170,186,188,.5),rgba(var(--t-rgb),.16) 60%,rgba(var(--t-rgb),0))}
-.rk-sky .wk.dim{color:#8fa9aa;text-shadow:0 0 6px rgba(var(--t-rgb),.5)}
+.rk-sky .puff.smoke{background:radial-gradient(closest-side,rgba(170,186,188,.5),rgba(var(--c-rgb),.16) 60%,rgba(var(--c-rgb),0))}
+.rk-sky .wk.dim{color:#8fa9aa;text-shadow:0 0 6px rgba(var(--c-rgb),.5)}
 /* v1.31 PREVIEW (jay 2026.09.30): failed liftoff 2.0: the fake launch's sputtering flame, white smoke trail and the crash poof at the screen edge */
 .rk-sky .rk.sput .rk-fl{animation:rk-sputter .3s steps(1,end) infinite}
 @keyframes rk-sputter{0%{opacity:1;transform:scale(1,1.7)}22%{opacity:0}40%{opacity:.85;transform:scale(.9,1.15)}62%{opacity:0}78%{opacity:.5;transform:scale(.8,.8)}90%{opacity:0}}
 .rk-sky .smk{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.75),rgba(255,255,255,.28) 55%,rgba(255,255,255,0));will-change:transform,opacity;pointer-events:none}
 .rk-sky .smk.grey{background:radial-gradient(closest-side,rgba(190,198,199,.6),rgba(190,198,199,.2) 55%,rgba(190,198,199,0))}
-.rk-sky .smk.hot{background:radial-gradient(closest-side,rgba(var(--o-l5-rgb),.95),rgba(var(--o-rgb),.55) 45%,rgba(var(--o-rgb),0))}
-.rk-sky .spk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:var(--orange);text-shadow:0 0 8px rgba(var(--o-rgb),.9);will-change:transform,opacity}
+.rk-sky .smk.hot{background:radial-gradient(closest-side,rgba(var(--f-l5-rgb),.95),rgba(var(--f-rgb),.55) 45%,rgba(var(--f-rgb),0))}
+.rk-sky .spk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:var(--f);text-shadow:0 0 8px rgba(var(--f-rgb),.9);will-change:transform,opacity}
 /* v1.29 (jay 2026.09.30): the success line = a heart (teal, burns to orange) + "please confirm via email". one line, never wraps, never taller than the form row it replaces */
 .status{white-space:nowrap}
 .status .hb{position:relative;display:inline-block;width:1.3em;height:1.3em;vertical-align:-.3em;margin-right:.5em;filter:drop-shadow(0 0 5px rgba(255,215,0,.75))}   /* v1.36: gold glow (was orange rgba(255,77,26,.7)) */
@@ -821,7 +822,7 @@ const burnHeart = hb => new Promise(done => {
   orange.animate([{clipPath: 'inset(100% 0 0 0)'}, {clipPath: 'inset(0% 0 0 0)'}], opt);   // the burn climbs from the tip to the top
   hot.animate([{clipPath: 'inset(92% 0 -4% 0)', opacity: 0}, {opacity: 1, offset: .1}, {opacity: 1, offset: .82}, {clipPath: 'inset(-8% 0 96% 0)', opacity: 0}], opt);   // a thin white-hot band on the burn line
   teal.animate([{opacity: 1}, {opacity: 0}], {duration: 220, delay: start + HEART.burn - 180, fill: 'both'});   // the teal glow goes out at the very end
-  hb.animate([{filter: `drop-shadow(0 0 5px rgba(${getComputedStyle(document.documentElement).getPropertyValue('--t-rgb')},.85))`}, {filter: 'drop-shadow(0 0 8px rgba(255,236,150,.95))', offset: .6}, {filter: 'drop-shadow(0 0 5px rgba(255,215,0,.75))'}], opt);   // v1.36: teal -> white-gold -> gold glow
+  hb.animate([{filter: `drop-shadow(0 0 5px rgba(${getComputedStyle(document.documentElement).getPropertyValue('--c-rgb')},.85))`}, {filter: 'drop-shadow(0 0 8px rgba(255,236,150,.95))', offset: .6}, {filter: 'drop-shadow(0 0 5px rgba(255,215,0,.75))'}], opt);   // v1.36: teal -> white-gold -> gold glow
   const t0 = performance.now(); let last = 0, raf = 0;
   const embers = now => {   // orange embers (rain glyphs) float up off the burn line
     const p = (now - t0 - start)/HEART.burn;
@@ -1046,7 +1047,7 @@ const GLOW = {pulses: 7, lead: 1.5, pulseMs: 500, reducedMs: 700, reducedPeak: .
 let glowRaf = 0, glowFocusing = false;
 const glowSet = g => {   // 0 = normal .. 1 = full teal glow
   if (g <= 0){ ['--eg-c', '--eg-pc', '--eg-s'].forEach(p => emailIn.style.removeProperty(p)); if (!emailIn.style.length) emailIn.removeAttribute('style'); return; }
-  const TR = getComputedStyle(document.documentElement).getPropertyValue('--t-rgb').split(',').map(Number), TS = TR.join(',');   // v1.51: the current teal (orange when swapped)
+  const TR = getComputedStyle(document.documentElement).getPropertyValue('--c-rgb').split(',').map(Number), TS = TR.join(',');   // v1.52: the current state colour (teal at 1x, orange at 2x)
   const mix = a => a.map((v, i) => Math.round(v + (TR[i] - v)*g)).join(',');
   emailIn.style.setProperty('--eg-c', `rgb(${mix([255, 255, 255])})`);
   emailIn.style.setProperty('--eg-pc', `rgba(${mix([246, 239, 233])},${(.34 + .66*g).toFixed(3)})`);
@@ -1117,6 +1118,7 @@ form.addEventListener('submit', async e => {
   const t = prepare(statusEl.lastChild, COPY.thanks); render(t, 0, TIMING.window);   // the text is reserved (invisible) from the first frame, so the line never reflows
   statusEl.tabIndex = -1; statusEl.style.outline = 'none'; statusEl.focus({preventScroll: true});
   await type(t, {speed: TIMING.paraSpeed, window: TIMING.window});
+  { const r = statusEl.getBoundingClientRect(); JayRain.gold({ms: 1700, y: (r.top + r.bottom)/2, lock: true}); }   // v1.52 (jay 2026.10.02): the thank-you is typed, so the whole page turns gold in a pulse out from this line (up + down at once, ~1.7s) and stays gold for the visit
 });
 const state = window.__intro = {line: -1, para: -1, head: 0, icons: 0, done: false};   // line: 0 hello, 1 paragraphs, 2 sign-off, 3 icons
 const hint = $('.tap-hint'), hintSpeed = hint.querySelector('b');
@@ -1327,13 +1329,14 @@ const DUMP = {ms: 1200, perStep: 14, eggWindow: 3,   // total budget (ms); per-s
   rain: 6, rainUp: 220, rainDown: 1100};   // v1.33 (jay 2026.09.30): while the dump fast-forwards, the rain runs at 6x (3x the orange 2x), ramping up over rainUp ms; when the page lands it eases back to 2x over rainDown ms
 let dumping = false, dumpRaf = 0, rainBoost = false;
 const unboost = ms => { if (!rainBoost) return; rainBoost = false; rain.setSpeed(fastNow() ? 2 : 1, ms); state.rainBoost = 'easing'; };   // v1.33: back to the mode's speed (always 2x after a dump)
-function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; dumping = false; unboost(250); }
+function stopDump(){ if (dumpRaf){ cancelAnimationFrame(dumpRaf); JayRain.goldOff({hold: 1000, ms: 700, first: true}); } dumpRaf = 0; dumping = false; unboost(250); }
 function dump(){
   if (dumping || state.done) return;
   if (reduced) return complete();
   dumping = true; skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); iconStop(); bottomStop();
   if (curLi.classList.contains('in')) cursorRow();   // v1.43: mid-icons, the cursor goes straight to its spot after linkedin (only not-yet-shown icons move), so the burst never shifts a visible icon   // v1.39: + the bottom rain   // v1.38: icons still raining land at once
   if (document.documentElement.dataset.mode !== 'fast') JayRain.mode(true);   // always already 2x via the tap flow; kept so the dump can never end in a teal/orange mismatch
+  { const r = $('.cta').getBoundingClientRect(); JayRain.gold({ms: 260, y: (r.top + r.bottom)/2}); }   // v1.52 (jay 2026.10.02): the skip-to-end gold flash: a quick pulse out from the signup line while it fast-forwards
   rainBoost = true; rain.setSpeed(DUMP.rain, DUMP.rainUp); state.rainBoost = 'on';   // v1.33: the rain fast-forwards with the text (colour stays the orange 2x)
   const tape = [], win = TIMING.window;
   for (let j = lineAt; j < lines.length; j++){
@@ -1362,7 +1365,8 @@ function dump(){
     while (at < k) tape[at++]();
     for (const c of scrambling) c.el.firstChild.textContent = rg();
     if (at < total){ dumpRaf = requestAnimationFrame(frame); return; }
-    dumpRaf = 0; dumping = false; state.dump.took = Math.round(performance.now() - t0); unboost(DUMP.rainDown);   // v1.33: landed, so the rain eases back to the orange 2x
+    dumpRaf = 0; dumping = false; state.dump.took = Math.round(performance.now() - t0); unboost(DUMP.rainDown); JayRain.goldOff({hold: 1000, ms: 700, first: true});   // v1.52: hold the gold 1s, then fade back to the first state (teal, 1x)
+      // v1.33: landed, so the rain eases back to the orange 2x
     state.line = 3; state.icons = icons.length;
     if (eggText && state.egg === 'dumping') eggSettle();
     finishUp();

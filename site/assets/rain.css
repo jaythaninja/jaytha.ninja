@@ -1,16 +1,30 @@
-/* v1.51 (jay 2026.10.02): the speed tap's colour swap. every teal / orange on these pages reads from these variables (rgb triplets for the rgba() glows, plus the light / dark / pale
-   tints). normal (1x): teal = text accents + rain, orange = the tappables. swapped (2x, html[data-mode="fast"], set by mode() in rain.js): teal <-> orange everywhere, tints
-   included (each swapped tint is the same mix of white with the other brand colour). white, gold and the dim colours stay. not persisted: the speed state isn't either */
-:root{--t-rgb:26,173,179;--o-rgb:255,77,26;--t-lt:#5FD6DA;--t-dk:#0E7C81;--t-pale:#C9F3F4;--t-hot:#d2f6f7;--t-wh:#E6FBFB;--t-lt-rgb:127,218,221;
-  --o-lt:#FF8A5E;--o-dk:#B8300A;--o-pale:#FFC2A8;--o-hot:#ffd9cc;--o-wh:#FFE6DC;--o-lt2:#FF9A6E;--o-l1-rgb:255,150,100;--o-l2-rgb:255,160,110;--o-l3-rgb:255,170,120;--o-l4-rgb:255,120,70;--o-l5-rgb:255,236,224}
-:root[data-mode="fast"]{--teal:#FF4D1A;--orange:#1AADB3;--t-rgb:255,77,26;--o-rgb:26,173,179;--t-lt:#FF885F;--t-dk:#B8300A;--t-pale:#FFD7C9;--t-hot:#FFDED2;--t-wh:#FFEDE6;--t-lt-rgb:255,158,127;
-  --o-lt:#62C7CC;--o-dk:#0E7C81;--o-pale:#ABE2E4;--o-hot:#CDEDEE;--o-wh:#DDF3F4;--o-lt2:#74CED2;--o-l1-rgb:107,203,207;--o-l2-rgb:118,208,211;--o-l3-rgb:129,212,215;--o-l4-rgb:74,191,196;--o-l5-rgb:226,245,246}
+/* v1.52 (jay 2026.10.02): one colour per state. every coloured thing on these pages is the state colour --c (teal #1AADB3 at 1x, the default): text accents, links,
+   icons, the daily lines + arrows, the rocket body, the rain, the hint, the cursor, the glows. the one exception is the flame/charge colour --f (orange #FF4D1A at 1x):
+   the rocket's flame (+ hot core, sparks, hot smoke), the charge port's LED and the charging cable (fill, flow, the full-charge pulse + its tints; the empty track
+   is the input's line, so it's --c). one tap (2x, html[data-mode="fast"], set by mode() in rain.js) is an exact inversion: --c turns orange, --f turns teal, tints
+   included. white, gold and the dim colours stay. links are no longer set apart by colour (the arrows etc. stay). not persisted: the speed state isn't either.
+   was (v1.51): teal accents + orange tappables, swapped at 2x */
+:root{--c:#1AADB3;--c-rgb:26,173,179;--c-lt:#5FD6DA;--c-dk:#0E7C81;--c-pale:#C9F3F4;--c-hot:#d2f6f7;--c-wh:#E6FBFB;--c-lt-rgb:127,218,221;--c-lt2:#74CED2;
+  --c-l1-rgb:107,203,207;--c-l2-rgb:118,208,211;--c-l3-rgb:129,212,215;--c-l4-rgb:74,191,196;--c-l5-rgb:226,245,246;
+  --f:#FF4D1A;--f-rgb:255,77,26;--f-lt:#FF8A5E;--f-dk:#B8300A;--f-pale:#FFD7C9;--f-wh:#FFE6DC;--f-lt2:#FF9A6E;--f-l4-rgb:255,120,70;--f-l5-rgb:255,236,224}
+:root[data-mode="fast"]{--c:#FF4D1A;--c-rgb:255,77,26;--c-lt:#FF8A5E;--c-dk:#B8300A;--c-pale:#FFC2A8;--c-hot:#ffd9cc;--c-wh:#FFE6DC;--c-lt-rgb:255,158,127;--c-lt2:#FF9A6E;
+  --c-l1-rgb:255,150,100;--c-l2-rgb:255,160,110;--c-l3-rgb:255,170,120;--c-l4-rgb:255,120,70;--c-l5-rgb:255,236,224;
+  --f:#1AADB3;--f-rgb:26,173,179;--f-lt:#5FD6DA;--f-dk:#0E7C81;--f-pale:#C9F3F4;--f-wh:#DDF3F4;--f-lt2:#74CED2;--f-l4-rgb:74,191,196;--f-l5-rgb:226,245,246}
+/* v1.52 (jay 2026.10.02): gold (the liftoff / thank-you gold #FFD700, same tints). .gld on an element (the gold pulse, see gold() in rain.js) or on <html> (pulse done)
+   turns --c and --f gold for it and everything inside; white, the dims and the layout stay. beats both speed states, so a speed tap while gold keeps it gold */
+.gld,:root.gld,:root.gld[data-mode="fast"]{--c:#FFD700;--c-rgb:255,215,0;--c-lt:#FFE066;--c-dk:#C99A00;--c-pale:#FFF6C2;--c-hot:#FFFBE8;--c-wh:#FFFBE8;--c-lt-rgb:255,230,102;--c-lt2:#FFE766;
+  --c-l1-rgb:255,224,102;--c-l2-rgb:255,231,120;--c-l3-rgb:255,236,150;--c-l4-rgb:255,190,0;--c-l5-rgb:255,246,194;
+  --f:#FFD700;--f-rgb:255,215,0;--f-lt:#FFE066;--f-dk:#C99A00;--f-pale:#FFF6C2;--f-wh:#FFFBE8;--f-lt2:#FFE766;--f-l4-rgb:255,190,0;--f-l5-rgb:255,246,194}
+/* while the pulse runs (and while it fades back) colour changes ease (--au-t, set by gold() / goldOff()) instead of snapping */
+html.au-wave body *{transition-property:color,background-color,border-color,fill,stroke,stop-color,text-shadow,box-shadow,outline-color,opacity!important;transition-duration:var(--au-t,.3s)!important;transition-delay:0s!important;transition-timing-function:ease!important}
+/* the background glows: a gold twin (made with the orange one in rain.js) shows instead while gold */
+.glow-au{opacity:0}.gld .glow:not(.glow-au),.glow.gld:not(.glow-au){opacity:0!important}.gld .glow-au,.glow-au.gld{opacity:.85!important}
 /* shared v1.16 hint */
-.tap-hint{--hint-icon:var(--teal);position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;gap:6px;color:var(--teal);font-size:12px;line-height:1;letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px #000;transition:color .25s ease,opacity .7s ease,transform .7s ease}
+.tap-hint{--hint-icon:var(--c);position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;gap:6px;color:var(--c);font-size:12px;line-height:1;letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px #000;transition:color .25s ease,opacity .7s ease,transform .7s ease}
 .tap-hint.ready{opacity:.7;transform:none}.tap-hint.settled{opacity:.52}.tap-hint svg{width:1.35em;height:1.35em;display:block;flex:none;color:var(--hint-icon);transition:color .25s ease}.tap-hint b{font-weight:500}
 @media(prefers-reduced-motion:reduce){.tap-hint{transition:none;transform:none}.tap-hint.ready{opacity:.7}.tap-hint.settled{opacity:.52}}
 
 .speed-label{display:flex;align-items:center;gap:.3em}.speed-arrows{width:1.125em;height:1.35em;display:block;flex:none;color:currentColor;overflow:visible}.speed-arrows path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 .glow{transition:opacity .5s ease}.glow-fast{opacity:0}[data-mode="fast"] .glow{opacity:0}[data-mode="fast"] .glow-fast{opacity:.85}@media(prefers-reduced-motion:reduce){.glow{transition:none}}
 /* jay 2026.09.30 v1.25: the homepage intro's "finish the dump" glyph (››|), shown only at 2x while the intro types. the hint's orange (#FF6A2B, same as the fast-mode › and glove). same box as the chevrons, so nothing shifts */
-.tap-hint .speed-arrows.dump{color:var(--teal)}
+.tap-hint .speed-arrows.dump{color:var(--c)}
