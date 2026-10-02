@@ -96,6 +96,9 @@ a:hover{color:var(--teal)}
 .notify button[disabled]{cursor:default;color:var(--ink-3);background:transparent}
 .status{align-self:center;color:#FFD700;font-size:var(--fs);line-height:1.5}
 .status:empty{display:none}
+/* v1.49 (jay 2026.10.02): the thank-you sits a paragraph gap under "drop us your email if you want to help" (text to text, same as between the intro paragraphs:
+   ~27.6px desktop, ~15.8px phones). nudged with position:relative, so the form slot keeps its height and nothing below moves. was: centred in the slot (~17.6px desktop) */
+.status{position:relative;top:10px}
 /* typing internals: resolved text, scrambling window, and the not-yet-typed text held invisibly so lines never reflow */
 .scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(127,218,221,.9)}
 .ghost{visibility:hidden}
@@ -136,6 +139,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .egg.on{visibility:visible}
 .egg p{margin:0}.egg p + p{margin-top:4px}   /* songs preview: two lines, a hair apart so each reads as its own link */
 .egg{position:relative}   /* v1.26: holds the (invisible) measuring line */
+.egg p.song{text-transform:lowercase}   /* v1.49 (jay 2026.10.02): the lyric line is always lowercase (lc() already lowercases COPY.lyric; this is the css safeguard) */
 .egg p{white-space:nowrap}   /* jay v1.26: BOTH egg lines never wrap and never shrink: at the normal size, a line too long for the column is cut at a word and ends in "… →" (fitEgg) */
 .egg .measure{position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap;pointer-events:none}   /* v1.26: fitEgg measures candidate lines here with the real font at the real column width */
 .egg a{color:var(--orange)}
@@ -176,7 +180,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .notify{gap:14px}
   .notify input{flex:1 1 auto;font-size:16px}
   .notify button{font-size:16px}
-  .status{font-size:var(--fs)}   /* v1.45: was 16px */
+  .status{font-size:var(--fs);top:.5px}   /* v1.45: was 16px. v1.49: phones were already ~a paragraph gap under the signup line */
   .elsewhere{margin-top:16px}
   .social{margin-left:-9px;gap:0}
   .social a{width:39px;height:40px}
@@ -458,9 +462,9 @@ const COPY = {
     ["drop us your email if you ", {text: "want to help", teal: true}]
   ],
   failNote: "that email isn't complete yet. try again (like you@email.com)",   // v1.31 PREVIEW: screen readers only (visually hidden), replaces the browser bubble's message
-  thanks: "please confirm via email",   // v1.29 (jay 2026.09.30): typed (teal) after the heart burns teal -> orange, in the form's slot, one line. was "almost there, check your email and tap confirm"
+  thanks: "thank you! 💛 we'll be in touch!",   // v1.49 (jay 2026.10.02): gold, typed in the form's slot, the cursor stays after it; the 💛 is part of the line (no drawn heart in front any more). was "please confirm via email" after the burning heart. v1.29 (jay 2026.09.30): typed (teal) after the heart burns teal -> orange, in the form's slot, one line. was "almost there, check your email and tap confirm"
   dayDate: "2026.10.02",   // v1.30 (jay 2026.09.30): THE DAY'S DATE, yyyy.mm.dd, shown in white as "🗓️ <date>" above the egg lines. the daily 5am song + quote routine sets it together with lyric (the day the song + quote were published, america/chicago; never the viewer's clock). "" hides the line.
-  lyric: "Ready or not, I can't get you out of my skin\nI never thought I'd get to feel somethin' like this\nMaybe it's stupid, maybe it's useless, lettin' you get too close\nBut ready or not, ready or not, ready or not, here I go",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
+  lyric: "ready or not, i can't get you out of my skin\ni never thought i'd get to feel somethin' like this\nmaybe it's stupid, maybe it's useless, lettin' you get too close\nbut ready or not, ready or not, ready or not, here i go",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
                                           // v1.26: always one line at the normal size; if it doesn't fit the column it's cut at a word with "… →" (the full lyric stays in the link's title + aria-label; see fitEgg)
   lyricHref: "/song-of-the-day/",   // v1.27 (jay 2026.09.30): was "/songs/" (the old url is now a redirect stub)
   egg: "today's quote",   // v1.26 (jay 2026.09.30): the last line is TODAY'S quote, read from eggData (the same quotes.json /quote-of-the-day/ types at the top: the newest entry dated today or earlier, america/chicago). shown as "💭 <quote> →", lowercase, no author, one line (cut with "… →" if long). THIS text is only the fallback if quotes.json can't be read.
@@ -1085,11 +1089,10 @@ form.addEventListener('submit', async e => {
   await settled;
   await launchRocket();   // v1.29: turn, climb off the top (the form fades out as it climbs), then the burning-heart success line
   form.inert = true; form.classList.add('gone');
-  statusEl.innerHTML = '<span class="sr"></span><span class="hb" aria-hidden="true">' + heartSvg('h-t') + heartSvg('h-o') + heartSvg('h-h') + '</span><span class="typed" aria-hidden="true"></span>';   // v1.29: the heart sits in front of the line
+  statusEl.innerHTML = '<span class="sr"></span><span class="typed" aria-hidden="true"></span>';   // v1.49: no heart in front of the line any more (the 💛 is in the text); burnHeart / heartSvg stay defined but unused
   statusEl.firstChild.textContent = COPY.thanks;
   const t = prepare(statusEl.lastChild, COPY.thanks); render(t, 0, TIMING.window);   // the text is reserved (invisible) from the first frame, so the line never reflows
   statusEl.tabIndex = -1; statusEl.style.outline = 'none'; statusEl.focus({preventScroll: true});
-  await burnHeart(statusEl.querySelector('.hb'));   // v1.29: teal heart pops in and burns to orange, then the words type
   await type(t, {speed: TIMING.paraSpeed, window: TIMING.window});
 });
 const state = window.__intro = {line: -1, para: -1, head: 0, icons: 0, done: false};   // line: 0 hello, 1 paragraphs, 2 sign-off, 3 icons

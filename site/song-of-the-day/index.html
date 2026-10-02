@@ -9,7 +9,7 @@
 <title>song of the day · jay tha ninja</title>
 <!-- jaytha.ninja/song-of-the-day/: song of the day (PREVIEW, jay 2026.09.30). same look, typing engine, rain + layout as /quote-of-the-day/.
      THE DAILY UPDATE TOUCHES ONLY songs.json (next to this file): [{date "YYYY-MM-DD" (america/chicago), lyric (string, or null until jay sends it), track, artist, id (spotify track id), url, slug}, …].
-     the newest entry dated today or earlier is typed at the top: the lyric (like a quote, exactly as jay wrote it), then "artist - song name" as an orange link to the track on spotify.
+     the newest entry dated today or earlier is typed at the top: the lyric (like a quote, always lowercase: v1.49), then "artist - song name" as an orange link to the track on spotify.
      no lyric yet = just the credit link (no empty quote). every older entry is the archive below, newest first. future-dated entries stay hidden until their day.
      self-contained: JetBrains Mono (latin, variable) is inlined; the only other load is songs.json (same origin). no spotify embed (dropped for the quotes layout, jay 2026.09.30). -->
 <style>
@@ -37,7 +37,8 @@ a:hover{color:var(--teal)}
 .home:hover,.home:focus-visible{color:var(--teal)}
 .kicker{font-size:21px;line-height:1.4;color:var(--teal)}
 .today{margin-top:26px}
-.qt{font-size:20px;line-height:1.7;color:var(--white);white-space:pre-line}   /* the lyric: same as a quote on /quote-of-the-day/, but NOT lowercased (it shows exactly as jay wrote it, e.g. "Japan") */
+.qt{font-size:20px;line-height:1.7;color:var(--white);white-space:pre-line}   /* the lyric: same as a quote on /quote-of-the-day/ */
+.qt,.aq{text-transform:lowercase}   /* v1.49 (jay 2026.10.02): lyrics are always lowercase (jay's style), today's and the archive; songs.json is lowercased when published, this is the safeguard. was (v1.27-v1.48): shown exactly as sent, e.g. "Japan" */
 /* the credit: "artist - song name", an orange link to the track on spotify (where /quote-of-the-day/ has the teal author). lowercase like /quote-of-the-day/' author line */
 .by{margin-top:22px;font-size:20px;line-height:1.5;color:var(--orange);text-transform:lowercase;font-weight:400}
 .by a{color:var(--orange)}
