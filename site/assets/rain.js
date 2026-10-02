@@ -7,7 +7,7 @@
   const clamp=(v,a=0,b=1)=>Math.max(a,Math.min(b,v));
   const sm=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0));return t*t*(3-2*t)};
   const DPR=Math.min(window.devicePixelRatio||1,2);
-  const T=[26,173,179], RAIN_ORANGE=[255,136,56];
+  const T=[26,173,179], RAIN_ORANGE=[255,77,26];
   const modeName=()=>document.documentElement.dataset.mode==='fast'?'fast':'normal';
 function Rain(cv, o){
   const R = {cv, o, drops:[], rects:[], ptr:{x:-9999,y:-9999}, last:0};
