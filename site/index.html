@@ -42,9 +42,17 @@ a:hover{color:var(--teal)}
 @media (max-width:760px){:root{--fs:14px}}
 .copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:var(--fs);text-shadow:0 0 8px rgba(0,0,0,.8)}
 .hello{font-size:21px;line-height:1.4;color:var(--teal)}
+/* v1.50 (jay 2026.10.02): roomier. --pgap = the gap between the 4 intro lines (para + para, and the signup line .cta): desktop 32px (was 20), phones 20px (was 10),
+   i.e. text to text ~39.6px desktop (was 27.6), ~25.8px phones (was 15.8). the thank-you keeps the same gap under the signup line (.status top follows --pgap) */
+/* v1.50: three sections, one equal gap between them: (a) intro + signup, (b) the daily lines (date / song / quote / recap), (c) the icons footer. measured on the ink
+   (last visible pixel of a section to the first of the next, rain hidden): desktop ~148px both, phones ~100px both, well over the biggest gap inside a section
+   (intro ~46px desktop / ~31px phones; daily lines ~21 / ~32px). --sec-a (.egg margin) and --sec-b (.elsewhere margin) differ because the date row's top padding and
+   the last daily row's bottom padding + the icons' own boxes add different blank space. the largest that fits: 375x667 (with the fixed hint clear) and 1440x900 */
+:root{--pgap:32px;--sec-a:138.5px;--sec-b:127.5px}
+@media (max-width:760px){:root{--pgap:20px;--sec-a:86px;--sec-b:72px}}
 .paras{margin-top:0}   /* v1.44: the first paragraph is the first line now (was 26px under the hello line) */
 .para{font-size:var(--fs);line-height:1.7;color:var(--white);white-space:pre-line}
-.para + .para{margin-top:20px}
+.para + .para{margin-top:var(--pgap)}
 @media (min-width:761px){.copy{width:min(72ch,calc(100vw - var(--left) - 24px))}}   /* v1.45: 72ch at --fs (18px) = 778px, just wider than the longest line (71 characters), so field + rocket still end at the text's right edge. was 70ch at 20px (840px) */   /* round 23 (jay 2026.09.29): desktop column wide enough for the longest paragraph */
 /* v1.46 (jay 2026.10.02): desktop: the date / song / quote / recap lines are --fs (18px) like the intro, in the intro column (.copy, 72ch at 18px). still one line each, cut with "… →" by fitEgg. phones unchanged (their own clamp size below). was (v1.45): 20px in their own min(70ch, 100vw - left - 24px) column (840px) */
 /* v1.42 (jay 2026.10.02): retired with the old copy: @media (min-width:940px){.para{white-space:nowrap}} (every paragraph on one line). the new paragraphs are longer than the column, so they wrap at every width */
@@ -54,7 +62,7 @@ a:hover{color:var(--teal)}
 .sig{margin-top:22px;font-size:20px;line-height:1.5;color:var(--teal)}
 .sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.08em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
 .sig .ninja.in{opacity:1;transform:none}
-.cta{margin-top:20px;font-size:var(--fs);line-height:1.5}   /* v1.44: paragraph spacing (the signup line is the 4th line of the intro). was 52px, one extra blank line after the sign-off (jay 2026.09.29) */
+.cta{margin-top:var(--pgap);font-size:var(--fs);line-height:1.5}   /* v1.44: paragraph spacing (the signup line is the 4th line of the intro). was 52px, one extra blank line after the sign-off (jay 2026.09.29) */
 .prompt{color:var(--white);line-height:1.7}
 .prompt + .prompt{margin-top:20px}   /* v1.43: the three signup lines are spaced like the paragraphs (10px on phones, below) */
 .prompt{text-wrap:balance}   /* v1.43: a signup line that wraps splits evenly (no lone "launch" / "public?" / "happens :)" on its own line); the untyped text is laid out (hidden) from the start, so the balance never changes mid-typing */   /* v1.42: the invitation is a full paragraph now, so it wraps with the paragraphs' line spacing (was the .cta's 1.5) */
@@ -98,7 +106,7 @@ a:hover{color:var(--teal)}
 .status:empty{display:none}
 /* v1.49 (jay 2026.10.02): the thank-you sits a paragraph gap under "drop us your email if you want to help" (text to text, same as between the intro paragraphs:
    ~27.6px desktop, ~15.8px phones). nudged with position:relative, so the form slot keeps its height and nothing below moves. was: centred in the slot (~17.6px desktop) */
-.status{position:relative;top:10px}
+.status{position:relative;top:calc(var(--pgap) - 10px)}   /* v1.50: follows --pgap (was 10px = 20px - 10px) */
 /* typing internals: resolved text, scrambling window, and the not-yet-typed text held invisibly so lines never reflow */
 .scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(127,218,221,.9)}
 .ghost{visibility:hidden}
@@ -108,7 +116,6 @@ a:hover{color:var(--teal)}
 /* v1.15 preview: fixed, non-interactive hint; safe-area aware and outside the copy column */
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
-.elsewhere{margin-top:30px}
 .social{margin-left:-8px;display:flex;flex-wrap:wrap;align-items:center;gap:4px 6px;list-style:none}
 .social li{opacity:0;transform:scale(.55) translateY(6px);transition:opacity .28s ease-out,transform .38s cubic-bezier(.34,1.56,.64,1)}
 .social li.in{opacity:1;transform:none}.revealed .social li.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .sig .ninja.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .notify.in:not(.gone){opacity:1!important;transform:none!important;visibility:visible;transition:none!important}.revealed .egg.fade,.revealed .social.fade{opacity:1!important;animation:none!important}
@@ -154,10 +161,20 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 @keyframes egg-land{0%{color:#fff;text-shadow:0 0 10px #fff,0 0 22px rgba(255,77,26,.95)}100%{color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6)}}
 .egg.fade{animation:egg-fade 1.4s ease-out both}   /* reduced motion: no falling, the line just fades in */
 @keyframes egg-fade{from{opacity:0}to{opacity:1}}
-/* v1.30 (jay 2026.09.30): the daily drop's date, "🗓️ yyyy.mm.dd" in white, right above the two egg lines (same font + size). COPY.dayDate, set by the 5am song + quote routine.
+/* v1.30 (jay 2026.09.30): the daily drop's date, "// yyyy.mm.dd" (v1.50; was "🗓️ yyyy.mm.dd") in white, right above the two egg lines (same font + size). COPY.dayDate, set by the 5am song + quote routine.
    v1.31 PREVIEW (jay 2026.09.30): it's the egg's first line now, so it stays hidden (space reserved) until the egg rains, falls letter by letter in white (landing a little ahead of the 🎧 line),
    and the dump types it first; was a separate line that faded in as a block. with a date the egg sits 36px under the icons (desktop; 52px without); lines stay 4px apart */
 .egg.has-day{margin-top:36px}
+/* v1.50 (jay 2026.10.02): roomier daily lines, easier to tap. each line (date / song / quote / recap) is a row of --egg-row: 40px desktop (was 27px + 4px apart = 31px pitch),
+   44px phones (the tap-target size; was ~18-20px + 4px). the text is centred in its row by padding, and each link's own box fills the row (inline-block, the same padding
+   taken back by negative margins, so the line box doesn't change): a tap anywhere in the row's height hits it. still one line each, cut with "… →" (fitEgg measures widths only).
+   the gap above the date stays as it was (the egg's margin loses the row's top padding). static from the first frame (the egg's space is reserved before the rain), so nothing moves */
+.egg{--egg-row:40px;--egg-pad:calc((var(--egg-row) - 1.5em)/2)}
+.egg p{padding:var(--egg-pad) 0}.egg p + p{margin-top:0}
+.egg p > a{display:inline-block;padding:var(--egg-pad) 0;margin:calc(-1*var(--egg-pad)) 0;vertical-align:baseline}
+.egg,.egg.has-day{margin-top:var(--sec-a)}   /* v1.50: the egg follows the signup now (section gap, see --sec-a) */
+.elsewhere{margin-top:var(--sec-b)}   /* v1.50: the footer follows the egg (section gap, see --sec-b) */
+
 .egg p.day{color:#fff;text-shadow:0 0 12px rgba(255,255,255,.45)}
 .egg p.day .c.fall{color:#fff;text-shadow:0 0 8px #fff,0 0 20px rgba(255,255,255,.65)}
 .egg p.day .tr{color:rgba(255,255,255,.72);text-shadow:0 0 10px rgba(255,255,255,.4)}
@@ -173,22 +190,21 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .hello{font-size:17px}
   .paras{margin-top:0}   /* v1.44: was 14px */
   .para{font-size:var(--fs);line-height:1.7}   /* v1.45: --fs (14px). was 16px, then (v1.45 draft) min(16px, (100vw - 48px)/22.4) */
-  .para + .para,.prompt + .prompt{margin-top:10px}   /* v1.33: was 12px. v1.43: + the signup lines */
+  .prompt + .prompt{margin-top:10px}   /* v1.50: .para + .para is --pgap now (was 10px here) */   /* v1.33: was 12px. v1.43: + the signup lines */
   .sig{margin-top:15px;font-size:16px}
-  .cta{margin-top:10px;font-size:var(--fs)}   /* v1.44: was 32px. v1.45: --fs (was 16px) */
+  .cta{font-size:var(--fs)}   /* v1.50: margin is --pgap (was 10px) */   /* v1.44: was 32px. v1.45: --fs (was 16px) */
   .signup{margin-top:4px}
   .notify{gap:14px}
   .notify input{flex:1 1 auto;font-size:16px}
   .notify button{font-size:16px}
-  .status{font-size:var(--fs);top:.5px}   /* v1.45: was 16px. v1.49: phones were already ~a paragraph gap under the signup line */
-  .elsewhere{margin-top:16px}
+  .status{font-size:var(--fs);top:calc(var(--pgap) - 9.5px)}   /* v1.50: follows --pgap (was .5px = 10px - 9.5px). v1.45: was 16px. v1.49: phones were already ~a paragraph gap under the signup line */
   .social{margin-left:-9px;gap:0}
   .social a{width:39px;height:40px}
   .ic{width:25px;height:20px}
   .social li.cur{font-size:16px}
   .social li.cur .cursor{margin-left:6px}
-  .egg{margin-top:30px;font-size:clamp(11px,calc((100vw - 48px)/27.6),16px)}   /* v1.45 (jay 2026.10.02): back to its own size (it was --fs in a v1.45 draft) */
-  .egg.has-day{margin-top:30px}   /* v1.31: phones keep the egg's 30px gap with or without the date */
+  .egg{margin-top:var(--sec-a);font-size:clamp(11px,calc((100vw - 48px)/27.6),16px);--egg-row:44px}   /* v1.45 (jay 2026.10.02): back to its own size (it was --fs in a v1.45 draft) */
+  .egg.has-day{margin-top:var(--sec-a)}   /* v1.31: phones keep the egg's 30px gap with or without the date */
 }
 /* v1.33 (jay 2026.09.30): "and while the journey ahead is long... we have space𝕏 to help us now" needs 3 lines below ~413px (16px mono, 38 chars to "long..."),
    so there it's balanced (and while the journey / ahead is long... we have / space𝕏 to help us now) instead of leaving "now" alone on the last line. wider phones keep 2 lines, broken after "long..." */
@@ -433,10 +449,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
         <p class="status" role="status" aria-live="polite"></p>
       </div>
     </div>
-    <nav class="elsewhere" data-part aria-label="elsewhere">
+    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/song-of-the-day/) then "💭 quote →" (/quote-of-the-day/), the very last line -->
+    <nav class="elsewhere" data-part aria-label="elsewhere">   <!-- v1.50 (jay 2026.10.02): the footer, last (was: between the signup and the egg) -->
       <ul class="social"></ul>
     </nav>
-    <div class="egg" aria-hidden="true"></div>   <!-- round 16: the easter egg lands here (jay 2026.09.29). songs preview (jay 2026.09.30): two lines, "🎧 lyric →" (/song-of-the-day/) then "💭 quote →" (/quote-of-the-day/), the very last line -->
   </div>
 </main>
 
@@ -454,16 +470,16 @@ const COPY = {
   // v1.44 (jay 2026.10.02): no "hello, world..." first line and no "- jay🥷" sign-off any more (both removed from the markup too). was: hello: "hello, world..." (teal), signoff: "- jay" + the ninja
   // jay's copy, 2026.09.28 (round 5). one [ ] per paragraph, typed in order with a pause between.
   paragraphs: [   // v1.45 (jay 2026.10.02): new intro. was (v1.44): "the internet used to be a place to make genuine connections (teal) with other humans" / "somewhere along the way, we turned it into the opposite" / "our team hopes to run it back to the good ol' days" (and before v1.44, see git history)
-    ["the internet was a place to make ", {text: "genuine connections", teal: true}, " with other humans"],   // 2 lines at 390 (see the phone font-size below)
+    ["the internet was a place to make ", {text: "genuine connections with other humans", teal: true}],   // 2 lines at 390 (see the phone font-size below). v1.50 (jay 2026.10.02): every intro line ends in teal: the teal runs to the end of line 1 (was "genuine connections" only)
     ["somewhere along the way, ", {text: "we messed up", teal: true}],
-    ["my team and i hope to run it back"]
+    ["my team and i hope to ", {text: "run it back", teal: true}]   // v1.50: "run it back" teal (was all white)
   ],
   cta: [   // v1.45 (jay 2026.10.02): the last intro line, typed right above the email field (same white, same paragraph spacing), "want to help" teal. was (v1.44): "drop us your email if you want to get updates on human stuff"
     ["drop us your email if you ", {text: "want to help", teal: true}]
   ],
   failNote: "that email isn't complete yet. try again (like you@email.com)",   // v1.31 PREVIEW: screen readers only (visually hidden), replaces the browser bubble's message
   thanks: "thank you! 💛 we'll be in touch!",   // v1.49 (jay 2026.10.02): gold, typed in the form's slot, the cursor stays after it; the 💛 is part of the line (no drawn heart in front any more). was "please confirm via email" after the burning heart. v1.29 (jay 2026.09.30): typed (teal) after the heart burns teal -> orange, in the form's slot, one line. was "almost there, check your email and tap confirm"
-  dayDate: "2026.10.02",   // v1.30 (jay 2026.09.30): THE DAY'S DATE, yyyy.mm.dd, shown in white as "🗓️ <date>" above the egg lines. the daily 5am song + quote routine sets it together with lyric (the day the song + quote were published, america/chicago; never the viewer's clock). "" hides the line.
+  dayDate: "2026.10.02",   // v1.30 (jay 2026.09.30): THE DAY'S DATE, yyyy.mm.dd, shown in white as "// <date>" (v1.50; was "🗓️ <date>") above the egg lines. the daily 5am song + quote routine sets it together with lyric (the day the song + quote were published, america/chicago; never the viewer's clock). "" hides the line.
   lyric: "ready or not, i can't get you out of my skin\ni never thought i'd get to feel somethin' like this\nmaybe it's stupid, maybe it's useless, lettin' you get too close\nbut ready or not, ready or not, ready or not, here i go",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
                                           // v1.26: always one line at the normal size; if it doesn't fit the column it's cut at a word with "… →" (the full lyric stays in the link's title + aria-label; see fitEgg)
   lyricHref: "/song-of-the-day/",   // v1.27 (jay 2026.09.30): was "/songs/" (the old url is now a redirect stub)
@@ -599,18 +615,19 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
    one column per letter (a scrambling head + a short fading trail, stepping row by row like the rain), resolves as it lands, and stays.
    laid out up front (hidden) so the landing never reflows; letters start above the viewport, so nothing adds scroll height or width */
 const eggEl = $('.egg');
+
 /* songs preview (jay 2026.09.30): two lines rain together. each line: an optional leading emoji (glued to the first word), words, and a trailing " →" (glued to the last word).
    every grapheme (emoji and arrow included) falls as its own letter; spaces are just gaps */
 /* v1.26 (jay 2026.09.30): line 1 = "🎧 <COPY.lyric> →" (/song-of-the-day/), line 2 = "💭 <today's quote> →" (/quote-of-the-day/), the very last line. the quote comes from quotes.json (see loadQuote below).
    both lines are lowercase and always ONE line at the normal size: fitEgg measures each line with the real font at the real column width and, if it would wrap,
    cuts it at a word boundary and ends it with "… →" so it fits exactly (the arrow always shows). the full text stays in the link's title + aria-label */
 const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
-const EGG = [{icon: '🗓️', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}, {icon: '📝', body: '', href: COPY.recapHref, recap: true}];   // v1.42: + the recap line (body "" = hidden until today's recap is known)   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
+const EGG = [{icon: '//', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}, {icon: '📝', body: '', href: COPY.recapHref, recap: true}];   // v1.42: + the recap line (body "" = hidden until today's recap is known)   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
 const quoteLine = EGG.find(l => l.quote), recapLine = EGG.find(l => l.recap);
-const lineText = (l, body) => l.day ? `${l.icon} ${body}` : `${l.icon} ${body} →`;   // v1.31: the date line has no link, so no arrow
+const lineText = (l, body) => l.day ? `${l.icon} ${body}` : `${l.icon} ${body} →`;   // v1.31: the date line has no link, so no arrow. v1.50: its icon is "//" (was 🗓️)   // v1.31: the date line has no link, so no arrow
 eggEl.classList.toggle('has-day', !!COPY.dayDate);
 const lineClass = l => l.day ? 'day' : l.song ? 'song' : l.recap ? 'recap' : 'quote';
-const isDeco = w => w === '→' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
+const isDeco = w => w === '→' || w === '//' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
 const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], ..., [last word, →]
   const words = text.split(' ').filter(Boolean), groups = [];
   words.forEach((w, i) => {
@@ -697,13 +714,14 @@ function eggSettle(){   // the final lines: plain links (same no-wrap groups, so
   eggText = eggLines.map(x => x.text).join('\n');
   eggEl.removeAttribute('aria-hidden'); state.egg = 'landed';
 }
-let eggStarted = false, eggRun = null;   // jay 2026.09.30 v1.25: eggRun = the live fall (animations, scramble, settle timers) so the dump or a full load can stop it
+let eggStarted = false, eggRun = null, eggThen = null;   // v1.50: eggThen = what runs once the egg's letters have landed (the footer)
+const eggNext = () => { const f = eggThen; eggThen = null; if (f) f(); };   // jay 2026.09.30 v1.25: eggRun = the live fall (animations, scramble, settle timers) so the dump or a full load can stop it
 function egg(){
   if (eggStarted || !eggText) return; eggStarted = true; state.egg = 'falling';
-  if (reduced || !eggEl.animate){ eggSettle(); eggEl.classList.add('on', 'fade'); return; }
+  if (reduced || !eggEl.animate){ eggSettle(); eggEl.classList.add('on', 'fade'); eggNext(); return; }
   const fs = parseFloat(getComputedStyle(eggEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep;
   let left = eggChars.length, last = 0, settled = false;
-  const settleOnce = () => { if (settled) return; settled = true; eggSettle(); introEnd(); };   // v1.30: the egg landing ends the intro (if the icons are in)
+  const settleOnce = () => { if (settled) return; settled = true; eggSettle(); eggNext(); introEnd(); };   // v1.30: the egg landing ends the intro (if the icons are in)
   const t0 = performance.now(); eggRun = {anims: [], timers: [], scr: 0};
   for (const c of eggChars){
     const top = c.el.getBoundingClientRect().top;
@@ -720,7 +738,7 @@ function egg(){
     an.finished.then(() => {
       c.done = true; c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall'); c.el.classList.add('land');
       tr.classList.add('off'); setTimeout(() => tr.remove(), 750);
-      if (--left === 0){ clearInterval(scr); eggRun.timers.push(setTimeout(settleOnce, 1200)); }
+      if (--left === 0){ clearInterval(scr); eggRun.timers.push(setTimeout(settleOnce, 1200)); eggNext(); }   // v1.50: all landed: the footer starts
     }, () => {});   // cancelled by eggStop(): nothing to do
   }
   state.eggMs = Math.round(last);
@@ -737,7 +755,7 @@ function egg(){
   eggRun.scr = scr;
 }
 function eggStop(){   // jay 2026.09.30 v1.25: stop a live fall. landed letters stay; the rest go back to their resting glyph (the dump hides + types them)
-  eggStarted = true; if (!eggRun) return;
+  eggStarted = true; eggThen = null; if (!eggRun) return;
   clearInterval(eggRun.scr); eggRun.timers.forEach(clearTimeout); eggRun.anims.forEach(a => a.cancel()); eggRun = null;
   for (const c of eggChars){ if (c.tr) c.tr.remove(); c.tr = null; c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall', 'land'); }
 }
@@ -1215,7 +1233,8 @@ async function intro(){
   await wait(TIMING.rocketAfter); if (skipped) return;
   form.classList.remove('rk-wait');                                                    // ...then the rocket
   await wait(TIMING.beforeIcons); if (skipped) return;
-  state.line = 3; lineAt = lines.length; popIcons(false);   // the icons one by one, the cursor riding along; when the last one is in, the egg rains (popIcons -> done -> egg)
+  state.line = 3; lineAt = lines.length;
+  if (eggText){ eggThen = () => popIcons(false); egg(); } else popIcons(false);   // v1.50: the daily block rains first, then the footer: the rule + the icons one by one, the cursor riding along to its spot after linkedin. was: icons, then the egg
 }
 /* v1.39 (jay 2026.10.01): "let's have 'want to be part of something human?' and everything below rainfall down so people aren't needing to wait for other stuff once that is presented."
    right after the sign-off, all of it starts at once, each column up to TIMING.rainJitter late: the prompt's letters, one column each for the email field, the rocket and "touch it",
@@ -1317,8 +1336,6 @@ function dump(){
     for (let h = (j === lineAt ? state.head : 0) + 1; h <= t.n + win; h++) tape.push(() => render(t, h, win));
     if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); form.classList.remove('rk-wait'); if (!form.classList.contains('in')) showForm(); });   // v1.30: after the icons the cursor is already home; leave it
   }
-  icons.forEach(li => { if (li.classList.contains('in')) return; const a = li.querySelector('a');
-    tape.push(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); }, () => {}); });
   const scrambling = new Set(), eggLeft = [];
   if (eggText && state.egg !== 'landed'){
     eggStop(); state.egg = 'dumping';
@@ -1330,6 +1347,9 @@ function dump(){
       if (k - W >= 0) land(eggLeft[k - W]);
     });
   }
+  // v1.50: then the footer (the icons), after the daily lines. was: the icons before the egg
+  icons.forEach(li => { if (li.classList.contains('in')) return; const a = li.querySelector('a');
+    tape.push(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); }, () => {}); });
   const total = tape.length, D = Math.min(DUMP.ms, total*DUMP.perStep), t0 = performance.now();
   let at = 0;
   state.dump = {steps: total, ms: Math.round(D), t0, from: {line: lineAt, head: state.head}};
