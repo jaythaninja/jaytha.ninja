@@ -36,7 +36,7 @@ a:hover{color:var(--teal)}
 .stage{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:clamp(48px,8vh,96px) 0 clamp(56px,9vh,100px)}   /* centered; if the block is taller than the viewport the stage just grows (no clipping) */
 .copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:20px;text-shadow:0 0 8px rgba(0,0,0,.8)}
 .hello{font-size:21px;line-height:1.4;color:var(--teal)}
-.paras{margin-top:26px}
+.paras{margin-top:0}   /* v1.44: the first paragraph is the first line now (was 26px under the hello line) */
 .para{font-size:20px;line-height:1.7;color:var(--white);white-space:pre-line}
 .para + .para{margin-top:20px}
 @media (min-width:761px){.copy{width:min(70ch,calc(100vw - var(--left) - 24px))}}   /* round 23 (jay 2026.09.29): desktop column wide enough for the longest paragraph */
@@ -47,7 +47,7 @@ a:hover{color:var(--teal)}
 .sig{margin-top:22px;font-size:20px;line-height:1.5;color:var(--teal)}
 .sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.08em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
 .sig .ninja.in{opacity:1;transform:none}
-.cta{margin-top:52px;font-size:20px;line-height:1.5}   /* jay 2026.09.29: one extra blank line after the sign-off */
+.cta{margin-top:20px;font-size:20px;line-height:1.5}   /* v1.44: paragraph spacing (the signup line is the 4th line of the intro). was 52px, one extra blank line after the sign-off (jay 2026.09.29) */
 .prompt{color:var(--white);line-height:1.7}
 .prompt + .prompt{margin-top:20px}   /* v1.43: the three signup lines are spaced like the paragraphs (10px on phones, below) */
 .prompt{text-wrap:balance}   /* v1.43: a signup line that wraps splits evenly (no lone "launch" / "public?" / "happens :)" on its own line); the untyped text is laid out (hidden) from the start, so the balance never changes mid-typing */   /* v1.42: the invitation is a full paragraph now, so it wraps with the paragraphs' line spacing (was the .cta's 1.5) */
@@ -160,11 +160,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .stage{padding:22px 0 18px}   /* v1.33 (jay 2026.09.30): was 24px 0 22px (the new last paragraph is a line longer on phones; see below) */
   .copy{margin-left:24px;width:calc(100vw - 48px)}
   .hello{font-size:17px}
-  .paras{margin-top:14px}
+  .paras{margin-top:0}   /* v1.44: was 14px */
   .para{font-size:16px;line-height:1.7}
   .para + .para,.prompt + .prompt{margin-top:10px}   /* v1.33: was 12px. v1.43: + the signup lines */
   .sig{margin-top:15px;font-size:16px}
-  .cta{margin-top:32px;font-size:16px}
+  .cta{margin-top:10px;font-size:16px}   /* v1.44: was 32px */
   .signup{margin-top:4px}
   .notify{gap:14px}
   .notify input{flex:1 1 auto;font-size:16px}
@@ -222,6 +222,28 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
   .notify.ok .rkb .rk{animation:none;filter:drop-shadow(0 0 8px rgba(255,77,26,.7))}
   .notify.ok .rk .rk-fl{animation:none}
   .notify .rkb:active .rk{transform:none}}
+/* v1.44 (jay 2026.10.02): the field charges the rocket, tesla-charger style. the underline stays teal; an orange (#FF4D1A) charge (.chg i, a soft-headed streak) runs
+   left to right along it into the rocket, and the rocket breathes (scale + orange glow) as each charge arrives, both on the same clock. four rising steps (form[data-chg]):
+   0 empty = slowest + softest, 1 any character = a step up, 2 the value has an "@" = stronger still, 3 a valid email = strongest, and the rocket goes into its ready state
+   (.ok: the v1.29 ignition pulse + flame flicker). deleting steps it back down. only transform, opacity and filter (glow) animate; .chg is absolutely placed over the
+   underline (placeChg in js) and never takes space, so nothing moves. reduced motion: no running charge, a static glow at the rocket end that brightens per step */
+.notify{position:relative}
+.notify .rkb{z-index:1}
+.notify .chg{position:absolute;left:0;top:0;width:0;height:16px;margin-top:-8px;overflow:hidden;pointer-events:none;z-index:0}
+.notify .chg i{position:absolute;left:0;top:7px;width:38%;height:2px;border-radius:1px;background:linear-gradient(90deg,rgba(255,77,26,0),rgba(255,77,26,.75) 62%,#FF4D1A 88%,#FFC2A8 97%,rgba(255,194,168,0));
+  opacity:var(--chg-o);filter:drop-shadow(0 0 var(--chg-glow) rgba(255,77,26,.9));transform:translateX(-100%);animation:chg-run var(--chg-t) linear infinite;transition:opacity .45s ease,filter .45s ease}
+.notify{--chg-t:3.6s;--chg-o:.5;--chg-glow:2.5px;--rk-s:1.012;--rk-g:4px;--rk-a:.35;--rk-o:.8}   /* 0: empty */
+.notify[data-chg="1"]{--chg-t:2.7s;--chg-o:.66;--chg-glow:3.5px;--rk-s:1.022;--rk-g:6px;--rk-a:.5;--rk-o:.85}   /* 1: typing */
+.notify[data-chg="2"]{--chg-t:1.7s;--chg-o:.84;--chg-glow:5px;--rk-s:1.035;--rk-g:8px;--rk-a:.66;--rk-o:.92}   /* 2: has an "@" */
+.notify[data-chg="3"]{--chg-t:.95s;--chg-o:1;--chg-glow:7px}   /* 3: valid. the rocket's own pulse is the .ok rk-pulse (strongest, 11px) */
+.notify:not(.ok) .rkb .rk{opacity:var(--rk-o);animation:rk-chg var(--chg-t) linear infinite}
+.notify:not(.ok) .rkb:active .rk{animation:none}   /* a press still gets the v1.29 squeeze (scale .92) */
+@keyframes chg-run{to{transform:translateX(263%)}}   /* the streak is 38% of the line: -100% = just off the left end, 263% = fully into the rocket */
+@keyframes rk-chg{0%,60%{transform:scale(1);filter:drop-shadow(0 0 calc(var(--rk-g)*.4) rgba(255,77,26,calc(var(--rk-a)*.45)))}
+  82%{transform:scale(var(--rk-s));filter:drop-shadow(0 0 var(--rk-g) rgba(255,77,26,var(--rk-a)))}100%{transform:scale(1);filter:drop-shadow(0 0 calc(var(--rk-g)*.4) rgba(255,77,26,calc(var(--rk-a)*.45)))}}
+@media (prefers-reduced-motion:reduce){
+  .notify .chg i{left:auto;right:0;width:26%;animation:none;transform:none;transition:opacity .3s ease}
+  .notify:not(.ok) .rkb .rk{animation:none;filter:drop-shadow(0 0 var(--rk-g) rgba(255,77,26,var(--rk-a)))}}
 /* v1.29: while the request is out the engine lights (flame grows, a tiny rumble); on success the rocket leaves the form for a fixed sky layer,
    turns to straight up, and climbs off the top of the screen with a long teal flame and a wake of rain glyphs. the form fades out under it, then the thank-you types */
 .notify.ign .rkb .rk{opacity:1;animation:rk-rumble .09s linear infinite;filter:drop-shadow(0 0 12px rgba(255,77,26,.9)) drop-shadow(0 0 6px rgba(26,173,179,.6))}
@@ -334,9 +356,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 
 <main class="stage" id="stage">
   <div class="copy">
-    <p class="hello" data-part></p>
     <div class="paras"></div>
-    <p class="sig" data-part></p>
     <div class="cta" data-part>
       <p class="prompt"></p>
       <div class="signup">
@@ -368,17 +388,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
    ===================================================================== */
 const NINJA = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNTYgMjU2Ij4KPGRlZnM+CiAgPHJhZGlhbEdyYWRpZW50IGlkPSJzdWl0IiBjeD0iMzglIiBjeT0iMjUlIiByPSI4NSUiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzNiNDI0NSIvPjxzdG9wIG9mZnNldD0iLjU1IiBzdG9wLWNvbG9yPSIjMWExZTIwIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMDcwOTBhIi8+PC9yYWRpYWxHcmFkaWVudD4KICA8cmFkaWFsR3JhZGllbnQgaWQ9ImhlYWQiIGN4PSIzNiUiIGN5PSIyOCUiIHI9Ijc1JSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNGE1MjU2Ii8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iIzIyMjgyYiIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzA5MGIwYyIvPjwvcmFkaWFsR3JhZGllbnQ+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJza2luIiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkZENzY2Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjRjVCODM1Ii8+PC9saW5lYXJHcmFkaWVudD4KICA8bGluZWFyR3JhZGllbnQgaWQ9InRlYWwiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiM1RkQ2REEiLz48c3RvcCBvZmZzZXQ9Ii41IiBzdG9wLWNvbG9yPSIjMUFBREIzIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMEU3QzgxIi8+PC9saW5lYXJHcmFkaWVudD4KICA8bGluZWFyR3JhZGllbnQgaWQ9InRlYWxSIiB4MT0iMCIgeTE9IjAiIHgyPSIxIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjRkY4QTVFIi8+PHN0b3Agb2Zmc2V0PSIuNSIgc3RvcC1jb2xvcj0iI0ZGNEQxQSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI0I4MzAwQSIvPjwvbGluZWFyR3JhZGllbnQ+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJndWFyZCIgeDE9IjAiIHkxPSIwIiB4Mj0iMSIgeTI9IjEiPjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzZiNzQ3OCIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzFjMjEyNCIvPjwvbGluZWFyR3JhZGllbnQ+CiAgPHJhZGlhbEdyYWRpZW50IGlkPSJzaGluZSIgY3g9IjUwJSIgY3k9IjUwJSIgcj0iNTAlIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmZmYiIHN0b3Atb3BhY2l0eT0iLjM1Ii8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjZmZmIiBzdG9wLW9wYWNpdHk9IjAiLz48L3JhZGlhbEdyYWRpZW50PgogIDxjbGlwUGF0aCBpZD0iaGVhZGNsaXAiPjxjaXJjbGUgY3g9IjEyOCIgY3k9IjEwNCIgcj0iNzYiLz48L2NsaXBQYXRoPgo8L2RlZnM+CjwhLS0ga2F0YW5hIGJlaGluZCByaWdodCBzaG91bGRlciAob3JhbmdlIHdyYXAsIGpheSAyMDI2LTA5LTI5KSAtLT4KPGcgdHJhbnNmb3JtPSJyb3RhdGUoMzggMTkwIDcwKSI+CiAgPHJlY3QgeD0iMTgxIiB5PSItOCIgd2lkdGg9IjE4IiBoZWlnaHQ9IjcwIiByeD0iNiIgZmlsbD0idXJsKCN0ZWFsUikiLz4KICA8ZyBzdHJva2U9IiM1YTE2MDQiIHN0cm9rZS13aWR0aD0iMyIgb3BhY2l0eT0iLjciPgogICAgPHBhdGggZD0iTTE4MSA0IEwxOTkgMTYgTTE5OSA0IEwxODEgMTYgTTE4MSAyMiBMMTk5IDM0IE0xOTkgMjIgTDE4MSAzNCBNMTgxIDQwIEwxOTkgNTIgTTE5OSA0MCBMMTgxIDUyIi8+CiAgPC9nPgogIDxyZWN0IHg9IjE3OSIgeT0iLTE0IiB3aWR0aD0iMjIiIGhlaWdodD0iMTAiIHJ4PSI0IiBmaWxsPSIjMGIwZDBlIi8+CiAgPGVsbGlwc2UgY3g9IjE5MCIgY3k9IjY2IiByeD0iMjAiIHJ5PSI3IiBmaWxsPSJ1cmwoI2d1YXJkKSIvPgogIDxyZWN0IHg9IjE4MiIgeT0iNzAiIHdpZHRoPSIxNiIgaGVpZ2h0PSIzMCIgcng9IjQiIGZpbGw9IiMwYjBkMGUiLz4KPC9nPgo8IS0tIGJvZHkgLS0+CjxwYXRoIGQ9Ik0zOCAyNTYgQzM4IDIwNiA3MCAxNzggMTI4IDE3OCBDMTg2IDE3OCAyMTggMjA2IDIxOCAyNTYgWiIgZmlsbD0idXJsKCNzdWl0KSIvPgo8IS0tIGtpbW9ubyBjcm9zcyBjb2xsYXIgLS0+CjxwYXRoIGQ9Ik05NiAxODIgTDEyOCAyMzggTDE2MCAxODIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzBhMGMwZCIgc3Ryb2tlLXdpZHRoPSIxNCIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNOTYgMTgyIEwxMjggMjM4IEwxNjAgMTgyIiBmaWxsPSJub25lIiBzdHJva2U9InVybCgjdGVhbCkiIHN0cm9rZS13aWR0aD0iNyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8IS0tIHNhc2ggLS0+CjxwYXRoIGQ9Ik00NCAyMzggQzkwIDIyOCAxNjYgMjI4IDIxMiAyMzggTDIxNCAyNTYgTDQyIDI1NiBaIiBmaWxsPSJ1cmwoI3RlYWwpIi8+CjxwYXRoIGQ9Ik00NCAyMzggQzkwIDIyOCAxNjYgMjI4IDIxMiAyMzgiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzlCRUJFRSIgc3Ryb2tlLW9wYWNpdHk9Ii41IiBzdHJva2Utd2lkdGg9IjIiLz4KPCEtLSBoZWFkIC8gaG9vZCAtLT4KPGNpcmNsZSBjeD0iMTI4IiBjeT0iMTA0IiByPSI3NiIgZmlsbD0idXJsKCNoZWFkKSIvPgo8ZyBjbGlwLXBhdGg9InVybCgjaGVhZGNsaXApIj4KICA8IS0tIGxvd2VyIGZhY2Ugd3JhcCBmb2xkcyAtLT4KICA8cGF0aCBkPSJNNjAgMTUwIEM5NSAxNDAgMTYxIDE0MCAxOTYgMTUwIiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iNCIvPgogIDxwYXRoIGQ9Ik02NiAxNjQgQzEwMCAxNTUgMTU2IDE1NSAxOTAgMTY0IiBmaWxsPSJub25lIiBzdHJva2U9IiMwMDAiIHN0cm9rZS1vcGFjaXR5PSIuMyIgc3Ryb2tlLXdpZHRoPSI0Ii8+CiAgPCEtLSBleWUgc2xpdCAtLT4KICA8cmVjdCB4PSI1MCIgeT0iOTgiIHdpZHRoPSIxNTYiIGhlaWdodD0iNDIiIHJ4PSIyMSIgZmlsbD0idXJsKCNza2luKSIvPgogIDxyZWN0IHg9IjUwIiB5PSI5OCIgd2lkdGg9IjE1NiIgaGVpZ2h0PSIxMCIgcng9IjUiIGZpbGw9IiMwMDAiIG9wYWNpdHk9Ii4xOCIvPgogIDwhLS0gaGVhZGJhbmQgLS0+CiAgPHJlY3QgeD0iNDgiIHk9IjcwIiB3aWR0aD0iMTYwIiBoZWlnaHQ9IjIwIiByeD0iNCIgZmlsbD0idXJsKCN0ZWFsKSIvPgogIDxyZWN0IHg9IjQ4IiB5PSI3MCIgd2lkdGg9IjE2MCIgaGVpZ2h0PSI0IiBmaWxsPSIjQTZGMEYyIiBvcGFjaXR5PSIuNTUiLz4KPC9nPgo8IS0tIGhlYWRiYW5kIGtub3QgKyB0YWlscyBvbiB0aGUgbGVmdCAtLT4KPHBhdGggZD0iTTU4IDgwIEM0MCA3NiAyNiA4NiAxNCAxMDQgQzMwIDEwMCA0MCA5NiA1MiA5MiBaIiBmaWxsPSJ1cmwoI3RlYWwpIi8+CjxwYXRoIGQ9Ik01OCA4NCBDNDQgOTIgMzQgMTA4IDMwIDEyOCBDNDQgMTE2IDUyIDEwNCA2MCA5MiBaIiBmaWxsPSIjMTI4RTkzIi8+CjxjaXJjbGUgY3g9IjU4IiBjeT0iODIiIHI9IjkiIGZpbGw9InVybCgjdGVhbCkiLz4KPCEtLSBleWVzIC0tPgo8ZWxsaXBzZSBjeD0iMTAwIiBjeT0iMTIxIiByeD0iMTAiIHJ5PSIxMiIgZmlsbD0iIzNhMjQxMCIvPgo8ZWxsaXBzZSBjeD0iMTU2IiBjeT0iMTIxIiByeD0iMTAiIHJ5PSIxMiIgZmlsbD0iIzNhMjQxMCIvPgo8Y2lyY2xlIGN4PSIxMDMuNSIgY3k9IjExNi41IiByPSIzLjQiIGZpbGw9IiNmZmYiIG9wYWNpdHk9Ii45Ii8+CjxjaXJjbGUgY3g9IjE1OS41IiBjeT0iMTE2LjUiIHI9IjMuNCIgZmlsbD0iI2ZmZiIgb3BhY2l0eT0iLjkiLz4KPCEtLSBicm93cyAtLT4KPHBhdGggZD0iTTg0IDEwNiBRMTAwIDEwMCAxMTQgMTA2IiBmaWxsPSJub25lIiBzdHJva2U9IiMzYTI0MTAiIHN0cm9rZS13aWR0aD0iNC41IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz4KPHBhdGggZD0iTTE0MiAxMDYgUTE1NiAxMDAgMTcyIDEwNiIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjM2EyNDEwIiBzdHJva2Utd2lkdGg9IjQuNSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIi8+CjwhLS0gdGVhbCByaW0gbGlnaHQgc28gdGhlIGhvb2QgcmVhZHMgb24gcHVyZSBibGFjayAtLT4KPGNpcmNsZSBjeD0iMTI4IiBjeT0iMTA0IiByPSI3NSIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMUFBREIzIiBzdHJva2Utb3BhY2l0eT0iLjQ1IiBzdHJva2Utd2lkdGg9IjIuNSIvPgo8cGF0aCBkPSJNNDAgMjU2IEM0MCAyMDggNzIgMTgwIDEyOCAxODAgQzE4NCAxODAgMjE2IDIwOCAyMTYgMjU2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxQUFEQjMiIHN0cm9rZS1vcGFjaXR5PSIuMzUiIHN0cm9rZS13aWR0aD0iMi41Ii8+CjwhLS0gaG9vZCBzaGluZSAtLT4KPGVsbGlwc2UgY3g9Ijk4IiBjeT0iNTQiIHJ4PSIzNCIgcnk9IjE4IiBmaWxsPSJ1cmwoI3NoaW5lKSIgdHJhbnNmb3JtPSJyb3RhdGUoLTIwIDk4IDU0KSIvPgo8L3N2Zz4K';
 const COPY = {
-  hello: "hello, world...",                  // first line (teal)
+  // v1.44 (jay 2026.10.02): no "hello, world..." first line and no "- jay🥷" sign-off any more (both removed from the markup too). was: hello: "hello, world..." (teal), signoff: "- jay" + the ninja
   // jay's copy, 2026.09.28 (round 5). one [ ] per paragraph, typed in order with a pause between.
-  paragraphs: [   // v1.42 (jay 2026.10.02): jay's new intro message. was (v1.33-v1.41): "for years, i "succeeded" at work that never felt like mine" / "i let it take me so far from myself that i didn't know who jay was" / "because i hadn't found my ikigai" (teal) / "but now... i have" (teal) / "i hope the cool stuff we're building helps you find yours" / "and while the journey ahead is long... we have space𝕏 to help us now"
-    ["isn't it weird that the internet, a place built to connect us, has become the hardest place to make ", {text: "genuine connections", teal: true}, " with other humans?"],
-    ["my team and i think so too, and we hope to change that."]   // v1.43 (jay 2026.10.02): was "...and we want to change that."
+  paragraphs: [   // v1.44 (jay 2026.10.02): the shorter intro. was (v1.42-v1.43): "isn't it weird that the internet, a place built to connect us, has become the hardest place to make genuine connections (teal) with other humans?" / "my team and i think so too, and we hope to change that." (and before v1.42, see git history)
+    ["the internet used to be a place to make ", {text: "genuine connections", teal: true}, " with other humans"],
+    ["somewhere along the way, we turned it into the opposite"],
+    ["our team hopes to run it back to the good ol' days"]
   ],
-  signoff: "- jay",   // round 26 (jay 2026.09.30): "tha" dropped, ninja sits right after "jay" with no gap. the ninja is our own drawing (black + teal, orange katana), popped in after the text (round 9)
-  cta: [   // v1.43 (jay 2026.10.02): three white lines typed in order right above the email field, each its own line (paragraph spacing). was (v1.42): one line, "come back any day to watch us build. if you want early updates or a spot in our second wave of testers, drop your email and hit enter to launch:"
-    "want to get notified when we open testing (iPhone\u00a0only) to the public?",   // \u00a0 = a no-break space: "(iPhone only)" never splits across lines (looks the same)
-    "drop your email and hit enter to launch",
-    "you can also just touch the rocket without an email and see what happens\u00a0:)"   // ...and the ":)" stays with "happens"
+  cta: [   // v1.44 (jay 2026.10.02): the last intro line, typed right above the email field (same white, same paragraph spacing). was (v1.43): "want to get notified when we open testing (iPhone only) to the public?" / "drop your email and hit enter to launch" / "you can also just touch the rocket without an email and see what happens :)"
+    "drop us your email if you want to get updates on human stuff"
   ],
   failNote: "that email isn't complete yet. try again (like you@email.com)",   // v1.31 PREVIEW: screen readers only (visually hidden), replaces the browser bubble's message
   thanks: "please confirm via email",   // v1.29 (jay 2026.09.30): typed (teal) after the heart burns teal -> orange, in the form's slot, one line. was "almost there, check your email and tap confirm"
@@ -504,9 +522,9 @@ const $ = s => document.querySelector(s);
 const parasEl = $('.paras');
 const paraLines = (COPY.paragraphs || [COPY.paragraph]).map(pieces => { const p = mk('p', 'para'); p.setAttribute('data-part', ''); parasEl.appendChild(p); return prepare(p, pieces); });
 const ctaLines = [].concat(COPY.cta).map((text, k) => { const p = k ? mk('p', 'prompt') : $('.prompt'); if (k){ p.setAttribute('data-part', ''); $('.cta .signup').before(p); } return prepare(p, text); });   // v1.43: one .prompt per signup line, in order, above the form
-const lines = [prepare($('.hello'), COPY.hello), ...paraLines, prepare($('.sig'), COPY.signoff), ...ctaLines];
-const LAST = lines.length - 1, SIG = LAST - ctaLines.length;   // v1.43: LAST = the last signup line (the form follows it); SIG = the sign-off (was LAST - 1)
-const ninja = mk('img', 'ninja'); ninja.alt = '🥷'; ninja.src = NINJA; $('.sig').appendChild(ninja);
+const lines = [...paraLines, ...ctaLines];   // v1.44: no hello line, no sign-off. was: [hello, ...paragraphs, sign-off, ...signup lines]
+const LAST = lines.length - 1, SIG = -1;   // LAST = the signup line (the form follows it). v1.44: SIG = -1, there is no sign-off any more (v1.43: SIG = LAST - ctaLines.length)
+// v1.44: the ninja went with the sign-off. was: const ninja = mk('img', 'ninja'); ninja.alt = '🥷'; ninja.src = NINJA; $('.sig').appendChild(ninja);
 const ul = $('.social');
 const iconLink = s => { const a = gateTap(mk('a')); a.setAttribute('href', s.href); a.setAttribute('aria-label', s.label); a.title = s.label;
   if (/^https?:/.test(s.href)){ a.target = '_blank'; a.rel = 'noopener'; }
@@ -669,7 +687,15 @@ const showForm = () => { form.classList.add('in'); setTimeout(() => formTaps.for
 const emailIn = form.querySelector('input[type=email]');
 const nativeOk = v => !(v.valueMissing || v.typeMismatch || v.patternMismatch || v.tooLong || v.tooShort || v.badInput);   // v1.30: the browser's own checks (our custom message aside)
 const looksDone = () => nativeOk(emailIn.validity) && /@[^@\s]+\.[^@\s.]{2,}$/.test(emailIn.value.trim());
-const syncOk = () => { form.classList.toggle('ok', looksDone()); };   // v1.31 PREVIEW (jay 2026.09.30): no custom validity message or native bubble any more (form is novalidate); looksDone() alone gates the post
+/* v1.44 (jay 2026.10.02): the charging line (css: .chg). it sits on the field's underline from the field's left end into the rocket's tail; placed once the layout is known
+   and again on resize (it's absolutely positioned and pointer-events:none, so placing it moves nothing). chgStep() sets the step: 0 empty, 1 typing, 2 "@", 3 valid */
+const chg = mk('span', 'chg'); chg.setAttribute('aria-hidden', 'true'); chg.appendChild(mk('i')); form.appendChild(chg);
+const rkBtn = form.querySelector('.rkb');
+const placeChg = () => { const x = emailIn.offsetLeft, end = rkBtn.offsetLeft + rkBtn.offsetWidth*.42;
+  chg.style.left = x + 'px'; chg.style.top = (emailIn.offsetTop + emailIn.offsetHeight - .5) + 'px'; chg.style.width = Math.max(0, end - x) + 'px'; };
+placeChg(); addEventListener('resize', placeChg); if (window.ResizeObserver) new ResizeObserver(placeChg).observe(form); if (document.fonts) document.fonts.ready.then(placeChg);
+const chgStep = () => { const v = emailIn.value, n = String(looksDone() ? 3 : v.includes('@') ? 2 : v.length ? 1 : 0); if (form.dataset.chg !== n) form.dataset.chg = n; };
+const syncOk = () => { form.classList.toggle('ok', looksDone()); chgStep(); };   // v1.31 PREVIEW (jay 2026.09.30): no custom validity message or native bubble any more (form is novalidate); looksDone() alone gates the post
 ['input', 'change', 'keyup'].forEach(ev => emailIn.addEventListener(ev, syncOk)); addEventListener('pageshow', syncOk); syncOk();
 /* v1.29 (jay 2026.09.30): the success heart. our own drawing, three stacked copies: teal (start), orange (the burnt heart, revealed bottom to top) and a white-hot band riding the burn line.
    it pops in like the ninja, holds a beat, burns upward with orange embers (rain glyphs) coming off the flame line, and settles orange. reduced motion: a plain teal -> orange crossfade */
@@ -1009,8 +1035,7 @@ const iconTimers = [], icons = [...ul.children].filter(li => li !== curLi);
    but ››| and the two-tap skip stay live until the egg lands (introEnd); was: finishUp() as soon as the last icon popped, while the egg was still raining */
 /* v1.42 (jay 2026.10.02): once the sign-off is typed, the cursor stays for good right after "- jay🥷" (next to the ninja, same line), blinking (teal at 1x, orange at 2x).
    it's an inline-block with a negative right margin, after the ninja, so the line doesn't change. was (v1.34-v1.41): removed, and the finger + "touch it" by the rocket blinked instead */
-const sigEl = $('.sig');
-const cursorSig = () => { glue.remove(); if (cursor.parentNode !== sigEl || sigEl.lastChild !== cursor) sigEl.appendChild(cursor); };
+const cursorSig = () => {};   // v1.44: no sign-off any more, so nothing to park the cursor after (it rides the typing, then the icon row). was: after "- jay🥷" in .sig
 /* v1.43 (jay 2026.10.02): the cursor travels with the typing again: it pauses after "- jay🥷", types the invitation, then rides along the icon row as each icon pops in,
    and rests for good right after the last icon (linkedin), in curLi (whose hidden placeholder has reserved that spot from the first paint, so nothing moves). was (v1.42): left at the sign-off */
 const cursorRow = (before) => { glue.remove(); curHold.remove(); if (cursor.parentNode !== curLi) curLi.appendChild(cursor); if (before !== undefined){ if (curLi.nextSibling !== before) ul.insertBefore(curLi, before); } else if (ul.lastChild !== curLi) ul.appendChild(curLi); curLi.classList.add('in'); };
@@ -1084,13 +1109,12 @@ async function intro(){
   for (let i=0;i<=LAST;i++){   // v1.43 (jay 2026.10.02): types through the invitation again (LAST), then the field, the rocket and the icons one by one; the daily block (egg) rains after. was (v1.39-v1.42): i < LAST, then bottomRain() (all of it at once)
     if (skipped) return;
     lineAt = i; state.i = i;
-    state.line = i === 0 ? 0 : 1; state.para = i === 0 ? -1 : i - 1; state.head = 0;
-    current = type(lines[i], {speed: i === 0 ? TIMING.helloSpeed : TIMING.paraSpeed, window: TIMING.window}); await current;
+    state.line = 1; state.para = i; state.head = 0;   // v1.44: every line is a paragraph now (was: line 0 = hello, para = i - 1)
+    current = type(lines[i], {speed: TIMING.paraSpeed, window: TIMING.window}); await current;
     if (skipped) return;
-    if (i === SIG){ ninja.classList.add('in'); cursorSig(); await wait(420); }
     const ended = lines[i].runs.flatMap(r => r.g).join('').trimEnd();
     if (i === LAST) break;
-    await wait(i === 0 ? TIMING.afterHello : i === SIG ? TIMING.beforeSignoff : ended.endsWith('...') ? TIMING.afterEllipsis : TIMING.betweenParas);
+    await wait(ended.endsWith('...') ? TIMING.afterEllipsis : TIMING.betweenParas);   // v1.44: was i === 0 ? afterHello : i === SIG ? beforeSignoff : ...
   }
   if (skipped) return;
   document.body.classList.remove('typing'); form.classList.add('rk-wait'); showForm();   // the field first...
@@ -1163,14 +1187,13 @@ function skip(){
   skipped = true; current && current.finish();
   lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window));
   showForm();
-  ninja.classList.add('in'); cursorSig(); document.body.classList.remove('typing'); state.line = 3; popIcons(true);
+  document.body.classList.remove('typing'); state.line = 3; popIcons(true);   // v1.44: (no ninja / sign-off cursor any more)
 }
 /* jay 2026.09.30 v1.25: the whole page at once, no typing, no pops, no egg fall (back navigation + bfcache restores). safe to call at any point, mid-intro or mid-dump */
 function complete(){
   skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); iconStop(); bottomStop(); stopDump();   // v1.39: bottomStop lands the bottom rain at once   // v1.38: iconStop lands a mid-rain icon row at once
   document.body.classList.add('revealed'); document.body.classList.remove('typing');   // .revealed first, so nothing below transitions in
   lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window));
-  ninja.classList.add('in'); cursorSig();
   if (!form.classList.contains('gone')){ form.classList.add('in'); formTaps.forEach(revealTap); }
   icons.forEach(li => { li.classList.add('in'); revealTap(li.querySelector('a')); }); state.icons = icons.length;
   state.line = 3; finishUp();
@@ -1198,7 +1221,6 @@ function dump(){
   for (let j = lineAt; j < lines.length; j++){
     const t = lines[j];
     for (let h = (j === lineAt ? state.head : 0) + 1; h <= t.n + win; h++) tape.push(() => render(t, h, win));
-    if (j === SIG) tape.push(() => { ninja.classList.add('in'); cursorSig(); });
     if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); form.classList.remove('rk-wait'); if (!form.classList.contains('in')) showForm(); });   // v1.30: after the icons the cursor is already home; leave it
   }
   icons.forEach(li => { if (li.classList.contains('in')) return; const a = li.querySelector('a');
