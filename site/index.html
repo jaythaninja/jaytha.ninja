@@ -46,7 +46,7 @@ a:hover{color:var(--teal)}
 .para{font-size:var(--fs);line-height:1.7;color:var(--white);white-space:pre-line}
 .para + .para{margin-top:20px}
 @media (min-width:761px){.copy{width:min(72ch,calc(100vw - var(--left) - 24px))}}   /* v1.45: 72ch at --fs (18px) = 778px, just wider than the longest line (71 characters), so field + rocket still end at the text's right edge. was 70ch at 20px (840px) */   /* round 23 (jay 2026.09.29): desktop column wide enough for the longest paragraph */
-@media (min-width:761px){.egg{width:min(70ch,calc(100vw - var(--left) - 24px))}}   /* v1.45: the date / song / quote / recap lines keep their pre-v1.45 width too (70ch at their 20px = 840px), so they cut exactly where they did before */
+/* v1.46 (jay 2026.10.02): desktop: the date / song / quote / recap lines are --fs (18px) like the intro, in the intro column (.copy, 72ch at 18px). still one line each, cut with "… →" by fitEgg. phones unchanged (their own clamp size below). was (v1.45): 20px in their own min(70ch, 100vw - left - 24px) column (840px) */
 /* v1.42 (jay 2026.10.02): retired with the old copy: @media (min-width:940px){.para{white-space:nowrap}} (every paragraph on one line). the new paragraphs are longer than the column, so they wrap at every width */
 .para a{white-space:nowrap}   /* an address/link never breaks mid-way; lines wrap at the "; " separators */
 .para .bold{font-weight:700;color:var(--white)}
@@ -132,7 +132,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .social li.cur .cursor{margin:0 0 0 7px;vertical-align:0}
 /* round 16: easter egg for people who stay. with the icons (round 23: starts ~250ms before the first one), the quote rains down in orange, one column per letter, and stays (jay 2026.09.29)
    the line is reserved in layout from the start (hidden), so nothing reflows when it lands */
-.egg{margin-top:52px;font-size:20px;line-height:1.5;font-weight:400;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
+.egg{margin-top:52px;font-size:var(--fs);line-height:1.5;font-weight:400;color:var(--orange);text-shadow:0 0 12px rgba(255,77,26,.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
 .egg.on{visibility:visible}
 .egg p{margin:0}.egg p + p{margin-top:4px}   /* songs preview: two lines, a hair apart so each reads as its own link */
 .egg{position:relative}   /* v1.26: holds the (invisible) measuring line */
