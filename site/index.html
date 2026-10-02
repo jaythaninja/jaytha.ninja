@@ -273,12 +273,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify{--dash:10;--flow-dash:10;--flow-l:9;--fill-o:.62;--fill-g:2px;--flow-o:.55;--chg-t:4s;--rk-s:1;--rk-g:5px;--rk-a:.38;--rk-o:.8}   /* 0: empty, a short segment */
 .notify[data-chg="1"]{--dash:34;--flow-dash:34;--fill-o:.75;--fill-g:3px;--flow-o:.6;--chg-t:2.4s;--rk-s:1.01;--rk-g:8px;--rk-a:.52;--rk-o:.86}   /* 1: typing, a third */
 .notify[data-chg="2"]{--dash:67;--flow-dash:67;--fill-o:.88;--fill-g:4.5px;--flow-o:.65;--chg-t:1.3s;--rk-s:1.02;--rk-g:11px;--rk-a:.7;--rk-o:.93}   /* 2: has an "@", two thirds */
-.notify[data-chg="3"]{--dash:100;--flow-dash:67;--fill-o:1;--fill-g:6px;--flow-o:.65;--chg-t:1.3s;--rk-s:1.035;--rk-g:15px;--rk-a:.92;--rk-o:1}   /* 3: valid, full + pulsing */
-/* v1.47 (jay 2026.10.02): fully charged = no moving charge. the flowing charge (speeding up per step: 4s empty, 2.4s typing, 1.3s "@", easing in toward the rocket) only
-   runs at steps 0-2. on a valid email the pulse already on its way finishes its run (step 3 keeps step 2's clock and end point), then chgStep adds .full: the flow stops
-   (it's between runs, so nothing jumps) and the whole cable, now filled to 100%, breathes as one (chg-full). was (v1.45): the flow kept running at step 3 */
-.notify.full .cbl-f{animation:chg-full 2.2s ease-in-out infinite}
-.notify.full .cbl-f .flow{animation:none;opacity:0}
+.notify[data-chg="3"]{--dash:100;--flow-dash:67;--fill-o:1;--fill-g:6px;--flow-o:0;--chg-t:1.3s;--rk-s:1.035;--rk-g:15px;--rk-a:.92;--rk-o:1}   /* 3: valid, full + pulsing */
+/* v1.48 (jay 2026.10.02): fully charged pulses as one. the flowing charge (4s empty, 2.4s typing, 1.3s "@", easing in toward the rocket) runs at steps 0-2 only.
+   the moment the email is valid the flow segment is gone (no animation, opacity 0, hidden, no fade) and the fill is the whole cable at once (no dash growing), so
+   nothing travels along it: the entire cable, curve included, pulses evenly between #FF4D1A and a lighter orange (stroke colour, plus its glow; opacity stays 1,
+   so the teal track never shows through). deleting steps back down as before (the fill shrinks with its usual ease, the flow restarts).
+   was (v1.47): the pulse already in flight finished its run first (up to 1.3s of a light segment moving along the full cable), then .full; the pulse dipped opacity */
+.notify[data-chg="3"] .cbl-f .flow{animation:none;opacity:0;visibility:hidden;transition:none}
+.notify[data-chg="3"] .cbl-f .fill{transition:none;animation:chg-full 2.2s ease-in-out infinite}
+.notify[data-chg="3"] .cbl-f{transition:none;animation:chg-glow 2.2s ease-in-out infinite}
 .notify:not(.ok) .rkb .rk{opacity:var(--rk-o);transform:scale(var(--rk-s));filter:drop-shadow(0 0 var(--rk-g) rgba(255,77,26,var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(255,150,100,calc(var(--rk-a)*.7)));
   animation:rk-chg var(--chg-t) ease-in-out infinite}
 .notify.ok .rkb .rk{opacity:1;animation:rk-full 2.2s ease-in-out infinite}   /* overrides the v1.29 .ok rk-pulse; the flame flicker (rk-flick) stays */
@@ -286,7 +289,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 .notify .rkb:active .rk{animation:none;transform:scale(.92)}   /* a press still gets the v1.29 squeeze */
 .notify .rkb[disabled] .rk{animation:none;opacity:.55}   /* (v1.29, restated so it still wins over the step glow while a request is out) */
 @keyframes cbl-flow{from{stroke-dashoffset:var(--flow-l)}to{stroke-dashoffset:calc(var(--flow-l) - var(--flow-dash))}}   /* from just behind the cable's start to the end of the fill */
-@keyframes chg-full{0%,100%{opacity:1;filter:drop-shadow(0 0 6px rgba(255,77,26,.95))}50%{opacity:.84;filter:drop-shadow(0 0 9px rgba(255,77,26,1))}}
+@keyframes chg-full{0%,100%{stroke:#FF4D1A}50%{stroke:#FF9A6E}}
+@keyframes chg-glow{0%,100%{filter:drop-shadow(0 0 6px rgba(255,77,26,.95))}50%{filter:drop-shadow(0 0 9px rgba(255,120,70,1))}}
 @keyframes rk-chg{0%,100%{transform:scale(var(--rk-s));filter:drop-shadow(0 0 calc(var(--rk-g)*.82) rgba(255,77,26,calc(var(--rk-a)*.85))) drop-shadow(0 0 calc(var(--rk-g)*.3) rgba(255,150,100,calc(var(--rk-a)*.6)))}
   55%{transform:scale(calc(var(--rk-s) + .008));filter:drop-shadow(0 0 var(--rk-g) rgba(255,77,26,var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(255,150,100,calc(var(--rk-a)*.7)))}}
 @keyframes rk-full{0%,100%{transform:scale(1.035);filter:drop-shadow(0 0 15px rgba(255,77,26,.92)) drop-shadow(0 0 5px rgba(255,160,110,.8))}
@@ -294,7 +298,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--teal);outline-offse
 @media (prefers-reduced-motion:reduce){
   .notify .cbl-f{animation:none!important;transition:none}
   .notify .cbl-t path,.rk .rk-flap,.rk .rk-led{transition:none!important}
-  .notify .cbl-f .fill{transition:none}
+  .notify .cbl-f .fill{transition:none;animation:none!important}
   .notify .cbl-f .flow{animation:none;opacity:0}
   .notify:not(.ok) .rkb .rk{animation:none}
   .notify .rkb:active .rk{transform:none}
@@ -763,15 +767,7 @@ const placeCable = () => {
   const len = cblPaths[0].getTotalLength && cblPaths[0].getTotalLength(); if (len) form.style.setProperty('--cbl-s', (100*(xs - x0)/len).toFixed(2));   // the straight part, as a share of the cable
 };
 placeCable(); addEventListener('resize', placeCable); if (window.ResizeObserver) new ResizeObserver(placeCable).observe(form); if (document.fonts) document.fonts.ready.then(placeCable);
-let fullT = 0;
-const chgStep = () => { const v = emailIn.value, n = String(looksDone() ? 3 : v.includes('@') ? 2 : v.length ? 1 : 0); if (form.dataset.chg === n) return; form.dataset.chg = n;
-  // v1.47: step 3 = .full once the charge in flight has finished its run (the flow's next animationiteration; reduced motion / no animation: at once; fallback 1.4s)
-  clearTimeout(fullT); cblPaths[2].onanimationiteration = null;
-  if (n !== '3'){ form.classList.remove('full'); return; }
-  const full = () => { clearTimeout(fullT); cblPaths[2].onanimationiteration = null; if (form.dataset.chg === '3') form.classList.add('full'); };
-  if (reduced || getComputedStyle(cblPaths[2]).animationName === 'none') return full();
-  cblPaths[2].onanimationiteration = full; fullT = setTimeout(full, 1400);
-};
+const chgStep = () => { const v = emailIn.value, n = String(looksDone() ? 3 : v.includes('@') ? 2 : v.length ? 1 : 0); if (form.dataset.chg !== n) form.dataset.chg = n; };   // (v1.48: no .full hand-off any more; step 3 is css-only)
 const syncOk = () => { form.classList.toggle('ok', looksDone()); chgStep(); };   // v1.31 PREVIEW (jay 2026.09.30): no custom validity message or native bubble any more (form is novalidate); looksDone() alone gates the post
 ['input', 'change', 'keyup'].forEach(ev => emailIn.addEventListener(ev, syncOk)); addEventListener('pageshow', syncOk); syncOk();
 /* v1.29 (jay 2026.09.30): the success heart. our own drawing, three stacked copies: teal (start), orange (the burnt heart, revealed bottom to top) and a white-hot band riding the burn line.
