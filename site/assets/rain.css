@@ -19,8 +19,28 @@
 html.au-wave body *{transition-property:color,background-color,border-color,fill,stroke,stop-color,text-shadow,box-shadow,outline-color,opacity!important;transition-duration:var(--au-t,.3s)!important;transition-delay:0s!important;transition-timing-function:ease!important}
 /* the background glows: a gold twin (made with the orange one in rain.js) shows instead while gold */
 .glow-au{opacity:0}.gld .glow:not(.glow-au),.glow.gld:not(.glow-au){opacity:0!important}.gld .glow-au,.glow-au.gld{opacity:.85!important}
+/* v1.53 (jay 2026.10.02): light + dark theme, following the system (prefers-color-scheme), on every page. dark (as before, unchanged): pure black #000 background,
+   white text. light: pure white #fff background, the white text turns black #000, every state works the same (teal state, orange inverted state, gold skip flash +
+   signup gold, flame/charge the opposite colour). neutral colours read these: --bg/--bg-rgb (the background + the dark halos behind text, which turn white), --fg/--fg-rgb
+   (white text + white-hot heads), --gk (white-hot glows: 1 dark, .45 light, so black glows on white stay soft), --ink-rgb (placeholders), --au* (the liftoff /
+   thank-you gold), --dim-w (the dim wake). light-only deeper shades (contrast on white; dark keeps the exact current colours):
+   teal #1AADB3 -> #13888D (2.74:1 -> 4.26:1), gold #FFD700 -> #A67C00 (1.40:1 -> 3.82:1; hot gold #FFFBE8 -> #7A5C00, light gold #FFE066 -> #B8860B),
+   the near-white "hot" heads (#d2f6f7 / #ffd9cc / #FFFBE8) -> deep teal #0B6569 / deep orange #B8300A / deep gold #7A5C00, dim wake #8fa9aa -> #6E8B8C (2.49 -> 3.66:1).
+   orange #FF4D1A -> #D93D11 (4.54:1; on the line from #FF4D1A to the brand dark orange #B8300A, which is its bright core; tints darkened by the same step). the rain on white is the state colour itself (see rain.js) */
+:root{--fg:#fff;--fg-rgb:255,255,255;--bg-rgb:0,0,0;--gk:1;--ink-rgb:246,239,233;--au:#FFD700;--au-rgb:255,215,0;--au-hot:#FFFBE8;--au-lt:#FFE066;--dim-w:#8fa9aa}
+@media (prefers-color-scheme:light){
+  :root{--bg:#fff;--bg-rgb:255,255,255;--fg:#000;--fg-rgb:0,0,0;--gk:.45;--ink:#000;--ink-rgb:0,0,0;--ink-2:rgba(0,0,0,.72);--ink-3:rgba(0,0,0,.5);--white:#000;
+    --au:#A67C00;--au-rgb:166,124,0;--au-hot:#7A5C00;--au-lt:#B8860B;--dim-w:#6E8B8C;--c:#13888D;--c-rgb:19,136,141;--c-hot:#0B6569;--c-wh:#0B6569;
+    --f:#D93D11;--f-rgb:217,61,17;--f-lt:#FF682F;--f-dk:#8B2408;--f-pale:#FFB49A;--f-wh:#B8300A;--f-lt2:#FF793F;--f-l4-rgb:255,86,23;--f-l5-rgb:255,207,177}
+  :root[data-mode="fast"]{--c:#D93D11;--c-rgb:217,61,17;--c-lt:#FF682F;--c-dk:#8B2408;--c-pale:#FFA179;--c-hot:#B8300A;--c-wh:#B8300A;--c-lt-rgb:255,122,80;--c-lt2:#FF793F;
+    --c-l1-rgb:255,118,53;--c-l2-rgb:255,129,63;--c-l3-rgb:255,140,73;--c-l4-rgb:255,86,23;--c-l5-rgb:255,207,177;--f:#13888D;--f-rgb:19,136,141}
+  .gld,:root.gld,:root.gld[data-mode="fast"]{--c:#A67C00;--c-rgb:166,124,0;--c-hot:#7A5C00;--c-wh:#7A5C00;--f:#A67C00;--f-rgb:166,124,0}
+  .scan{display:none}   /* the scan lines are a screen blend: nothing on white */
+  .glows{opacity:.5}   /* the soft background glows at half strength, so the page reads white (not tinted) */
+  .rk-sky .smk,.rk-sky .plm,.rk-sky .puff.smoke{filter:brightness(.62)}   /* the white liftoff / crash smoke would vanish on white: grey it */
+}
 /* shared v1.16 hint */
-.tap-hint{--hint-icon:var(--c);position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;gap:6px;color:var(--c);font-size:12px;line-height:1;letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px #000;transition:color .25s ease,opacity .7s ease,transform .7s ease}
+.tap-hint{--hint-icon:var(--c);position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;gap:6px;color:var(--c);font-size:12px;line-height:1;letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px var(--bg);transition:color .25s ease,opacity .7s ease,transform .7s ease}
 .tap-hint.ready{opacity:.7;transform:none}.tap-hint.settled{opacity:.52}.tap-hint svg{width:1.35em;height:1.35em;display:block;flex:none;color:var(--hint-icon);transition:color .25s ease}.tap-hint b{font-weight:500}
 @media(prefers-reduced-motion:reduce){.tap-hint{transition:none;transform:none}.tap-hint.ready{opacity:.7}.tap-hint.settled{opacity:.52}}
 

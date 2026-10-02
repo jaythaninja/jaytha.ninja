@@ -8,6 +8,8 @@
   const sm=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0));return t*t*(3-2*t)};
   const DPR=Math.min(window.devicePixelRatio||1,2);
   const T=[26,173,179], RAIN_ORANGE=[255,77,26];
+  // v1.53: light theme (prefers-color-scheme): on white every glyph is the state colour itself (deeper teal #13888D, orange #D93D11, gold #A67C00), no white heads
+  const LIGHT_Q=matchMedia('(prefers-color-scheme: light)'), L_TEAL=[19,136,141], L_ORANGE=[217,61,17], L_GOLD=[166,124,0];
   const modeName=()=>document.documentElement.dataset.mode==='fast'?'fast':'normal';
 function Rain(cv, o){
   const R = {cv, o, drops:[], rects:[], ptr:{x:-9999,y:-9999}, last:0};
@@ -65,6 +67,7 @@ function Rain(cv, o){
     const pc = R.paleTint && R.paleTintAt(now);
     const th = tc && tc.map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62)));
     const ph = pc && pc.map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62)));   // family-matched tips ease with their bodies
+    const light = LIGHT_Q.matches, le = light ? (tc ? clamp((tc[0] - T[0])/(RAIN_ORANGE[0] - T[0])) : (R.fast ? 1 : 0)) : 0, lc = light ? L_TEAL.map((c, i) => Math.round(c + (L_ORANGE[i] - c)*le)) : null;   // v1.53: where the tint is between teal and orange
     const A = R.au, gk = !A ? null : A.out ? (k => () => k)(1 - clamp((now - A.out.t0)/A.out.ms)) : y => clamp((now - A.t0 - Math.min(1, Math.abs(y - A.y)/A.maxD)*A.ms)/A.fade);   // v1.52: the gold pulse (per glyph, by distance from its line) / the fade back
     for (const d of R.drops){
       if (!REDUCED){
@@ -83,7 +86,8 @@ function Rain(cv, o){
         let col;
         if (i === 0){ col = R.fast ? (d.pal === o.paleTint ? ph : th) : d.head; a = Math.min(1, a*1.9); }
         else { const t = i / d.len; a *= i < 3 ? 1 : Math.pow(1 - t, 1.5); col = R.fast ? (d.pal === o.paleTint ? pc : tc) : d.pal; }
-        if (gk){ const k = gk(y); if (k > 0){ const g = d.pal === o.paleTint ? (i === 0 ? R.gph : GOLD_PALE) : (i === 0 ? R.gh : GOLD); col = col.map((c, j) => Math.round(c + (g[j] - c)*k)); } }
+        if (light){ col = lc; if (d.pal === o.paleTint) a *= .6; }
+        if (gk){ const k = gk(y); if (k > 0){ const g = light ? L_GOLD : d.pal === o.paleTint ? (i === 0 ? R.gph : GOLD_PALE) : (i === 0 ? R.gh : GOLD); col = col.map((c, j) => Math.round(c + (g[j] - c)*k)); } }
         ctx.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${a})`;
         ctx.fillText(boost > .4 && Math.random() < .3 ? glyph() : d.g[i], d.x, y);
       }
@@ -156,16 +160,16 @@ function Rain(cv, o){
     const back=ms=>{if(rain)rain.setSpeed(modeName()==='fast'?2:1,ms)};
     if(rain)rain.setSpeed(o.rain||6,o.rainUp||220);
     if(o.gold!==false)gold({ms:o.goldMs||260,y:o.goldY});   // v1.52: the skip-to-end gold flash
-    const frame=now=>{const k=Math.min(total,Math.ceil((now-t0)/D*total));while(at<k)tape[at++]();if(at<total){raf=requestAnimationFrame(frame);return}raf=0;live=false;back(o.rainDown||1100);if(o.gold!==false)goldOff({hold:1000,ms:700,first:true});if(done)done()};
+    const frame=now=>{const k=Math.min(total,Math.ceil((now-t0)/D*total));while(at<k)tape[at++]();if(at<total){raf=requestAnimationFrame(frame);return}raf=0;live=false;back(o.rainDown||1100);if(o.gold!==false)goldOff({hold:1000,ms:350,first:true});if(done)done()};
     raf=requestAnimationFrame(frame);
-    return {stop(){if(!live)return;live=false;cancelAnimationFrame(raf);back(250);if(o.gold!==false)goldOff({hold:1000,ms:700,first:true})}};};
+    return {stop(){if(!live)return;live=false;cancelAnimationFrame(raf);back(250);if(o.gold!==false)goldOff({hold:1000,ms:350,first:true})}};};
   document.documentElement.dataset.mode=document.documentElement.dataset.mode==='fast'?'fast':'normal';
 
   /* v1.52 (jay 2026.10.02): gold. gold(o) turns everything coloured gold in a pulse that spreads out from a line (o.y, viewport px; default the middle of the screen) up to
      the top and down to the bottom at the same time: each element (and each rain glyph) turns gold as the pulse reaches it, over o.ms (signup: ~1.7s; the skip-to-end
      flash: ~260ms). it works by putting .gld on each element (the gold values of --c / --f, see rain.css) in distance order, then .gld on <html> when the pulse is done.
      white stays white (only the colour variables change), nothing moves. o.lock (the signup) keeps it gold for the rest of the visit, speed taps included.
-     goldOff(o): unless locked, hold o.hold ms (1000), then fade everything back over o.ms (700); o.first also returns to the first state (1x, teal).
+     goldOff(o): unless locked, hold o.hold ms (1000), then fade everything back over o.ms (350; v1.53, was 700); o.first also returns to the first state (1x, teal).
      the skip-to-end on every page (burst() here, the homepage's own dump()) flashes gold while it fast-forwards, then holds 1s and fades back to teal 1x */
   const GOLD=[255,215,0], GOLD_PALE=[255,236,150];
   let auLock=false, auTimers=[], auRaf=0;
@@ -185,7 +189,7 @@ function Rain(cv, o){
       if(i<els.length){auRaf=requestAnimationFrame(step);return;}auRaf=0;h.classList.add('gld');auTimers.push(setTimeout(()=>h.classList.remove('au-wave'),fade+60));res();};auRaf=requestAnimationFrame(step);});
   };
   const goldOff=(o={})=>{
-    if(auLock)return;auClear();const h=document.documentElement,hold=o.hold??1000,ms=REDUCED?0:(o.ms??700);
+    if(auLock)return;auClear();const h=document.documentElement,hold=o.hold??1000,ms=REDUCED?0:(o.ms??350);
     auTimers.push(setTimeout(()=>{if(auLock)return;if(ms){auWave(ms);h.classList.add('gld-out');}
       if(o.first&&modeName()==='fast')mode(false);
       h.classList.remove('gld');document.querySelectorAll('.gld').forEach(e=>e.classList.remove('gld'));

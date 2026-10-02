@@ -3,8 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#000000">
-<meta name="color-scheme" content="dark">
+<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#000000">
+<meta name="theme-color" media="(prefers-color-scheme: light)" content="#ffffff">   <!-- v1.53: the browser / safari bar follows the theme -->
+<meta name="color-scheme" content="dark light">
 <script>document.documentElement.classList.add('js')</script>
 <title>song of the day · jay tha ninja</title>
 <!-- jaytha.ninja/song-of-the-day/: song of the day (PREVIEW, jay 2026.09.30). same look, typing engine, rain + layout as /quote-of-the-day/.
@@ -32,7 +33,7 @@ a:hover{color:var(--c)}
 .scan{position:fixed;inset:0;z-index:30;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(235,250,250,.026) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:screen;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}
 
 .stage{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:clamp(48px,8vh,96px) 0 clamp(56px,9vh,100px)}   /* centered while short; once the archive is long the page just scrolls */
-.copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:20px;text-shadow:0 0 8px rgba(0,0,0,.8)}
+.copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:20px;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
 .home{display:inline-block;margin:0 0 30px;font-size:14px;line-height:1.5;color:var(--c);letter-spacing:.02em}   /* the way back: brand orange like every link; teal on hover */
 .home:hover,.home:focus-visible{color:var(--c)}
 .kicker{font-size:21px;line-height:1.4;color:var(--c)}
@@ -55,7 +56,7 @@ a:hover{color:var(--c)}
 .archive .ab a:hover,.archive .ab a:focus-visible{color:var(--c)}
 .none{font-size:16px;line-height:1.6;color:var(--ink-2)}
 /* typing internals (same as the homepage): resolved text, scrambling window, not-yet-typed text held invisibly so lines never reflow */
-.scr{color:#fff;font-weight:500;text-shadow:0 0 10px rgba(var(--c-lt-rgb),.9)}
+.scr{color:var(--fg);font-weight:500;text-shadow:0 0 10px rgba(var(--c-lt-rgb),.9)}
 .ghost{visibility:hidden}
 .cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--c);box-shadow:0 0 14px rgba(var(--c-rgb),.75);animation:blink 1.05s infinite}
 /* v1.51: (the 2x orange cursor rule is gone: the cursor is the state colour, var(--c)) */
