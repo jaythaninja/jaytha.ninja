@@ -94,7 +94,7 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 <meta name="twitter:description" content="jay's day, in his own words">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image-v128.png">
 <meta name="twitter:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
-<link rel="stylesheet" href="/assets/rain.css?v=1.58"><script src="/assets/rain.js?v=1.58"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.59"><script src="/assets/rain.js?v=1.59"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -206,7 +206,7 @@ async function load(){
     const r = await fetch(COPY.data, {cache: 'no-cache'}); if (!r.ok) throw new Error(r.status);
     const all = (await r.json()).filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && typeof e.text === 'string' && e.text.trim());
     const day = TZ_DAY();
-    const shown = all.filter(e => e.date <= day).sort((a, b) => b.date < a.date ? -1 : b.date > a.date ? 1 : 0);   // future-dated entries stay hidden until their day
+    const shown = all.filter(e => (/^\d{4}-\d{2}-\d{2}$/.test(e.live || '') ? e.live : e.date) <= day)   /* v1.59: an optional "live" day (the night-before drop: the update keeps the day it's about as its date, and shows from 12:00am ct on its live day) */.sort((a, b) => b.date < a.date ? -1 : b.date > a.date ? 1 : 0);   // future-dated entries stay hidden until their day
     return {top: shown[0] || null, rest: shown.slice(1)};
   } catch (err) { return {error: true, top: null, rest: []}; }
 }

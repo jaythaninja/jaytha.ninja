@@ -222,6 +222,17 @@ function Rain(cv, o){
       if(rain&&rain.au)rain.au.out={t0:performance.now(),ms:Math.max(1,ms)};
       auTimers.push(setTimeout(()=>{h.classList.remove('au-wave','gld-out');if(rain)rain.au=null;},ms+60));},hold));
   };
-  window.JayRain={Rain,register,mode,dump,rendered:markRendered,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock};
+  // v1.59 (jay 2026.10.03): every daily thing flips at exactly 12:00am america/chicago. the daily drop now publishes the next day's entries the night before (~11:30pm ct), dated that
+  // next day, and every page only shows entries dated today (ct) or earlier, so they're held until midnight. this watches the chicago date: a timer that wakes just after the next
+  // ct midnight (at most a minute apart, so a sleeping laptop / dst day still catches up) + on becoming visible. when the date changes it calls the page's newDay(cb) hook, or
+  // reloads (the daily pages: they re-read their json and type the new entry; the homepage swaps in place, see its newDay)
+  const ctDay=()=>new Intl.DateTimeFormat('en-CA',{timeZone:'America/Chicago',year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
+  const toMidnight=()=>{const n=new Date(),p={};new Intl.DateTimeFormat('en-US',{timeZone:'America/Chicago',hourCycle:'h23',hour:'2-digit',minute:'2-digit',second:'2-digit'}).formatToParts(n).forEach(x=>p[x.type]=+x.value);return ((23-p.hour)*3600+(59-p.minute)*60+(60-p.second))*1000-n.getMilliseconds()};
+  let dayNow=ctDay(),dayCb=null,dayT=0;
+  const dayCheck=()=>{const d=ctDay();if(d===dayNow)return;const was=dayNow;dayNow=d;if(dayCb)dayCb(d,was);else location.reload()};
+  const dayLoop=()=>{dayCheck();clearTimeout(dayT);dayT=setTimeout(dayLoop,Math.max(200,Math.min(toMidnight()+150,60000)))};
+  dayLoop();document.addEventListener('visibilitychange',()=>{if(!document.hidden)dayCheck()});addEventListener('pageshow',e=>{if(e.persisted)dayCheck()});
+  const newDay=cb=>{dayCb=cb||null};
+  window.JayRain={Rain,register,mode,dump,rendered:markRendered,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock,day:ctDay,newDay};
   if(document.readyState!=='loading')boot();else addEventListener('DOMContentLoaded',boot,{once:true});
 })();
