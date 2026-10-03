@@ -68,7 +68,7 @@ function Rain(cv, o){
     const th = tc && tc.map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62)));
     const ph = pc && pc.map((c, i) => Math.round(c + (o.head[i] - c)*(o.headMix ?? .62)));   // family-matched tips ease with their bodies
     const light = LIGHT_Q.matches, le = light ? (tc ? clamp((tc[0] - T[0])/(RAIN_ORANGE[0] - T[0])) : (R.fast ? 1 : 0)) : 0, lc = light ? L_TEAL.map((c, i) => Math.round(c + (L_ORANGE[i] - c)*le)) : null;   // v1.53: where the tint is between teal and orange
-    const A = R.au, gk = !A ? null : A.out ? (k => () => k)(1 - clamp((now - A.out.t0)/A.out.ms)) : y => clamp((now - A.t0 - Math.min(1, Math.abs(y - A.y)/A.maxD)*A.ms)/A.fade);   // v1.52: the gold pulse (per glyph, by distance from its line) / the fade back
+    const A = R.au, gk = !A ? null : A.out ? (k => () => k)(1 - clamp((now - A.out.t0)/A.out.ms)) : A.trk ? (wy => wy === -Infinity ? () => 1 : y => clamp((y - wy)/A.soft))(A.trk()) : y => clamp((now - A.t0 - Math.min(1, Math.abs(y - A.y)/A.maxD)*A.ms)/A.fade);   // v1.52: the gold pulse (per glyph, by distance from its line) / the fade back
     for (const d of R.drops){
       if (!REDUCED){
         if (!d.last){ d.last = now; d.clock = d.every; }
@@ -124,14 +124,19 @@ function Rain(cv, o){
   const DUMP_GLYPH=`<svg class="speed-arrows dump" data-count="end" viewBox="0 0 20 24" preserveAspectRatio="xMinYMid meet" aria-label="skip to the end"><path d="M1.5 3.6L10 10.1 18.5 3.6M1.5 10.6L10 17.1 18.5 10.6M1.5 20.4H18.5"/></svg>`;   // v1.32: two down chevrons over a bar (was ››|)
   let rain=null,hint=null,down=null,booted=false,onMode=null,onTap=null,dumpHint=false;
   // jay 2026.09.30 v1.25: while a page has the dump state on (only the homepage intro turns it on, at 2x), the hint shows ››| instead of the 1x/2x chevrons
-  const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`anywhere for${dumpHint?DUMP_GLYPH:arrows(fast?1:2)}`;}};
+  // v1.57 (jay 2026.10.02): the hint reads "tap tap tap" (was the 👇 glove + "anywhere for"), one colour per word: --c, --f, then --au while the page still renders (the gold skip
+  // is still possible: .live on the hint), --c once it's done (rendered()). the chevrons keep the hint's own colour. a speed tap swaps --c / --f as everywhere (see rain.css)
+  const WORDS='<span class="tws"><span class="tw tw1">tap</span> <span class="tw tw2">tap</span> <span class="tw tw3">tap</span></span>';
+  let rendered=false;
+  const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`${WORDS}${dumpHint?DUMP_GLYPH:arrows(fast?1:2)}`;}};
   // v1.20: each teal background glow gets an orange twin that fades in at >> speed (both pages via this shared file)
   const glowTwins=()=>document.querySelectorAll('.glow:not(.glow-fast):not([data-twin])').forEach(g=>{g.dataset.twin='1';const t=g.cloneNode(false);t.classList.add('glow-fast');t.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,77,26,'));g.after(t);const u=g.cloneNode(false);u.classList.add('glow-au');u.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,215,0,'));t.after(u);});   // v1.52: + a gold twin (shown while .gld)
   const ensure=()=>{
     glowTwins();
     hint=document.querySelector('.tap-hint');
-    if(hint){const legacy=hint.querySelector('.speed-label')||hint.querySelector('.speed')||hint.querySelector(':scope > span');if(legacy)legacy.className='speed-label';}
-    if(!hint){ hint=document.createElement('div'); hint.className='tap-hint'; hint.setAttribute('aria-hidden','true'); hint.innerHTML=ICON+'<span class="speed-label"></span>'; (document.querySelector('.scan')||document.body).after(hint); }
+    if(hint){const legacy=hint.querySelector('.speed-label')||hint.querySelector('.speed')||hint.querySelector(':scope > span');if(legacy)legacy.className='speed-label';hint.querySelectorAll(':scope > svg').forEach(g=>g.remove());}   // v1.57: no glove
+    if(!hint){ hint=document.createElement('div'); hint.className='tap-hint'; hint.setAttribute('aria-hidden','true'); hint.innerHTML='<span class="speed-label"></span>'; (document.querySelector('.scan')||document.body).after(hint); }   // v1.57: was ICON + the label
+    if(!rendered)hint.classList.add('live');
     setHintMode(modeName()==='fast'); hint.classList.add('ready'); requestAnimationFrame(()=>hint.classList.add('ready')); place();
   };
   const place=()=>{if(!hint)return;const copy=document.querySelector('.copy');if(!copy)return;const r=copy.getBoundingClientRect();const mobile=innerWidth<760;const lh=parseFloat(getComputedStyle(copy.querySelector('.hello')||copy).lineHeight)||30;hint.style.top=mobile?`calc(env(safe-area-inset-top,0px) + 11px)`:`${Math.max(11,r.top-2*lh)}px`;if(mobile){hint.style.right=`calc(env(safe-area-inset-right,0px) + 14px)`;return;}let right=0;for(const el of copy.querySelectorAll('.hello,.para,.sig,.prompt')){const range=document.createRange();range.selectNodeContents(el);for(const q of range.getClientRects())right=Math.max(right,q.right);}if(!right)right=r.right;hint.style.right=Math.max(14,innerWidth-right-16)+'px';};
@@ -140,6 +145,7 @@ function Rain(cv, o){
   // jay 2026.09.30 v1.25: optional tap hook. if it returns true the page used the tap (the homepage's terminal dump) and the 1x/2x toggle is skipped
   const register=(r,cb,tap)=>{rain=r;onMode=cb||null;onTap=tap||null;boot()};
   const dump=on=>{dumpHint=!!on;setHintMode(modeName()==='fast')};
+  const markRendered=()=>{rendered=true;if(hint)hint.classList.remove('live')};   // v1.57: the page has finished rendering (no gold skip any more): the hint's 3rd word goes back to --c
   // jay 2026.09.30 v1.25: back-navigation note. off the homepage (/song-of-the-day/, /quote-of-the-day/), a plain same-tab click on a link home ("← jaytha.ninja") leaves a one-shot sessionStorage note; the homepage reads + clears it and opens fully loaded
   const HOME=/^\/(index\.html)?$/;
   if(!HOME.test(location.pathname))document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(a.target&&a.target!=='_self'))return;const u=new URL(a.href,location.href);if(u.origin===location.origin&&HOME.test(u.pathname)){try{sessionStorage.setItem('jtn.back','1')}catch(_){}}},true);
@@ -184,11 +190,24 @@ function Rain(cv, o){
     const vh=innerHeight, y0=o.y??vh/2, maxD=Math.max(y0,vh-y0,1), fade=Math.max(120,Math.min(450,ms*.25));
     if(rain)rain.au={y:y0+scrollY,t0:performance.now(),ms,maxD,fade:ms?fade:1,out:null};
     if(!ms){h.classList.add('gld');return Promise.resolve();}
+    if(o.track)return goldTrack(o);
     auWave(fade);
     const els=[...document.body.querySelectorAll('*')].filter(e=>{const tg=e.tagName.toLowerCase();if(tg!=='svg'&&e.closest('svg'))return false;if(/^(script|style|canvas|br|noscript)$/.test(tg))return false;if(e.classList.contains('glow'))return true;const r=e.getBoundingClientRect();return r.height<=160&&(r.width>0||r.height>0);})
       .map(e=>{const r=e.getBoundingClientRect(),d=r.top>y0?r.top-y0:r.bottom<y0?y0-r.bottom:0;return{e,t:Math.min(1,d/maxD)*ms};}).sort((a,b)=>a.t-b.t);
     return new Promise(res=>{const t0=performance.now();let i=0;const step=now=>{const el=now-t0;while(i<els.length&&els[i].t<=el)els[i++].e.classList.add('gld');
       if(i<els.length){auRaf=requestAnimationFrame(step);return;}auRaf=0;h.classList.add('gld');auTimers.push(setTimeout(()=>h.classList.remove('au-wave'),fade+60));res();};auRaf=requestAnimationFrame(step);});
+  };
+  /* v1.57 (jay 2026.10.02): the liftoff's gold wave. o.track() = the wave's line now (viewport px; the rocket's centre), -Infinity once it's gone. every element whose centre
+     is below the line turns gold (so everything under the rocket at once: the icons), the rest as the rocket passes them, top last (the hint); the rain the same way,
+     with a soft o.soft px edge under the line. when the line is gone: everything gold (html.gld), as at the end of the old pulse */
+  const goldTrack=o=>{
+    const h=document.documentElement,trk=o.track,fade=o.fade??320;auWave(fade);
+    if(rain)rain.au={trk:()=>{const y=trk();return y===-Infinity?-Infinity:y+scrollY},soft:o.soft??70,out:null};
+    const els=[...document.body.querySelectorAll('*')].filter(e=>{const tg=e.tagName.toLowerCase();if(tg!=='svg'&&e.closest('svg'))return false;if(/^(script|style|canvas|br|noscript)$/.test(tg))return false;if(e.classList.contains('glow'))return true;const r=e.getBoundingClientRect();return r.height<=160&&(r.width>0||r.height>0);})
+      .map(e=>{const r=e.getBoundingClientRect();return{e,y:e.classList.contains('glow')?-1e9:(r.top+r.bottom)/2};}).sort((a,b)=>b.y-a.y);
+    return new Promise(res=>{let i=0;const step=()=>{const y=trk();while(i<els.length&&(y===-Infinity||els[i].y>=y))els[i++].e.classList.add('gld');
+      if(y!==-Infinity){auRaf=requestAnimationFrame(step);return;}auRaf=0;h.classList.add('gld');if(rain)rain.au={y:0,t0:-1e9,ms:0,maxD:1,fade:1,out:null};
+      auTimers.push(setTimeout(()=>h.classList.remove('au-wave'),fade+60));res();};auRaf=requestAnimationFrame(step);});
   };
   const goldOff=(o={})=>{
     if(auLock)return;auClear();const h=document.documentElement,hold=o.hold??1000,ms=REDUCED?0:(o.ms??350);
@@ -203,6 +222,6 @@ function Rain(cv, o){
       if(rain&&rain.au)rain.au.out={t0:performance.now(),ms:Math.max(1,ms)};
       auTimers.push(setTimeout(()=>{h.classList.remove('au-wave','gld-out');if(rain)rain.au=null;},ms+60));},hold));
   };
-  window.JayRain={Rain,register,mode,dump,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock};
+  window.JayRain={Rain,register,mode,dump,rendered:markRendered,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock};
   if(document.readyState!=='loading')boot();else addEventListener('DOMContentLoaded',boot,{once:true});
 })();
