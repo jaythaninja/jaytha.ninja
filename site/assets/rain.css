@@ -50,3 +50,7 @@ html.au-snap,html.au-snap *,html.au-snap *::before,html.au-snap *::after{transit
 .glow{transition:opacity .5s ease}.glow-fast{opacity:0}[data-mode="fast"] .glow{opacity:0}[data-mode="fast"] .glow-fast{opacity:.85}@media(prefers-reduced-motion:reduce){.glow{transition:none}}
 /* jay 2026.09.30 v1.25: the homepage intro's "finish the dump" glyph (››|), shown only at 2x while the intro types. the hint's orange (#FF6A2B, same as the fast-mode › and glove). same box as the chevrons, so nothing shifts */
 .tap-hint .speed-arrows.dump{color:var(--c)}
+/* v1.57 (jay 2026.10.02): "tap tap tap", a colour per word: the state colour, the flame colour, then gold while the page still renders (the gold skip is still on: .live),
+   the state colour again once it's done. light mode uses the light variants (--c #13888D, --f #D93D11, --au #A67C00). a speed tap swaps --c / --f (orange, teal, gold / orange,
+   teal, orange); gold (.gld) turns all three gold. the chevrons keep the hint's colour */
+.tap-hint .tws{white-space:nowrap}.tap-hint .tw1{color:var(--c)}.tap-hint .tw2{color:var(--f)}.tap-hint .tw3{color:var(--c)}.tap-hint.live .tw3{color:var(--au)}
