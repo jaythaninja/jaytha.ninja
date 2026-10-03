@@ -45,6 +45,14 @@ a:hover{color:var(--c)}
 .para a{white-space:nowrap}
 .para .bold{font-weight:700;color:var(--white)}
 .para .teal,.prompt .teal{color:var(--c);white-space:nowrap}
+.spamcan{--spam-body:#1AADB3;--spam-body-edge:#0B5B5E;--spam-rim:#F2B632;--spam-rim-edge:#6E4A06;--spam-ink:#021213}
+.spamcan.is-orange,:root[data-mode="fast"] .spamcan{--spam-body:#FF4D1A;--spam-body-edge:#8A2208;--spam-ink:#2A0A02}
+.spamcan.is-gold,:root[data-mode] .gld .spamcan,:root[data-mode] .spamcan.gld,:root[data-mode].gld .spamcan,:root[data-mode] .cta:has(.notify.gold-ok) .spamcan{--spam-body:#FFD700;--spam-body-edge:#7A5C00;--spam-rim:#FFFBE8;--spam-rim-edge:#7A5C00;--spam-ink:#5A4300}
+@media (prefers-color-scheme:light){
+  .spamcan{--spam-body:#0E7C81;--spam-body-edge:#064346;--spam-ink:#fff}
+  .spamcan.is-orange,:root[data-mode="fast"] .spamcan{--spam-ink:#2A0A02}
+  .spamcan.is-gold,:root[data-mode] .gld .spamcan,:root[data-mode] .spamcan.gld,:root[data-mode].gld .spamcan,:root[data-mode] .cta:has(.notify.gold-ok) .spamcan{--spam-body:#E0B400;--spam-body-edge:#7A5C00;--spam-ink:#3D2E00}
+}
 .sig{margin-top:22px;font-size:20px;line-height:1.5;color:var(--c)}
 .sig .ninja{display:inline-block;height:1.45em;width:1.45em;margin-left:.08em;vertical-align:-.38em;opacity:0;transform:scale(.4) translateY(6px);transition:opacity .28s ease-out,transform .42s cubic-bezier(.34,1.56,.64,1)}
 .sig .ninja.in{opacity:1;transform:none}
@@ -367,7 +375,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 <meta name="twitter:image" content="https://jaytha.ninja/og/home.png?d=2026-10-03">
 <meta name="twitter:image:alt" content="the intro on jaytha.ninja: the internet was a place to make genuine connections with other humans, somewhere along the way, we messed up, my team and i hope to run it back">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "jay", "url": "https://jaytha.ninja/", "sameAs": ["https://x.com/jaythaninja", "https://www.instagram.com/jaythaninja", "https://www.threads.com/jaythaninja", "https://github.com/jaythaninja", "https://www.strava.com/athletes/64153021", "https://www.linkedin.com/in/jaythaninja"]}</script>
-<link rel="stylesheet" href="/assets/rain.css?v=1.61"><script src="/assets/rain.js?v=1.61"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.62"><script src="/assets/rain.js?v=1.62"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -388,7 +396,25 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
       <p class="para" data-static>my team and i hope to <span class="teal">run it back</span></p>
     </div>
     <div class="cta" data-part>
-      <p class="prompt"><span data-static>drop us your email if you <span class="teal">want to help</span></span></p>
+      <p class="prompt"><span data-static>drop your email, <span class="teal">we promise no <svg class="spamcan" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 26 20" role="img" aria-label="spam" style="height:1.15em;width:1.5em;vertical-align:-0.22em">
+<defs><linearGradient id="spamcan-shade" x1="0" x2="1"><stop offset="0" stop-color="#fff" stop-opacity=".16"/><stop offset=".55" stop-color="#fff" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".22"/></linearGradient></defs>
+<rect x="1.4" y="2" width="23.2" height="16" rx="2.4" style="fill:var(--spam-body,#1AADB3)"/>
+<rect x="1.4" y="2" width="23.2" height="16" rx="2.4" fill="url(#spamcan-shade)" style="stroke:var(--spam-body-edge,#0B5B5E)" stroke-width=".7"/>
+<path style="fill:var(--spam-ink,#021213)" d="M6.539 7.970000000000001Q6.063 7.970000000000001 5.7059999999999995 7.819500000000001Q5.348999999999999 7.6690000000000005 5.1495 7.4030000000000005Q4.949999999999999 7.1370000000000005 4.949999999999999 6.78H6.0Q6.0 6.948 6.1505 7.0495Q6.301 7.151000000000001 6.539 7.151000000000001H6.8469999999999995Q7.134 7.151000000000001 7.2844999999999995 7.046000000000001Q7.435 6.941000000000001 7.435 6.752000000000001Q7.435 6.577 7.302 6.4825Q7.169 6.388 6.888999999999999 6.353000000000001L6.441 6.297000000000001Q5.72 6.206 5.391 5.947000000000001Q5.061999999999999 5.688000000000001 5.061999999999999 5.156000000000001Q5.061999999999999 4.596 5.446999999999999 4.288Q5.832 3.9800000000000004 6.574 3.9800000000000004H6.84Q7.547 3.9800000000000004 7.9670000000000005 4.288Q8.387 4.596 8.387 5.114000000000001H7.337Q7.337 4.974 7.2005 4.8865Q7.064 4.799 6.84 4.799H6.574Q6.3149999999999995 4.799 6.196 4.8865Q6.077 4.974 6.077 5.149000000000001Q6.077 5.3100000000000005 6.185499999999999 5.394Q6.294 5.478 6.532 5.513L7.015 5.5760000000000005Q7.743 5.667 8.096499999999999 5.9399999999999995Q8.45 6.213 8.45 6.752000000000001Q8.45 7.34 8.044 7.655Q7.638 7.970000000000001 6.8469999999999995 7.970000000000001ZM9.262 9.16V4.050000000000001H10.277000000000001V4.785H10.522L10.277000000000001 5.03Q10.277000000000001 4.533 10.55 4.256500000000001Q10.823 3.9800000000000004 11.299000000000001 3.9800000000000004Q11.88 3.9800000000000004 12.23 4.3895Q12.580000000000002 4.799 12.580000000000002 5.485V6.465Q12.580000000000002 6.92 12.422500000000001 7.2595Q12.265 7.599 11.978000000000002 7.7845Q11.691 7.970000000000001 11.299000000000001 7.970000000000001Q10.823 7.970000000000001 10.55 7.6935Q10.277000000000001 7.417000000000001 10.277000000000001 6.92L10.522 7.165H10.277000000000001L10.312000000000001 8.110000000000001V9.16ZM10.921000000000001 7.0600000000000005Q11.215 7.0600000000000005 11.3725 6.8955Q11.530000000000001 6.731 11.530000000000001 6.430000000000001V5.5200000000000005Q11.530000000000001 5.212 11.3725 5.051Q11.215 4.890000000000001 10.921000000000001 4.890000000000001Q10.634 4.890000000000001 10.473 5.054500000000001Q10.312000000000001 5.219 10.312000000000001 5.5200000000000005V6.430000000000001Q10.312000000000001 6.731 10.473 6.8955Q10.634 7.0600000000000005 10.921000000000001 7.0600000000000005ZM14.604933852140078 7.970000000000001Q14.022 7.970000000000001 13.682500000000001 7.654724242424242Q13.343 7.339448484848485 13.343 6.801Q13.343 6.220000000000001 13.7455 5.9085Q14.148 5.597 14.904 5.597H15.702V5.3100000000000005Q15.702 5.086 15.5445 4.953Q15.387 4.82 15.121 4.82Q14.879408695652174 4.82 14.716704347826088 4.932Q14.554 5.0440000000000005 14.519 5.24H13.504Q13.567 4.659000000000001 14.0115 4.319500000000001Q14.456 3.9800000000000004 15.156 3.9800000000000004Q15.891 3.9800000000000004 16.3215 4.3405000000000005Q16.752 4.7010000000000005 16.752 5.3100000000000005V7.9H15.737V7.2700000000000005H15.568999999999999L15.744 7.025Q15.744 7.461153846153847 15.432431906614786 7.715576923076924Q15.120863813229573 7.970000000000001 14.604933852140078 7.970000000000001ZM14.995000000000001 7.2Q15.304917808219178 7.2 15.50345890410959 7.035500000000001Q15.702 6.871 15.702 6.605765625V6.192H14.925Q14.687 6.192 14.54 6.3285Q14.393 6.465 14.393 6.687570422535211Q14.393 6.925669014084507 14.552352941176471 7.062834507042254Q14.711705882352941 7.2 14.995000000000001 7.2ZM17.494000000000003 7.9V4.050000000000001H18.320000000000004V4.61H18.488000000000003L18.355000000000004 4.708Q18.355000000000004 4.3790000000000004 18.544000000000004 4.179500000000001Q18.733000000000004 3.9800000000000004 19.013 3.9800000000000004Q19.314000000000004 3.9800000000000004 19.482000000000003 4.239000000000001Q19.650000000000002 4.498 19.650000000000002 4.925000000000001L19.524 4.61H19.720000000000002L19.657000000000004 4.708Q19.657000000000004 4.3790000000000004 19.839000000000006 4.179500000000001Q20.021000000000004 3.9800000000000004 20.329000000000004 3.9800000000000004Q20.679000000000002 3.9800000000000004 20.896 4.242500000000001Q21.113000000000003 4.505000000000001 21.113000000000003 4.960000000000001V7.9H20.210000000000004V5.03Q20.210000000000004 4.869 20.140000000000004 4.7815Q20.070000000000004 4.694000000000001 19.937000000000005 4.694000000000001Q19.804000000000002 4.694000000000001 19.734 4.7815Q19.664 4.869 19.664 5.03V7.9H18.943V5.03Q18.943 4.869 18.873000000000005 4.7815Q18.803000000000004 4.694000000000001 18.67 4.694000000000001Q18.537000000000003 4.694000000000001 18.467000000000002 4.7815Q18.397000000000002 4.869 18.397000000000002 5.03V7.9Z"/>
+<g class="spamcan-burger">
+<path d="M8.2 15.7h9.6a.9.9 0 0 0 .9-.9v-.6H7.3v.6a.9.9 0 0 0 .9.9z" fill="#D98A35" stroke="#2B1405" stroke-width=".45" stroke-linejoin="round"/>
+<rect x="7" y="12.6" width="12" height="1.65" rx=".5" fill="#F29A9A" stroke="#2B1405" stroke-width=".45" stroke-linejoin="round"/>
+<path d="M8.2 13.05h9.6" stroke="#FFC9C4" stroke-width=".35" stroke-linecap="round"/>
+<path d="M7.4 12.15h11.2v.55h-3.4l-.6.6-.6-.6H7.4z" fill="#FFC21F" stroke="#2B1405" stroke-width=".45" stroke-linejoin="round"/>
+<path d="M7.1 12.2c0-2.3 2.6-3.4 5.9-3.4s5.9 1.1 5.9 3.4z" fill="#EFA046" stroke="#2B1405" stroke-width=".45" stroke-linejoin="round"/>
+<path d="M9.4 10.4h.01M12.3 9.8h.01M15.2 10.2h.01M13.9 11h.01M10.9 11.1h.01" stroke="#FFF3D6" stroke-width=".7" stroke-linecap="round"/>
+</g>
+<rect x=".5" y=".8" width="25" height="2.3" rx="1.15" style="fill:var(--spam-rim,#F2B632);stroke:var(--spam-rim-edge,#6E4A06)" stroke-width=".6"/>
+<rect x=".5" y="16.9" width="25" height="2.3" rx="1.15" style="fill:var(--spam-rim,#F2B632);stroke:var(--spam-rim-edge,#6E4A06)" stroke-width=".6"/>
+<rect x=".5" y=".8" width="25" height="2.3" rx="1.15" fill="url(#spamcan-shade)"/>
+<rect x=".5" y="16.9" width="25" height="2.3" rx="1.15" fill="url(#spamcan-shade)"/>
+<path d="M2.4 1.55h21.2" stroke="#fff" stroke-opacity=".6" stroke-width=".5" stroke-linecap="round"/>
+</svg></span></span></p>
       <div class="signup">
         <form class="notify" action="https://buttondown.com/api/emails/embed-subscribe/jaythaninja" method="post" novalidate>
           <label class="sr" for="notify-email">your email</label>
@@ -417,7 +443,7 @@ const COPY = {
     ["my team and i hope to ", {text: "run it back", teal: true}]
   ],
   cta: [
-    ["drop us your email if you ", {text: "want to help", teal: true}]
+    ["drop your email, ", {text: "we promise no ", teal: true, can: true}]
   ],
   failNote: "that email isn't complete yet. try again (like you@email.com)",
   thanks: "thanks! 💛 check your inbox to confirm",
@@ -490,6 +516,7 @@ let pace = 2;
 const gateTap = el => { el.style.pointerEvents = 'none'; el.tabIndex = -1; el.setAttribute('aria-hidden', 'true'); return el; };
 const revealTap = el => { el.style.pointerEvents = ''; el.removeAttribute('tabindex'); el.removeAttribute('aria-hidden'); return el; };
 function prepare(el, pieces){
+  const can = el.querySelector('svg.spamcan');
   el.textContent = '';
   const runs = []; let n = 0;
   for (const p of (Array.isArray(pieces) ? pieces : [pieces])){
@@ -499,6 +526,7 @@ function prepare(el, pieces){
     const res = mk('span', 'res'), scr = mk('span', 'scr'), ghost = mk('span', 'ghost');
     ghost.textContent = o.text; node.append(res, scr, ghost); el.appendChild(node);
     const g = graphemes(o.text); runs.push({node, res, scr, ghost, g, start: n}); n += g.length;
+    if (o.can && can){ const box = mk('span', 'can ghost'), after = mk('span'); box.appendChild(can); node.append(box, after); runs.push({node, res: box, ghost: after, g: ['\uFFFC'], start: n, can: true}); n += 1; }
   }
   return {el, runs, n};
 }
@@ -508,6 +536,7 @@ function render(t, head, win){
   let active = t.runs[0];
   for (const r of t.runs){
     const L = r.g.length, a = Math.min(L, Math.max(0, resolved - r.start)), b = Math.min(L, Math.max(0, top - r.start));
+    if (r.can){ r.res.classList.toggle('ghost', b < 1); if (b > 0) active = r; continue; }
     if (r.node.tagName === 'A' && resolved >= r.start + L) revealTap(r.node);
     r.res.textContent = r.g.slice(0, a).join('');
     r.scr.textContent = r.g.slice(a, b).map(scrambleOf).join('');
