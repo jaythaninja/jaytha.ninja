@@ -9,14 +9,6 @@
 .foot .fs-slot{display:grid;margin-top:10px}
 .foot .fs-slot > *{grid-area:1/1}
 .foot .fs-row{display:flex;align-items:baseline;gap:14px;transition:opacity .35s ease,visibility 0s}
-.foot .fs-row{flex-wrap:wrap;row-gap:0}
-/* v1.61 (jay 2026.10.03): the optional @ ("your @ (we'll save it)", buttondown metadata__username), the homepage's second line: the row wraps and the @ takes a full
-   line, always visible (jay 2026.10.03: no fade-in), styled like the email field and as wide (23ch), part of the form from the first frame. the email's text to the
-   @'s text = the label's last line to the email's text (measured baseline to baseline in chrome: --fat-m, 5.2px desktop / -1.2px phones). the row's baseline is still the email's (the first line), so the
-   thank-you still lands on the email's text. no js: hidden (no name, nothing sent) */
-.foot{--fat-m:5.2px}
-.foot .fs-at{flex:0 0 100%;display:flex;min-width:0;margin-top:var(--fat-m)}
-.foot:not(.live) .fs-at{display:none}
 .foot .fs-in{flex:0 1 23ch;min-width:0;font:inherit;font-size:16px;line-height:1.5;color:var(--white);background:transparent;border:0;border-bottom:1px solid rgba(var(--c-rgb),.55);border-radius:0;padding:4px 0 5px;caret-color:var(--c);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s ease,box-shadow .2s ease,text-shadow .2s ease}
 .foot .fs-in::placeholder{color:rgba(var(--ink-rgb),.34);opacity:1;transition:color .2s ease}
 .foot .fs-in:hover{border-bottom-color:rgba(var(--c-rgb),.8)}
@@ -33,5 +25,5 @@
 .foot form.sent .fs-row{opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s .35s}
 .foot form.sent .fs-thx{visibility:visible}
 .foot .fs-thx .gh{visibility:hidden}
-@media (max-width:760px){.foot{--fat-m:-1.2px;margin-left:24px;width:calc(100vw - 48px);padding-bottom:22px;font-size:14px}.foot .fs-slot{margin-top:6px}}
+@media (max-width:760px){.foot{margin-left:24px;width:calc(100vw - 48px);padding-bottom:22px;font-size:14px}.foot .fs-slot{margin-top:6px}}
 @media (prefers-reduced-motion:reduce){.foot .fs-row,.foot form.sent .fs-row{transition:none}.foot form.bad input[type=email],.foot form.bad input[type=email]::placeholder{animation:none;color:var(--c)}}

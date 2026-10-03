@@ -4,13 +4,11 @@
    show a captcha or a typo. the tag: ?ref= from the visit (JayRain.ref, e.g. "x") or else the page's own (data-ref: song / quote / snap / update) */
 (() => {
   const foot = document.querySelector('.foot'); if (!foot) return;
-  const form = foot.querySelector('form'), input = form.querySelector('input[type=email]'), atIn = form.querySelector('#fs-at'), AT_KEY = 'metadata__username', tag = form.querySelector('input[name=tag]'), go = form.querySelector('.fs-go'), thx = foot.querySelector('.fs-thx'), note = foot.querySelector('.fs-note');
+  const form = foot.querySelector('form'), input = form.querySelector('input[type=email]'), tag = form.querySelector('input[name=tag]'), go = form.querySelector('.fs-go'), thx = foot.querySelector('.fs-thx'), note = foot.querySelector('.fs-note');
   const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches, THANKS = 'thanks! 💛 check your inbox to confirm';
   const seg = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('en', {granularity: 'grapheme'}) : null;
   const graphemes = t => seg ? Array.from(seg.segment(t), x => x.segment) : Array.from(t);
   const looksDone = () => input.validity.valid && /@[^@\s]+\.[^@\s.]{2,}$/.test(input.value.trim());   // = the homepage's check
-  /* v1.61: the optional @ (see foot.css), always visible. sent as metadata__username, spaces + a leading @ stripped; empty sends nothing */
-  const atVal = () => atIn ? atIn.value.trim().replace(/^@+/, '').trim() : '';
   foot.classList.add('live');
   input.addEventListener('input', () => { form.classList.toggle('ok', looksDone()); form.classList.remove('bad'); note.textContent = ''; });
   let busy = false;
@@ -19,9 +17,9 @@
     if (!looksDone()){ form.classList.remove('bad'); void form.offsetWidth; form.classList.add('bad'); note.textContent = "that email isn't complete yet, try again (like you@email.com)"; return; }
     busy = true; go.disabled = true;
     tag.value = (window.JayRain && JayRain.ref && JayRain.ref()) || foot.dataset.ref || 'site';
-    const fd = new FormData(form), u = atVal(); fd.delete(AT_KEY); if (u) fd.set(AT_KEY, u);
+    const fd = new FormData(form);
     let res = null; try { res = await fetch(form.action, {method: 'POST', body: fd, mode: 'cors'}); } catch (err) {}
-    if (!res || !res.ok){ go.disabled = false; busy = false; if (atIn){ if (u){ atIn.name = AT_KEY; atIn.value = u; } else atIn.removeAttribute('name'); } HTMLFormElement.prototype.submit.call(form); return; }
+    if (!res || !res.ok){ go.disabled = false; busy = false; HTMLFormElement.prototype.submit.call(form); return; }
     thanks();
   });
   function thanks(){
