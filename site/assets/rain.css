@@ -28,14 +28,14 @@ html.au-snap,html.au-snap *,html.au-snap *::before,html.au-snap *::after{transit
    thank-you gold), --dim-w (the dim wake). light-only deeper shades (contrast on white; dark keeps the exact current colours):
    teal #1AADB3 -> #13888D (2.74:1 -> 4.26:1), gold #FFD700 -> #A67C00 (1.40:1 -> 3.82:1; hot gold #FFFBE8 -> #7A5C00, light gold #FFE066 -> #B8860B),
    the near-white "hot" heads (#d2f6f7 / #ffd9cc / #FFFBE8) -> deep teal #0B6569 / deep orange #B8300A / deep gold #7A5C00, dim wake #8fa9aa -> #6E8B8C (2.49 -> 3.66:1).
-   orange #FF4D1A -> #D93D11 (4.54:1; on the line from #FF4D1A to the brand dark orange #B8300A, which is its bright core; tints darkened by the same step). the rain on white is the state colour itself (see rain.js) */
+   orange #FF4D1A -> #E85D0C (v1.58, jay 2026.10.03: a truer orange, 3.50:1 on white, hue 22deg; #D93D11 (4.54:1, hue 13deg) read too red. #F0650A was more orange but only 3.20:1. the tints moved with it: the same hue +9deg; was #D93D11 on the line from #FF4D1A to the brand dark orange #B8300A, its bright core). the rain on white is the state colour itself (see rain.js) */
 :root{--fg:#fff;--fg-rgb:255,255,255;--bg-rgb:0,0,0;--gk:1;--ink-rgb:246,239,233;--au:#FFD700;--au-rgb:255,215,0;--au-hot:#FFFBE8;--au-lt:#FFE066;--dim-w:#8fa9aa}
 @media (prefers-color-scheme:light){
   :root{--bg:#fff;--bg-rgb:255,255,255;--fg:#000;--fg-rgb:0,0,0;--gk:.45;--ink:#000;--ink-rgb:0,0,0;--ink-2:rgba(0,0,0,.72);--ink-3:rgba(0,0,0,.5);--white:#000;
     --au:#A67C00;--au-rgb:166,124,0;--au-hot:#7A5C00;--au-lt:#B8860B;--dim-w:#6E8B8C;--c:#13888D;--c-rgb:19,136,141;--c-hot:#0B6569;--c-wh:#0B6569;
-    --f:#D93D11;--f-rgb:217,61,17;--f-lt:#FF682F;--f-dk:#8B2408;--f-pale:#FFB49A;--f-wh:#B8300A;--f-lt2:#FF793F;--f-l4-rgb:255,86,23;--f-l5-rgb:255,207,177}
-  :root[data-mode="fast"]{--c:#D93D11;--c-rgb:217,61,17;--c-lt:#FF682F;--c-dk:#8B2408;--c-pale:#FFA179;--c-hot:#B8300A;--c-wh:#B8300A;--c-lt-rgb:255,122,80;--c-lt2:#FF793F;
-    --c-l1-rgb:255,118,53;--c-l2-rgb:255,129,63;--c-l3-rgb:255,140,73;--c-l4-rgb:255,86,23;--c-l5-rgb:255,207,177;--f:#13888D;--f-rgb:19,136,141}
+    --f:#E85D0C;--f-rgb:232,93,12;--f-lt:#FF872F;--f-dk:#8B3808;--f-pale:#FFC39A;--f-wh:#B84A0A;--f-lt2:#FF963F;--f-l4-rgb:255,121,23;--f-l5-rgb:255,219,177}
+  :root[data-mode="fast"]{--c:#E85D0C;--c-rgb:232,93,12;--c-lt:#FF872F;--c-dk:#8B3808;--c-pale:#FFB579;--c-hot:#B84A0A;--c-wh:#B84A0A;--c-lt-rgb:255,148,80;--c-lt2:#FF963F;
+    --c-l1-rgb:255,148,53;--c-l2-rgb:255,158,63;--c-l3-rgb:255,167,73;--c-l4-rgb:255,121,23;--c-l5-rgb:255,219,177;--f:#13888D;--f-rgb:19,136,141}
   .gld,:root.gld,:root.gld[data-mode="fast"]{--c:#A67C00;--c-rgb:166,124,0;--c-hot:#7A5C00;--c-wh:#7A5C00;--f:#A67C00;--f-rgb:166,124,0}
   .scan{display:none}   /* the scan lines are a screen blend: nothing on white */
   .glows{opacity:.5}   /* the soft background glows at half strength, so the page reads white (not tinted) */
@@ -51,6 +51,6 @@ html.au-snap,html.au-snap *,html.au-snap *::before,html.au-snap *::after{transit
 /* jay 2026.09.30 v1.25: the homepage intro's "finish the dump" glyph (››|), shown only at 2x while the intro types. the hint's orange (#FF6A2B, same as the fast-mode › and glove). same box as the chevrons, so nothing shifts */
 .tap-hint .speed-arrows.dump{color:var(--c)}
 /* v1.57 (jay 2026.10.02): "tap tap tap", a colour per word: the state colour, the flame colour, then gold while the page still renders (the gold skip is still on: .live),
-   the state colour again once it's done. light mode uses the light variants (--c #13888D, --f #D93D11, --au #A67C00). a speed tap swaps --c / --f (orange, teal, gold / orange,
+   the state colour again once it's done. light mode uses the light variants (--c #13888D, --f #E85D0C (v1.58; was #D93D11), --au #A67C00). a speed tap swaps --c / --f (orange, teal, gold / orange,
    teal, orange); gold (.gld) turns all three gold. the chevrons keep the hint's colour */
 .tap-hint .tws{white-space:nowrap}.tap-hint .tw1{color:var(--c)}.tap-hint .tw2{color:var(--f)}.tap-hint .tw3{color:var(--c)}.tap-hint.live .tw3{color:var(--au)}

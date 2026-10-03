@@ -291,7 +291,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
    starts (--trk = --cbl-s, "unplugged") and the flap stayed shut until the first character, so before typing (and after clearing the field) there was a ~32px (phones) /
    ~35px (desktop) gap to the rocket at every size and theme; once typing, the geometry was already exact (< 1px). now the track always runs the whole way into the port
    and the flap is open whenever the cable is in (it still shuts when the rocket leaves for the sky).
-   the colours: the straight part in even thirds, the state colour (--c: teal #1AADB3 / light #13888D), the flame colour (--f: orange #FF4D1A / light #D93D11), gold (--au:
+   the colours: the straight part in even thirds, the state colour (--c: teal #1AADB3 / light #13888D), the flame colour (--f: orange #FF4D1A / light #E85D0C, v1.58; was #D93D11), gold (--au:
    #FFD700 / light #A67C00); the gold third also takes the curve into the rocket, so it's a bit longer. a speed tap swaps --c / --f (orange, teal, gold); gold stays gold.
    .cbl-t = the dim track (three paths, .55 alpha, .8 on hover, solid + 1.6px on focus); .cbl-f1/2/3 = the charge, one svg per third so each glows in its own colour. the
    battery fill, left to right: 0 empty = a short bit of the first third, 1 any character = the first third, 2 an "@" = two thirds, 3 a valid email = the whole cable, and then
@@ -463,6 +463,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .cta .signup{margin-top:var(--su)}
 @media (max-width:760px){html.snap-short{--su:3px;--sec-a:7px}}
 @media (min-width:761px){html.snap-short{--su:var(--su-ss,6px);--sec-a:6px}}
+/* v1.58 (jay 2026.10.03): the thank-you lands exactly on the email field's text: the same baseline and x, at every size and in short mode. both share the signup's one grid
+   cell and are baseline-aligned in it (the form's baseline is the field's), so the line sits where the typed email sat. was: centred in the cell and nudged down
+   calc(var(--pgap) - 10px) (v1.49/v1.50, a paragraph gap under the prompt), which v1.57's even gaps (--su) pushed ~10px (phones) / ~22px (desktop) under the field's
+   text. still no layout shift: the form keeps the cell (it's only hidden), the status is shorter than the form, so nothing below moves */
+.signup > .notify,.signup > .status{align-self:baseline}
+.signup > .status{top:0}
+@media (max-width:760px){.signup > .status{top:1.5px}}   /* phones: the field is 16px scaled .875 from its bottom-left (no ios zoom, see v1.45), so its text is drawn ~1.5px under its layout baseline ((34px - 21.8px) x .125) */
 .egg .snapfig.done img{opacity:1}
 .egg .snapfig.done canvas{display:none}
 .egg .snapfig::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(var(--c-rgb),.18);opacity:0;transition:opacity .6s ease-out;pointer-events:none}
@@ -490,7 +497,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 <meta name="twitter:description" content="something human is in the works...">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image-v128.png">
 <meta name="twitter:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
-<link rel="stylesheet" href="/assets/rain.css?v=1.57"><script src="/assets/rain.js?v=1.57"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.58"><script src="/assets/rain.js?v=1.58"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -1350,7 +1357,7 @@ function cursorHome(){
 }
 function finishUp(){
   if (state.done) return;
-  dumpSnap();   // v1.55: the gold skip ends here, in one frame
+  skipOutro();   // v1.58: the gold skip ends here: gold stays, the signup pulses 3x, then back to teal (was v1.55: dumpSnap, back to teal in one frame)
   cursorHome(); state.done = true; hint.classList.add('ready'); JayRain.dump(false); JayRain.rendered && JayRain.rendered(); markSeen();
 }
 let iconsIn = false;
@@ -1516,6 +1523,31 @@ let dumping = false, dumpRaf = 0, rainBoost = false, dumpGold = false;
 /* v1.55 (jay 2026.10.02): once everything has landed (the daily lines too), the gold snaps back to teal 1x and the rain to 1x in one frame (no hold, no fade) */
 const dumpSnap = () => { if (!dumpGold) return; dumpGold = false; dumping = false; rainBoost = false; state.rainBoost = 'off'; JayRain.goldOff({snap: true, first: true}); };
 const unboost = ms => { if (!rainBoost) return; rainBoost = false; rain.setSpeed(fastNow() ? 2 : 1, ms); state.rainBoost = 'easing'; };   // v1.33: back to the mode's speed (always 2x after a dump)
+/* v1.58 (jay 2026.10.03): the gold skip's outro. once everything has rained down, the page stays gold (no snap back to teal) and the rain eases to 1x; then the email field,
+   the charging line and the rocket do three quick gold pulses together (PULSE.ms each: a brighter gold + a gold glow, filter only, so nothing moves) to pull the eye to the
+   email, and then everything fades back to teal 1x (goldOff, PULSE.fade). typing in the field during the pulses ends them at once (and the gold fades straight back, so the
+   line's own states take over: three colours, and gold-ok when the email is valid). a real signup's gold lock wins over all of it (goldOff is a no-op once locked).
+   reduced motion / the form not in / already sent: the v1.55 snap back, as before. the other pages' gold skip is unchanged (snap back) */
+const PULSE = {ms: 300, n: 3, fade: 350, typedFade: 200};
+let skipPulse = null;
+function pulseEnd(how){
+  if (!skipPulse) return; const p = skipPulse; skipPulse = null;
+  clearTimeout(p.t); p.anims.forEach(a => { try { a.cancel(); } catch (e) {} }); form.classList.remove('au-pulse');
+  state.skipPulse = how; JayRain.goldOff({hold: 0, ms: how === 'typed' ? PULSE.typedFade : PULSE.fade, first: true});
+}
+function skipOutro(){
+  if (!dumpGold) return;
+  const ok = !reduced && form.classList.contains('in') && !form.classList.contains('gone') && !form.inert && typeof Element.prototype.animate === 'function';
+  if (!ok){ dumpSnap(); return; }
+  dumpGold = false; dumping = false; rainBoost = false; state.rainBoost = 'off'; rain.setSpeed(1, 400);   // still gold; the rain slows to 1x under it
+  const au = (getComputedStyle(document.documentElement).getPropertyValue('--au-rgb') || '255,215,0').trim();
+  const glow = `brightness(1.7) drop-shadow(0 0 6px rgba(${au},1)) drop-shadow(0 0 18px rgba(${au},.75))`, line = `0 1px 0 rgba(${au},1), 0 12px 20px -8px rgba(${au},.95)`;
+  const els = [emailIn, ...form.querySelectorAll('.cbl-t, .cbl-f, .cbl-w, .rkb')].filter(Boolean);
+  form.classList.add('au-pulse');
+  const anims = els.map(el => el.animate([el === emailIn ? {offset: .4, filter: glow, boxShadow: line, borderBottomColor: `rgb(${au})`} : {offset: .4, filter: glow}], {duration: PULSE.ms, iterations: PULSE.n, easing: 'ease-in-out'}));   // the field: its line lights up too   // implicit from / to: each element's own filter (the rocket keeps its glow)
+  skipPulse = {anims, t: setTimeout(() => pulseEnd('done'), PULSE.ms*PULSE.n + 30)}; state.skipPulse = 'on';
+}
+emailIn.addEventListener('input', () => pulseEnd('typed'));
 function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; dumpSnap(); dumping = false; unboost(250); }
 function dump(){
   if (dumping || state.done) return;
