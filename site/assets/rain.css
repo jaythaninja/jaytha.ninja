@@ -42,15 +42,17 @@ html.au-snap,html.au-snap *,html.au-snap *::before,html.au-snap *::after{transit
   .rk-sky .smk,.rk-sky .plm,.rk-sky .puff.smoke{filter:brightness(.62)}   /* the white liftoff / crash smoke would vanish on white: grey it */
 }
 /* shared v1.16 hint */
-.tap-hint{--hint-icon:var(--c);position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;gap:6px;color:var(--c);font-size:12px;line-height:1;letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px var(--bg);transition:color .25s ease,opacity .7s ease,transform .7s ease}
+.tap-hint{--hint-icon:currentColor;position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;gap:6px;color:var(--c);font-size:12px;line-height:1;letter-spacing:-.02em;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px var(--bg);transition:color .25s ease,opacity .7s ease,transform .7s ease}
 .tap-hint.ready{opacity:.7;transform:none}.tap-hint.settled{opacity:.52}.tap-hint svg{width:1.35em;height:1.35em;display:block;flex:none;color:var(--hint-icon);transition:color .25s ease}.tap-hint b{font-weight:500}
 @media(prefers-reduced-motion:reduce){.tap-hint{transition:none;transform:none}.tap-hint.ready{opacity:.7}.tap-hint.settled{opacity:.52}}
 
 .speed-label{display:flex;align-items:center;gap:.3em}.speed-arrows{width:1.125em;height:1.35em;display:block;flex:none;color:currentColor;overflow:visible}.speed-arrows path{fill:none;stroke:currentColor;stroke-width:3.2;stroke-linecap:round;stroke-linejoin:round}
 .glow{transition:opacity .5s ease}.glow-fast{opacity:0}[data-mode="fast"] .glow{opacity:0}[data-mode="fast"] .glow-fast{opacity:.85}@media(prefers-reduced-motion:reduce){.glow{transition:none}}
-/* jay 2026.09.30 v1.25: the homepage intro's "finish the dump" glyph (››|), shown only at 2x while the intro types. the hint's orange (#FF6A2B, same as the fast-mode › and glove). same box as the chevrons, so nothing shifts */
-.tap-hint .speed-arrows.dump{color:var(--c)}
-/* v1.57 (jay 2026.10.02): "tap tap tap", a colour per word: the state colour, the flame colour, then gold while the page still renders (the gold skip is still on: .live),
-   the state colour again once it's done. light mode uses the light variants (--c #127F84 (v1.60; was #13888D), --f #E85D0C (v1.58; was #D93D11), --au #A67C00). a speed tap swaps --c / --f (orange, teal, gold / orange,
-   teal, orange); gold (.gld) turns all three gold. the chevrons keep the hint's colour */
-.tap-hint .tws{white-space:nowrap}.tap-hint .tw1{color:var(--c)}.tap-hint .tw2{color:var(--f)}.tap-hint .tw3{color:var(--c)}.tap-hint.live .tw3{color:var(--au)}
+/* jay 2026.09.30 v1.25: the homepage intro's "finish the dump" glyph (››|, now two down chevrons over a bar), shown only at 2x while the skip is on. same box as the chevrons, so nothing shifts. v1.61: the hint's colour, like the chevrons */
+/* v1.61 (jay 2026.10.03): one word, "tap", + the chevrons, both in the colour the NEXT tap gives (data-next, set by rain.js): teal -> orange, orange -> gold while the gold
+   skip is on (else teal), gold -> what comes next (a signup's gold stays gold, the skip's flash -> orange). its own fixed colours (--hn-*), so a .gld pulse or a speed
+   tap on the hint itself can't repaint it; light mode uses the light variants (teal #127F84, orange #E85D0C, gold #A67C00). was (v1.57): "tap tap tap", a colour per word */
+:root{--hn-t:#1AADB3;--hn-o:#FF4D1A;--hn-g:#FFD700}
+@media (prefers-color-scheme:light){:root{--hn-t:#127F84;--hn-o:#E85D0C;--hn-g:#A67C00}}
+.tap-hint .tws{white-space:nowrap}
+.tap-hint,.tap-hint[data-next="orange"]{color:var(--hn-o)}.tap-hint[data-next="teal"]{color:var(--hn-t)}.tap-hint[data-next="gold"]{color:var(--hn-g)}

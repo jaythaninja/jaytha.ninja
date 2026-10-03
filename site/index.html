@@ -37,6 +37,8 @@ a:hover{color:var(--c)}
 @media (max-width:760px){:root{--pgap:20px;--sec-a:18px;--sec-b:72.5px}}
 @media (min-width:761px) and (max-height:700px){:root{--pgap:20px;--sec-a:20.5px;--sec-b:72.5px}}
 .paras{margin-top:0}
+.js [data-static]{visibility:hidden}
+.ns-links{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:var(--fs);line-height:1.5}.ns-links a{color:var(--f)}
 .para{font-size:var(--fs);line-height:1.7;color:var(--white);white-space:pre-line}
 .para + .para{margin-top:var(--pgap)}
 @media (min-width:761px){.copy{width:min(72ch,calc(100vw - var(--left) - 24px))}}
@@ -332,30 +334,40 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .egg .snapfig.done canvas{display:none}
 .egg .snapfig::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(var(--c-rgb),.18);opacity:0;transition:opacity .6s ease-out;pointer-events:none}
 .egg .snapfig.done::after{opacity:1}
+@media (orientation:landscape) and (min-width:900px) and (max-width:1100px) and (max-height:800px){
+  .stage{padding:0}
+  .copy{display:grid;grid-template-columns:minmax(0,1.12fr) minmax(0,.88fr);grid-template-rows:auto auto auto;column-gap:56px;width:calc(100vw - 112px);margin-left:56px;align-items:start;align-content:center}
+  .copy>.paras{grid-column:1;grid-row:1}
+  .copy>.cta{grid-column:1;grid-row:2}
+  .copy>.elsewhere{grid-column:1;grid-row:3}
+  .copy>.egg,.copy>.egg.has-day,.copy>.egg.has-snap{grid-column:2;grid-row:1 / span 3;margin:0;align-self:center}
+  .copy>.egg::before{content:"";position:absolute;left:-28px;top:0;bottom:0;border-left:1px solid rgba(var(--c-rgb),.18);pointer-events:none}
+}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="canonical" href="https://jaytha.ninja/">
-<meta name="description" content="something human is in the works...">
+<meta name="description" content="a human building something human, with a little help from his 🤖 team">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="jaytha.ninja">
 <meta property="og:url" content="https://jaytha.ninja/">
 <meta property="og:title" content="jay tha ninja">
-<meta property="og:description" content="something human is in the works...">
-<meta property="og:image" content="https://jaytha.ninja/og-image-v128.png">
+<meta property="og:description" content="a human building something human, with a little help from his 🤖 team">
+<meta property="og:image" content="https://jaytha.ninja/og/home.png?d=2026-10-03">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
-<meta property="og:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
+<meta property="og:image:alt" content="the intro on jaytha.ninja: the internet was a place to make genuine connections with other humans, somewhere along the way, we messed up, my team and i hope to run it back">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@jaythaninja">
 <meta name="twitter:title" content="jay tha ninja">
-<meta name="twitter:description" content="something human is in the works...">
-<meta name="twitter:image" content="https://jaytha.ninja/og-image-v128.png">
-<meta name="twitter:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
-<link rel="stylesheet" href="/assets/rain.css?v=1.60"><script src="/assets/rain.js?v=1.60"></script>
+<meta name="twitter:description" content="a human building something human, with a little help from his 🤖 team">
+<meta name="twitter:image" content="https://jaytha.ninja/og/home.png?d=2026-10-03">
+<meta name="twitter:image:alt" content="the intro on jaytha.ninja: the internet was a place to make genuine connections with other humans, somewhere along the way, we messed up, my team and i hope to run it back">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "jay", "url": "https://jaytha.ninja/", "sameAs": ["https://x.com/jaythaninja", "https://www.instagram.com/jaythaninja", "https://www.threads.com/jaythaninja", "https://github.com/jaythaninja", "https://www.strava.com/athletes/64153021", "https://www.linkedin.com/in/jaythaninja"]}</script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.61"><script src="/assets/rain.js?v=1.61"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -365,14 +377,18 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 <canvas id="rain" aria-hidden="true"></canvas>
 <div class="scan" aria-hidden="true"></div>
 <div class="tap-hint" aria-hidden="true">
-  <span class="speed-label"><span class="tws"><span class="tw tw1">tap</span> <span class="tw tw2">tap</span> <span class="tw tw3">tap</span></span></span>
+  <span class="speed-label"><span class="tws">tap</span></span>
 </div>
 
 <main class="stage" id="stage">
   <div class="copy">
-    <div class="paras"></div>
+    <div class="paras">
+      <p class="para" data-static>the internet was a place to make <span class="teal">genuine connections with other humans</span></p>
+      <p class="para" data-static>somewhere along the way, <span class="teal">we messed up</span></p>
+      <p class="para" data-static>my team and i hope to <span class="teal">run it back</span></p>
+    </div>
     <div class="cta" data-part>
-      <p class="prompt"></p>
+      <p class="prompt"><span data-static>drop us your email if you <span class="teal">want to help</span></span></p>
       <div class="signup">
         <form class="notify" action="https://buttondown.com/api/emails/embed-subscribe/jaythaninja" method="post" novalidate>
           <label class="sr" for="notify-email">your email</label>
@@ -386,6 +402,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
     </div>
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
+      <noscript><p class="ns-links"><a href="https://x.com/jaythaninja">𝕏</a> <a href="https://www.instagram.com/jaythaninja">instagram</a> <a href="https://www.threads.com/jaythaninja">threads</a> <a href="https://github.com/jaythaninja">github</a> <a href="https://www.strava.com/athletes/64153021">strava</a> <a href="https://open.spotify.com/playlist/4agJs1yW7WQcFx1Lg5VVZq">spotify</a> <a href="https://www.linkedin.com/in/jaythaninja">linkedin</a></p></noscript>
     </nav>
     <div class="egg" aria-hidden="true"></div>
   </div>
@@ -520,7 +537,7 @@ function type(t, opt){
 const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms/pace));
 
 const $ = s => document.querySelector(s);
-const parasEl = $('.paras');
+const parasEl = $('.paras'); parasEl.replaceChildren();
 const paraLines = (COPY.paragraphs || [COPY.paragraph]).map(pieces => { const p = mk('p', 'para'); p.setAttribute('data-part', ''); parasEl.appendChild(p); return prepare(p, pieces); });
 const ctaLines = [].concat(COPY.cta).map((text, k) => { const p = k ? mk('p', 'prompt') : $('.prompt'); if (k){ p.setAttribute('data-part', ''); $('.cta .signup').before(p); } return prepare(p, text); });
 const lines = [...paraLines, ...ctaLines];
@@ -1263,10 +1280,18 @@ let dumping = false, dumpRaf = 0, rainBoost = false, dumpGold = false;
 const dumpSnap = () => { if (!dumpGold) return; dumpGold = false; dumping = false; rainBoost = false; state.rainBoost = 'off'; JayRain.goldOff({snap: true, first: true}); };
 const unboost = ms => { if (!rainBoost) return; rainBoost = false; rain.setSpeed(fastNow() ? 2 : 1, ms); state.rainBoost = 'easing'; };
 const PULSE = {ms: 300, n: 3, fade: 350, typedFade: 200};
+const PH = {k: .6, a: 1, s: 1};
+const phGlow = (g, AU) => {
+  if (!(g > 0) || !AU){ ['--eg-pc', '--eg-s'].forEach(p => emailIn.style.removeProperty(p)); if (!emailIn.style.length) emailIn.removeAttribute('style'); return; }
+  const INK = getComputedStyle(document.documentElement).getPropertyValue('--ink-rgb').split(',').map(Number), A = AU.join(',');
+  const mix = INK.map((v, i) => Math.round(v + (AU[i] - v)*g)).join(',');
+  emailIn.style.setProperty('--eg-pc', `rgba(${mix},${(.34 + .66*PH.a*g).toFixed(3)})`);
+  emailIn.style.setProperty('--eg-s', `0 0 ${(3 + 7*g).toFixed(1)}px rgba(${A},${(.95*PH.s*g).toFixed(3)}),0 0 ${(10 + 12*g).toFixed(1)}px rgba(${A},${(.6*PH.s*g).toFixed(3)})`);
+};
 let skipPulse = null;
 function pulseEnd(how){
   if (!skipPulse) return; const p = skipPulse; skipPulse = null;
-  clearTimeout(p.t); p.anims.forEach(a => { try { a.cancel(); } catch (e) {} }); form.classList.remove('au-pulse');
+  clearTimeout(p.t); cancelAnimationFrame(p.raf); phGlow(0); p.anims.forEach(a => { try { a.cancel(); } catch (e) {} }); form.classList.remove('au-pulse');
   state.skipPulse = how; JayRain.goldOff({hold: 0, ms: how === 'typed' ? PULSE.typedFade : PULSE.fade, first: true});
 }
 function skipOutro(){
@@ -1275,11 +1300,20 @@ function skipOutro(){
   if (!ok){ dumpSnap(); return; }
   dumpGold = false; dumping = false; rainBoost = false; state.rainBoost = 'off'; rain.setSpeed(1, 400);
   const au = (getComputedStyle(document.documentElement).getPropertyValue('--au-rgb') || '255,215,0').trim();
-  const glow = `brightness(1.7) drop-shadow(0 0 6px rgba(${au},1)) drop-shadow(0 0 18px rgba(${au},.75))`, line = `0 1px 0 rgba(${au},1), 0 12px 20px -8px rgba(${au},.95)`;
-  const els = [emailIn, ...form.querySelectorAll('.cbl-t, .cbl-f, .cbl-w, .rkb')].filter(Boolean);
+  const glowAt = k => `brightness(${1 + .7*k}) drop-shadow(0 0 6px rgba(${au},${k})) drop-shadow(0 0 18px rgba(${au},${.75*k}))`;
+  const LINE_K = .5, line = `0 1px 0 rgba(${au},${LINE_K}), 0 12px 20px -8px rgba(${au},${.95*LINE_K})`;
+  const cable = [...form.querySelectorAll('.cbl-t, .cbl-f, .cbl-w')], rkb = form.querySelector('.rkb');
   form.classList.add('au-pulse');
-  const anims = els.map(el => el.animate([el === emailIn ? {offset: .4, filter: glow, boxShadow: line, borderBottomColor: `rgb(${au})`} : {offset: .4, filter: glow}], {duration: PULSE.ms, iterations: PULSE.n, easing: 'ease-in-out'}));
-  skipPulse = {anims, t: setTimeout(() => pulseEnd('done'), PULSE.ms*PULSE.n + 30)}; state.skipPulse = 'on';
+  const opt = {duration: PULSE.ms, iterations: PULSE.n, easing: 'ease-in-out'};
+  const anims = [emailIn.animate([{offset: .4, filter: glowAt(LINE_K), boxShadow: line, borderBottomColor: `rgb(${au})`}], opt), ...cable.map(el => el.animate([{offset: .4, filter: glowAt(LINE_K)}], opt)), ...(rkb ? [rkb.animate([{offset: .4, filter: glowAt(1)}], opt)] : [])];
+  const clock = anims[0], AU = au.split(',').map(Number);
+  const phStep = () => {
+    if (!skipPulse || skipPulse.anims !== anims) return;
+    const p = clock.effect && clock.effect.getComputedTiming().progress;
+    const g = p == null ? 0 : p < .4 ? p/.4 : (1 - p)/.6;
+    phGlow(g*PH.k, AU); skipPulse.raf = requestAnimationFrame(phStep);
+  };
+  skipPulse = {anims, t: setTimeout(() => pulseEnd('done'), PULSE.ms*PULSE.n + 30)}; state.skipPulse = 'on'; skipPulse.raf = requestAnimationFrame(phStep);
 }
 emailIn.addEventListener('input', () => pulseEnd('typed'));
 function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; dumpSnap(); dumping = false; unboost(250); }

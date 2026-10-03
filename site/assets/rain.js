@@ -126,9 +126,15 @@ function Rain(cv, o){
   // jay 2026.09.30 v1.25: while a page has the dump state on (only the homepage intro turns it on, at 2x), the hint shows ››| instead of the 1x/2x chevrons
   // v1.57 (jay 2026.10.02): the hint reads "tap tap tap" (was the 👇 glove + "anywhere for"), one colour per word: --c, --f, then --au while the page still renders (the gold skip
   // is still possible: .live on the hint), --c once it's done (rendered()). the chevrons keep the hint's own colour. a speed tap swaps --c / --f as everywhere (see rain.css)
-  const WORDS='<span class="tws"><span class="tw tw1">tap</span> <span class="tw tw2">tap</span> <span class="tw tw3">tap</span></span>';
-  let rendered=false;
-  const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`${WORDS}${dumpHint?DUMP_GLYPH:arrows(fast?1:2)}`;}};
+  // v1.61 (jay 2026.10.03): one word, "tap", + the chevrons, and both show the colour the NEXT tap gives (was v1.57: "tap tap tap", a colour per word). data-next on the hint
+  // (see rain.css): teal now -> orange; orange -> gold while the gold skip is still on (dumpHint: the page has the skip armed, i.e. the ››| glyph shows), else teal; gold
+  // locked (a signup) -> gold (taps keep it gold); the gold skip flash (auFx, taps swallowed / it snaps back to teal) -> orange. it is re-read on every mode change, dump(),
+  // gold() / goldOff() and rendered(), so it recolours on its own the moment the gold window ends. colour only: the hint's box never changes
+  const WORDS='<span class="tws">tap</span>';
+  let rendered=false,auFx=false;
+  const nextTap=()=>auLock?'gold':auFx?'orange':modeName()==='fast'?(dumpHint?'gold':'teal'):'orange';
+  const hintNext=()=>{if(hint&&hint.dataset.next!==nextTap())hint.dataset.next=nextTap()};
+  const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`${WORDS}${dumpHint?DUMP_GLYPH:arrows(fast?1:2)}`;}hintNext();};
   // v1.20: each teal background glow gets an orange twin that fades in at >> speed (both pages via this shared file)
   const glowTwins=()=>document.querySelectorAll('.glow:not(.glow-fast):not([data-twin])').forEach(g=>{g.dataset.twin='1';const t=g.cloneNode(false);t.classList.add('glow-fast');t.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,77,26,'));g.after(t);const u=g.cloneNode(false);u.classList.add('glow-au');u.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,215,0,'));t.after(u);});   // v1.52: + a gold twin (shown while .gld)
   const ensure=()=>{
@@ -136,7 +142,6 @@ function Rain(cv, o){
     hint=document.querySelector('.tap-hint');
     if(hint){const legacy=hint.querySelector('.speed-label')||hint.querySelector('.speed')||hint.querySelector(':scope > span');if(legacy)legacy.className='speed-label';hint.querySelectorAll(':scope > svg').forEach(g=>g.remove());}   // v1.57: no glove
     if(!hint){ hint=document.createElement('div'); hint.className='tap-hint'; hint.setAttribute('aria-hidden','true'); hint.innerHTML='<span class="speed-label"></span>'; (document.querySelector('.scan')||document.body).after(hint); }   // v1.57: was ICON + the label
-    if(!rendered)hint.classList.add('live');
     setHintMode(modeName()==='fast'); hint.classList.add('ready'); requestAnimationFrame(()=>hint.classList.add('ready')); place();
   };
   const place=()=>{if(!hint)return;const copy=document.querySelector('.copy');if(!copy)return;const r=copy.getBoundingClientRect();const mobile=innerWidth<760;const lh=parseFloat(getComputedStyle(copy.querySelector('.hello')||copy).lineHeight)||30;hint.style.top=mobile?`calc(env(safe-area-inset-top,0px) + 11px)`:`${Math.max(11,r.top-2*lh)}px`;if(mobile){hint.style.right=`calc(env(safe-area-inset-right,0px) + 14px)`;return;}let right=0;for(const el of copy.querySelectorAll('.hello,.para,.sig,.prompt')){const range=document.createRange();range.selectNodeContents(el);for(const q of range.getClientRects())right=Math.max(right,q.right);}if(!right)right=r.right;hint.style.right=Math.max(14,innerWidth-right-16)+'px';};
@@ -145,7 +150,7 @@ function Rain(cv, o){
   // jay 2026.09.30 v1.25: optional tap hook. if it returns true the page used the tap (the homepage's terminal dump) and the 1x/2x toggle is skipped
   const register=(r,cb,tap)=>{rain=r;onMode=cb||null;onTap=tap||null;boot()};
   const dump=on=>{dumpHint=!!on;setHintMode(modeName()==='fast')};
-  const markRendered=()=>{rendered=true;if(hint)hint.classList.remove('live')};   // v1.57: the page has finished rendering (no gold skip any more): the hint's 3rd word goes back to --c
+  const markRendered=()=>{rendered=true;hintNext()};   // the page has finished rendering (no gold skip any more). v1.61: the hint re-reads the next colour (was v1.57: .live off, the 3rd word back to --c)
   // jay 2026.09.30 v1.25: back-navigation note. off the homepage (/song-of-the-day/, /quote-of-the-day/), a plain same-tab click on a link home ("← jaytha.ninja") leaves a one-shot sessionStorage note; the homepage reads + clears it and opens fully loaded
   const HOME=/^\/(index\.html)?$/;
   if(!HOME.test(location.pathname))document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(a.target&&a.target!=='_self'))return;const u=new URL(a.href,location.href);if(u.origin===location.origin&&HOME.test(u.pathname)){try{sessionStorage.setItem('jtn.back','1')}catch(_){}}},true);
@@ -190,7 +195,7 @@ function Rain(cv, o){
   const gold=(o={})=>{
     if(auLock)return Promise.resolve();
     auClear();const h=document.documentElement;h.classList.remove('gld-out');
-    const ms=REDUCED?0:(o.ms??1700); if(o.lock)auLock=true;
+    const ms=REDUCED?0:(o.ms??1700); if(o.lock)auLock=true;else auFx=true; hintNext();
     const vh=innerHeight, y0=o.y??vh/2, maxD=Math.max(y0,vh-y0,1), fade=Math.max(120,Math.min(450,ms*.25));
     if(rain)rain.au={y:y0+scrollY,t0:performance.now(),ms,maxD,fade:ms?fade:1,out:null};
     if(!ms){h.classList.add('gld');return Promise.resolve();}
@@ -217,12 +222,12 @@ function Rain(cv, o){
     if(auLock)return;auClear();const h=document.documentElement,hold=o.hold??1000,ms=REDUCED?0:(o.ms??350);
     if(o.snap){   // v1.55 (jay 2026.10.02): the skip's gold ends in one frame: transitions off (html.au-snap) for two frames, gold off, first state, rain 1x + teal at once
       h.classList.add('au-snap');h.classList.remove('au-wave','gld-out');if(o.first&&modeName()==='fast')mode(false,1);
-      h.classList.remove('gld');document.querySelectorAll('.gld').forEach(e=>e.classList.remove('gld'));
+      h.classList.remove('gld');document.querySelectorAll('.gld').forEach(e=>e.classList.remove('gld'));auFx=false;hintNext();
       if(rain){rain.au=null;rain.setSpeed(modeName()==='fast'?2:1,1);}
       requestAnimationFrame(()=>requestAnimationFrame(()=>h.classList.remove('au-snap')));return;}
     auTimers.push(setTimeout(()=>{if(auLock)return;if(ms){auWave(ms);h.classList.add('gld-out');}
       if(o.first&&modeName()==='fast')mode(false);
-      h.classList.remove('gld');document.querySelectorAll('.gld').forEach(e=>e.classList.remove('gld'));
+      h.classList.remove('gld');document.querySelectorAll('.gld').forEach(e=>e.classList.remove('gld'));auFx=false;hintNext();
       if(rain&&rain.au)rain.au.out={t0:performance.now(),ms:Math.max(1,ms)};
       auTimers.push(setTimeout(()=>{h.classList.remove('au-wave','gld-out');if(rain)rain.au=null;},ms+60));},hold));
   };

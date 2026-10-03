@@ -4,6 +4,10 @@ name: Deploy GitHub Pages
 on:
   push:
     branches: [main]
+  schedule:
+    # v1.61: redeploy just after 12:00am CT so the share cards staged by the 11:31pm drop (og-next/) flip with the entries.
+    # cron is UTC: 05:xx = midnight CDT, 06:xx = midnight CST; the extra runs are no-op redeploys (and retries if github runs one late)
+    - cron: '2,32 5,6 * * *'
   workflow_dispatch:
 
 permissions:
@@ -24,6 +28,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Share cards (flip at 12:00am CT)
+        # copies og-next/ into site/og/ + rewrites ?d= once that date has started in chicago; a no-op otherwise, and never blocks the deploy
+        run: python3 scripts/make_cards.py flip
+        continue-on-error: true
       - name: Setup Pages
         uses: actions/configure-pages@v5
       - name: Upload artifact

@@ -88,18 +88,19 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 <meta property="og:url" content="https://jaytha.ninja/quote-of-the-day/">
 <meta property="og:title" content="quote of the day · jay tha ninja">
 <meta property="og:description" content="a quote a day, a different person every day">
-<meta property="og:image" content="https://jaytha.ninja/og-image-v128.png">
+<meta property="og:image" content="https://jaytha.ninja/og/quote.png?d=2026-10-03">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:type" content="image/png">
-<meta property="og:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
+<meta property="og:image:alt" content="today's quote of the day on jaytha.ninja">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@jaythaninja">
 <meta name="twitter:title" content="quote of the day · jay tha ninja">
 <meta name="twitter:description" content="a quote a day, a different person every day">
-<meta name="twitter:image" content="https://jaytha.ninja/og-image-v128.png">
-<meta name="twitter:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
-<link rel="stylesheet" href="/assets/rain.css?v=1.60"><script src="/assets/rain.js?v=1.60"></script>
+<meta name="twitter:image" content="https://jaytha.ninja/og/quote.png?d=2026-10-03">
+<meta name="twitter:image:alt" content="today's quote of the day on jaytha.ninja">
+<link rel="stylesheet" href="/assets/rain.css?v=1.61"><script src="/assets/rain.js?v=1.61"></script>
+<link rel="stylesheet" href="/assets/foot.css?v=1.61"><script src="/assets/foot.js?v=1.61" defer></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -122,6 +123,21 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
     <noscript><p class="none">turn on javascript to see today's quote (or read <a href="/quote-of-the-day/quotes.json">quotes.json</a>)</p></noscript>
   </div>
 </main>
+<footer class="foot" data-ref="quote">   <!-- v1.61 (jay 2026.10.03): the shared footer signup (same partial on every subpage, see assets/foot.css + foot.js) -->
+  <form action="https://buttondown.com/api/emails/embed-subscribe/jaythaninja" method="post" novalidate>
+    <label class="fs-l" for="fs-email">drop us your email if you <span class="teal">want to help</span></label>
+    <div class="fs-slot">
+      <div class="fs-row">
+        <input id="fs-email" class="fs-in" type="email" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
+        <input type="hidden" name="embed" value="1">
+        <input type="hidden" name="tag" value="quote">
+        <button type="submit" class="fs-go" aria-label="sign up" title="sign up">→</button>
+      </div>
+      <p class="fs-thx" role="status" aria-live="polite"></p>
+    </div>
+    <p class="sr fs-note" role="status" aria-live="polite"></p>
+  </form>
+</footer>
 
 <script>
 /* =====================================================================
@@ -226,7 +242,7 @@ const rain = JayRain.Rain(document.getElementById('rain'), {
   palette: (x, w, r) => r < .84 ? T : PALE_TEAL,
   bands: (w, H) => [{y0: 0, y1: H, perCol: mob() ? 1.6 : 2.1, lenMin: 8, lenMax: 30, alpha: .56, stepMin: 60, stepMax: 170, colDensity: () => 1}],
   alphaAt: (x, y, R) => 1 - .45*JayRain.smooth(R.H*.55, R.H, y),
-  partSel: '.copy', partPad: 50, partFloor: .3
+  partSel: '.copy, .foot', partPad: 50, partFloor: .3
 });
 /* v1.41 (jay 2026.10.01): the homepage's terminal state, here too. a first tap is the usual faster pace (orange); at the faster pace while the page still types, the hint shows
    ››| (two down chevrons over a bar) and the next tap skips to the end: everything left types out in one ~1.2s burst while the rain runs fast, links usable as they land.
