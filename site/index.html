@@ -154,7 +154,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .social.fade{animation:egg-fade 1.4s ease-out both}
 /* round 16: the cursor stays after everything renders, blinking at the end of the icon row (teal at 1x, orange at 2x) (jay 2026.09.29) */
 .social li.cur{display:flex;align-items:center;height:var(--ich);pointer-events:none;flex:none;width:0;min-width:0;margin-left:calc(-1*var(--igap));white-space:nowrap}   /* v1.53: 0 wide (the cursor hangs out of it) and it cancels its own gap, so riding along the row never moves an icon */
-.social li.cur .cursor{margin:0 0 0 7px;vertical-align:0;flex:none}
+.social li.cur .cursor{margin:0 0 0 var(--igap);vertical-align:0;flex:none}   /* v1.56 (jay 2026.10.02): the cursor is the row's 8th item, one full gap after the icon before it (was 7px; phones 6px) */
 /* round 16: easter egg for people who stay. with the icons (round 23: starts ~250ms before the first one), the quote rains down in orange, one column per letter, and stays (jay 2026.09.29)
    the line is reserved in layout from the start (hidden), so nothing reflows when it lands */
 .egg{margin-top:52px;font-size:var(--fs);line-height:1.5;font-weight:400;color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6);visibility:hidden}   /* one extra blank line below the icons (same idea as the sign-off gap) */
@@ -215,7 +215,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
   .status{font-size:var(--fs);top:calc(var(--pgap) - 9.5px)}   /* v1.50: follows --pgap (was .5px = 10px - 9.5px). v1.45: was 16px. v1.49: phones were already ~a paragraph gap under the signup line */
   /* v1.54: icon sizes are --k (px per viewBox unit) / --igap / --ich (see .social) */
   .social li.cur{font-size:16px}
-  .social li.cur .cursor{margin-left:6px}
   .egg{margin-top:var(--sec-b);font-size:clamp(11px,calc((100vw - 48px)/27.6),16px);--egg-row:44px}   /* v1.45 (jay 2026.10.02): back to its own size (it was --fs in a v1.45 draft) */
   .egg.has-day{margin-top:var(--sec-b)}   /* v1.31: phones keep the egg's 30px gap with or without the date */
 }
@@ -393,6 +392,53 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .status .hb.lit .h-t{opacity:0}
 .status .hb .em{position:absolute;left:0;top:0;font:500 9px/1 var(--mono);color:var(--au-lt);text-shadow:0 0 6px rgba(var(--au-rgb),.95);pointer-events:none;will-change:transform,opacity}
 .status .hb .em.hot{color:var(--au-hot);text-shadow:0 0 6px rgba(var(--fg-rgb),var(--gk)),0 0 10px rgba(var(--au-rgb),.95)}   /* v1.36: gold embers (were orange) */
+/* v1.56 (jay 2026.10.02): flipped. the daily lines (date, song, quote, update) on top, the typed section (intro, signup + rocket, icons) below them; the load order is
+   the same (typing first, then the daily lines rain in above it). the dom order is unchanged (screen readers + the tab order still read intro, signup, icons, then the
+   daily lines): .copy is a column and the daily lines get order -1. the gap between the two halves is --mid: one rule at every size, ~2.5 body line-heights of
+   empty space (the intro's 1.7 line-height at --fs), less the ~20px the two lines' own leading already adds, so the ink to ink gap is ~60px phones / ~73px desktop; the whole block is centred on the screen (the stage's own centring, equal padding above and below). the gaps inside each
+   half are unchanged. (a v1.56 draft pinned the halves to the top and bottom of the screen) */
+:root{--mid:calc(var(--fs)*1.7*2.5 - 20px)}
+.stage{align-items:center;padding:clamp(18px,4vh,48px) 0}
+.copy{display:flex;flex-direction:column}
+.copy>.egg,.copy>.egg.has-day{order:-1;margin-top:0;margin-bottom:var(--mid)}
+/* v1.56 (jay 2026.10.02): the snap on the homepage. under the 📝 line: the photo (its own 3:2 crop, "home" in snaps.json), centred, in the snap page's rounded frame, then
+   the "📸 snap of the day →" line under it like a caption, centred; both link to /snap-of-the-day/. the photo's width is set by fitSnap so the whole block fits the small
+   viewport (100svh: with the browser bars showing), capped at the column (phones) / 480px (desktop). its space is held from the first layout; it digitizes in place
+   (see snapDig) while the daily lines rain, and is plain (no tint) once it's in. both only show when the newest snap is dated today or yesterday, like the 📝 line */
+.egg p.snap{text-align:center;font-size:.86em;padding:var(--cap-gap) 0 0}   /* jay 2026.10.02: the caption a step smaller than the daily lines, close under the photo (no row padding below it) */
+/* jay 2026.10.02: even spacing. --sg = the one gap (ink to ink): the last daily line to the top of the photo = the bottom of the caption to the typed text.
+   the photo's margin-top and the egg's margin-bottom take off the blank space the text rows already carry (--sg-a: the last daily row's padding + leading under its ink;
+   --sg-b: the leading under the caption's ink + over the intro's first line), so the visible gaps come out equal (measured on the ink, see MANIFEST) */
+:root{--sg:44px;--cap-gap:6px;--sg-b:7px}
+.egg{--sg-a:calc(var(--egg-pad) + .22em)}   /* on .egg, where --egg-pad lives (the em is the photo's = the daily lines' size) */
+@media (min-width:761px){:root{--sg:52px;--sg-b:9px}}
+.copy>.egg.has-snap{margin-bottom:calc(var(--sg) - var(--sg-b))}
+.egg .snapfig{display:block;position:relative;width:240px;aspect-ratio:3/2;margin:calc(var(--sg) - var(--sg-a)) auto 0;border-radius:10px;overflow:hidden;-webkit-tap-highlight-color:transparent}
+.egg .snapfig img,.egg .snapfig canvas{position:absolute;inset:0;display:block;width:100%;height:100%}
+.egg .snapfig img{object-fit:cover;opacity:0}
+/* v1.56 short phones (jay 2026.10.02: "don't let the photo shrink too small"): when the photo can't be the full column width at the normal rhythm, fitSnap adds
+   html.snap-short (SNAP_SHORT.mode 'tight'; desktop: when it would be under SNAP_SHORT.desk px) and every gap tightens: the daily rows, the even gap around the photo + caption, the intro lines + their
+   leading, the icons, the stage padding. then the photo takes what's left (375x667: ~full width). other modes (see SNAP_SHORT): 'hide' = .off on the photo below
+   SNAP_SHORT.below (just the caption), 'keep' = no tightening, the photo just shrinks (min 96px) */
+@media (max-width:760px){
+  html.snap-short{--sg:24px;--cap-gap:4px;--sg-b:6px;--pgap:12px;--sec-a:10px}
+  html.snap-short .egg{--egg-row:30px}
+  html.snap-short .para{line-height:1.55}
+  html.snap-short .prompt + .prompt{margin-top:6px}
+  html.snap-short .stage{padding:10px 0}
+}
+@media (min-width:761px){   /* short desktop windows (951x669, 1280x720): the same idea at the desktop sizes */
+  html.snap-short{--sg:28px;--cap-gap:5px;--sg-b:10px;--pgap:12px;--sec-a:12px}
+  html.snap-short .egg{--egg-row:32px}
+  html.snap-short .para{line-height:1.5}
+  html.snap-short .prompt + .prompt{margin-top:6px}
+  html.snap-short .stage{padding:12px 0}
+}
+.egg .snapfig.off{display:none}
+.egg .snapfig.done img{opacity:1}
+.egg .snapfig.done canvas{display:none}
+.egg .snapfig::after{content:"";position:absolute;inset:0;border-radius:inherit;box-shadow:inset 0 0 0 1px rgba(var(--c-rgb),.18);opacity:0;transition:opacity .6s ease-out;pointer-events:none}
+.egg .snapfig.done::after{opacity:1}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
@@ -505,6 +551,9 @@ const COPY = {
   eggData: "/quote-of-the-day/quotes.json",   // v1.26: the daily 5:10am routine updates only this file (it already does for /quote-of-the-day/); nothing on the homepage needs editing. was (<= v1.25): egg: "💭 the clearest view of a man is from below →"
   recapData: "/daily-update/recaps.json",   // v1.42 (jay 2026.10.02): the third egg line, "📝 <start of today's recap> →" (/daily-recap/). shown only when the newest recaps.json entry is dated today or yesterday (america/chicago); otherwise there's no line at all
   recapHref: "/daily-update/",   // v1.53: renamed from /daily-recap/ (which forwards here)
+  snapData: "/snap-of-the-day/snaps.json",   // v1.56 (jay 2026.10.02): the 4th egg line, "📸 snap of the day →" (/snap-of-the-day/), under 📝. shown only when the newest snaps.json entry is dated today or yesterday (america/chicago), like the 📝 line
+  snapHref: "/snap-of-the-day/",
+  snapText: "snap of the day",
   eggHref: "/quote-of-the-day/",   // v1.27: was "/quotes/" (now a redirect stub). round 16: leave "" for plain text; put a url here and the landed line becomes a link   // typed (teal) in place of the form. buttondown is double opt-in
   socials: [   // order per jay (round 4); icon = key in ICONS below. round 14: all out front, all orange. round 24: instagram 3rd, + telegram 4th. v1.26 (jay 2026.09.30): tiktok removed v1.53 (jay 2026.10.02): new order, telegram removed (7 icons)
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
@@ -638,11 +687,74 @@ const eggEl = $('.egg');
    both lines are lowercase and always ONE line at the normal size: fitEgg measures each line with the real font at the real column width and, if it would wrap,
    cuts it at a word boundary and ends it with "… →" so it fits exactly (the arrow always shows). the full text stays in the link's title + aria-label */
 const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
-const EGG = [{icon: '//', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}, {icon: '📝', body: '', href: COPY.recapHref, recap: true}];   // v1.42: + the recap line (body "" = hidden until today's recap is known)   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
-const quoteLine = EGG.find(l => l.quote), recapLine = EGG.find(l => l.recap);
+const EGG = [{icon: '//', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}, {icon: '📝', body: '', href: COPY.recapHref, recap: true}, {icon: '📸', body: '', href: COPY.snapHref, snap: true}];   // v1.56: + the snap line (body "" = hidden until today's snap is known)   // v1.42: + the recap line (body "" = hidden until today's recap is known)   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
+const quoteLine = EGG.find(l => l.quote), recapLine = EGG.find(l => l.recap), snapLine = EGG.find(l => l.snap);
+/* v1.56: the snap photo (see the .snapfig css): one link with the photo + the canvas it digitizes on. it lives in the egg, just above the 📸 caption line */
+const snapFig = gateTap(mk('a', 'snapfig')), snapImg = mk('img'), snapCv = mk('canvas');
+snapFig.setAttribute('href', COPY.snapHref); snapFig.setAttribute('aria-label', COPY.snapText); snapCv.setAttribute('aria-hidden', 'true');
+snapImg.alt = ''; snapImg.decoding = 'async'; snapImg.width = 1200; snapImg.height = 800; snapFig.append(snapImg, snapCv);
+let snapData = null, dig = null;
+const placeSnap = () => { const p = snapLine.body && snapData && eggEl.querySelector('p.snap'); if (p) eggEl.insertBefore(snapFig, p); else snapFig.remove(); eggEl.classList.toggle('has-snap', !!p); };   // has-snap: the even gap below the caption (see --sg)
+/* v1.56: short screens. one switch: mode 'tight' (phones: if the photo can't be the full column width, html.snap-short tightens every gap, see the css, then the photo
+   takes what's left), 'keep' (no tightening, the photo just shrinks, min 96px) or 'hide' (no photo when the small viewport is under `below` px, the caption only) */
+const SNAP_SHORT = Object.assign({mode: 'tight', below: 760, desk: 300}, window.__snapShort || {});   // jay 2026.10.02: 'tight' (was a 'keep' / 'tight' / 'hide' choice)
+let svhProbe = null;
+function fitSnap(){   // the photo's width: whatever keeps the whole block inside the small viewport (with the browser bars), at most the column / 480px (desktop), at least 96px
+  const root = document.documentElement;
+  if (!snapFig.isConnected){ root.classList.remove('snap-short'); return; }
+  if (!svhProbe){ svhProbe = mk('div'); svhProbe.setAttribute('aria-hidden', 'true'); svhProbe.style.cssText = 'position:fixed;left:0;top:0;width:0;height:100vh;height:100svh;visibility:hidden;pointer-events:none'; document.body.appendChild(svhProbe); }
+  const svh = svhProbe.getBoundingClientRect().height, col = eggEl.clientWidth, max = col > 700 ? 480 : col;
+  const off = SNAP_SHORT.mode === 'hide' && svh < SNAP_SHORT.below; snapFig.classList.toggle('off', off); root.classList.remove('snap-short');
+  if (off){ state.snapFit = {w: 0, h: 0, off: true, svh: Math.round(svh)}; return; }
+  const room = () => {   // the photo height that still fits: the small viewport less the stage padding and the rest of the block (the photo's margins included)
+    const copy = document.querySelector('.copy'), st = getComputedStyle(document.querySelector('.stage'));
+    return svh - parseFloat(st.paddingTop) - parseFloat(st.paddingBottom) - (copy.getBoundingClientRect().height - snapFig.getBoundingClientRect().height) - 4;
+  };
+  let avail = room(), short = false;
+  const need = col > 700 ? SNAP_SHORT.desk : max;   // phones: tighten unless the photo gets the full column; desktop: unless it gets at least SNAP_SHORT.desk px
+  if (SNAP_SHORT.mode === 'tight' && avail*1.5 < need - .5){ root.classList.add('snap-short'); short = true; avail = room(); }
+  const w = Math.max(96, Math.min(max, avail*1.5));
+  snapFig.style.width = w.toFixed(1) + 'px'; state.snapFit = {w: Math.round(w), h: Math.round(w/1.5), avail: Math.round(avail), svh: Math.round(svh), col, mode: short ? 'short' : 'normal'};
+}
+/* v1.56: the digitize. on a canvas over the (still hidden) photo: a mosaic that sharpens level by level (5 blocks across ... 170), the blocks switching on in a random
+   order over the first half, tinted towards the state colour (teal; gold in a gold skip) and faded to the true colours by the end (light mode: a lighter tint, no scanlines).
+   it starts with the daily lines' rain and ends exactly when the caption's last letter lands: it follows the caption letters' landing times (c.end), so a 3x / gold
+   rain-down speeds it up too. then the canvas goes and the plain photo is in */
+const snapDone = () => { if (dig){ cancelAnimationFrame(dig.raf); dig = null; } if (!snapFig.classList.contains('done')){ snapFig.classList.add('done'); revealTap(snapFig); } state.snapDig = Object.assign(state.snapDig || {}, {p: 1, done: true}); };
+function snapDig(){
+  if (!snapFig.isConnected || snapFig.classList.contains('done') || dig) return;
+  if (snapFig.classList.contains('off')){ snapDone(); return; }   // short screen, 'hide' mode: nothing to digitize
+  const sc = eggChars.filter(c => c.el.closest('p.snap')), ctx = snapCv.getContext && snapCv.getContext('2d');
+  if (!sc.length || !ctx) return;
+  const dpr = Math.min(2, devicePixelRatio || 1), r = snapFig.getBoundingClientRect(), W = snapCv.width = Math.max(1, Math.round(r.width*dpr)), H = snapCv.height = Math.max(1, Math.round(r.height*dpr));
+  const light = !matchMedia('(prefers-color-scheme: dark)').matches, LV = [5, 8, 12, 18, 28, 44, 70, 110, 170], CX = 12, CY = 8;
+  const thr = Array.from({length: CX*CY}, () => Math.random()), off = document.createElement('canvas'), o = off.getContext('2d');
+  const t0 = performance.now(); let p = 0, last = t0;
+  const draw = () => {
+    ctx.globalCompositeOperation = 'source-over'; ctx.clearRect(0, 0, W, H);
+    if (!snapImg.complete || !snapImg.naturalWidth) return;
+    const n = LV[Math.max(0, Math.min(LV.length - 1, Math.floor(p*LV.length)))], m = Math.max(1, Math.round(n*H/W));
+    off.width = n; off.height = m; o.imageSmoothingEnabled = true; o.drawImage(snapImg, 0, 0, n, m);
+    ctx.imageSmoothingEnabled = false; ctx.drawImage(off, 0, 0, n, m, 0, 0, W, H);
+    const k = (1 - p)*(1 - p)*(light ? .25 : .55), rgb = (getComputedStyle(snapFig).getPropertyValue('--c-rgb') || '26,173,179').trim();
+    if (k > .004){ ctx.globalCompositeOperation = 'color'; ctx.fillStyle = `rgba(${rgb},${k})`; ctx.fillRect(0, 0, W, H); ctx.globalCompositeOperation = 'source-over'; }
+    if (!light && p < 1){ ctx.fillStyle = `rgba(0,0,0,${.22*(1 - p)})`; for (let y = 0; y < H; y += 3*dpr) ctx.fillRect(0, y, W, dpr); }   // dark: faint scanlines while it resolves
+    const cov = Math.min(1, p/.5), cw = W/CX, ch = H/CY;
+    for (let i = 0; i < thr.length; i++) if (thr[i] > cov) ctx.clearRect(Math.floor((i % CX)*cw), Math.floor(Math.floor(i/CX)*ch), Math.ceil(cw) + 1, Math.ceil(ch) + 1);
+  };
+  const tick = now => {
+    if (!dig) return;
+    const end = Math.max(...sc.map(c => c.end || now)), dt = Math.max(0, now - last); last = Math.max(last, now);   // rAF time can be a little before t0 (the frame started before snapDig ran): never let dt / p go negative
+    p = end <= now ? 1 : Math.max(0, Math.min(1, p + (1 - p)*dt/(end - now + dt || 1)));
+    draw(); state.snapDig = {p: +p.toFixed(3), ms: Math.round(now - t0)};
+    if (p >= 1 || sc.every(c => c.done)){ snapDone(); return; }
+    dig.raf = requestAnimationFrame(tick);
+  };
+  dig = {raf: requestAnimationFrame(tick)}; draw();
+}
 const lineText = (l, body) => l.day ? `${l.icon} ${body}` : `${l.icon} ${body} →`;   // v1.31: the date line has no link, so no arrow. v1.50: its icon is "//" (was 🗓️)   // v1.31: the date line has no link, so no arrow
 eggEl.classList.toggle('has-day', !!COPY.dayDate);
-const lineClass = l => l.day ? 'day' : l.song ? 'song' : l.recap ? 'recap' : 'quote';
+const lineClass = l => l.day ? 'day' : l.song ? 'song' : l.recap ? 'recap' : l.snap ? 'snap' : 'quote';
 const isDeco = w => w === '→' || w === '//' || /^\p{Extended_Pictographic}/u.test(w);   // emoji + arrow: decorative, hidden from screen readers
 const eggGroups = text => {   // words -> no-wrap groups: [emoji, first word], ..., [last word, →]
   const words = text.split(' ').filter(Boolean), groups = [];
@@ -708,6 +820,7 @@ function buildEgg(){   // the falling letters, laid out (hidden) up front, so th
   eggEl.textContent = ''; eggChars = [];
   eggLines = fitted.map(f => { const p = mk('p', lineClass(f.l)); fillChars(p, f.text, eggChars); eggEl.appendChild(p); return {p, l: f.l, text: f.text}; });
   eggText = eggLines.map(x => x.text).join('\n');
+  placeSnap(); fitSnap();   // v1.56
 }
 let fitW = -1;
 function fitEgg(force){   /* v1.26: (re)fit both lines to the column. runs once the fonts are ready, and again on resize / orientation change */
@@ -729,6 +842,7 @@ function eggSettle(){   // the final lines: plain links (same no-wrap groups, so
   });
   eggText = eggLines.map(x => x.text).join('\n');
   eggEl.removeAttribute('aria-hidden'); state.egg = 'landed';
+  placeSnap(); if (snapFig.isConnected){ snapDone(); fitSnap(); }   // v1.56: landed = the photo is in
 }
 let eggStarted = false, eggRun = null, eggThen = null, eggRate = 1;   // v1.55: eggRate 3 = the gold skip's 3x rain-down (see dump)   // v1.50: eggThen = what runs once the egg's letters have landed (the footer)
 const eggNext = () => { const f = eggThen; eggThen = null; if (f) f(); };   // jay 2026.09.30 v1.25: eggRun = the live fall (animations, scramble, settle timers) so the dump or a full load can stop it
@@ -758,6 +872,7 @@ function egg(){
     }, () => {});   // cancelled by eggStop(): nothing to do
   }
   state.eggMs = Math.round(last);
+  snapDig();   // v1.56: the photo digitizes while the lines rain, ending with the caption
   eggRun.timers.push(setTimeout(settleOnce, last + 1400/r));
   eggEl.classList.add('on');
   const scr = setInterval(() => {   // scramble: heads flicker, trails shift like the rain columns; the real letter shows just before it lands
@@ -813,10 +928,11 @@ const placeCable = () => {
   cblPaths.forEach(pa => pa.setAttribute('d', path));
   const len = cblPaths[0].getTotalLength && cblPaths[0].getTotalLength(); if (len) form.style.setProperty('--cbl-s', (100*(xs - x0)/len).toFixed(2));   // the straight part, as a share of the cable
 };
-/* v1.53 (jay 2026.10.02): the icon row spans the email line: 7 glyphs (v1.54: each its own original width, read from the svgs), 6 equal gaps, then the cursor (its 6-7px gap + .58em block) ending at the line's right end */
+/* v1.53 (jay 2026.10.02): the icon row spans the email line: 7 glyphs (v1.54: each its own original width, read from the svgs), then the cursor ending at the line's right end.
+   v1.56 (jay 2026.10.02): the cursor is the 8th item of the even spread: 𝕏 ... linkedin, cursor, 7 equal gaps (was 6 gaps between the icons + the cursor 6-7px after linkedin) */
 const fitRow = () => { const W = emailIn.getBoundingClientRect().width; if (!W) return; const ics = [...ul.querySelectorAll('li:not(.cur) svg.ic')], n = ics.length, gw = ics.reduce((t, e) => t + (parseFloat(getComputedStyle(e).width) || 0), 0);
-  const c = curLi.querySelector('.cursor'), cw = c ? .58*parseFloat(getComputedStyle(curLi).fontSize) + (parseFloat(getComputedStyle(c).marginLeft) || 0) : 0;
-  ul.style.setProperty('--igap', Math.max(2, (W - cw - gw)/(n - 1)).toFixed(2) + 'px'); };
+  const cw = .58*parseFloat(getComputedStyle(curLi).fontSize);   // the cursor block (.58em)
+  ul.style.setProperty('--igap', Math.max(2, (W - cw - gw)/n).toFixed(2) + 'px'); };
 fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver) new ResizeObserver(fitRow).observe(form); if (document.fonts) document.fonts.ready.then(fitRow);
 placeCable(); addEventListener('resize', placeCable); if (window.ResizeObserver) new ResizeObserver(placeCable).observe(form); if (document.fonts) document.fonts.ready.then(placeCable);
 const chgStep = () => { const v = emailIn.value, n = String(looksDone() ? 3 : v.includes('@') ? 2 : v.length ? 1 : 0); if (form.dataset.chg !== n) form.dataset.chg = n; };   // (v1.48: no .full hand-off any more; step 3 is css-only)
@@ -992,26 +1108,45 @@ function failLiftoff(){
   // straight-up launch comes within ~3/4 of a rocket of the email box or leaves the screen
   const R = (a, b) => a + Math.random()*(b - a), m = sz*.6, ce = sz*.35;
   const box = emailIn.getBoundingClientRect(), bp = sz*.75;   // .75: clear of the box even when the rocket is tilted 45deg
-  const bad = (x, y) => x < sz*.3 || x > W - sz*.3 || y < sz*.3 || y > H - sz*.3 || (x > box.left - bp && x < box.right + bp && y > box.top - bp && y < box.bottom + bp);
-  const EDGES = ['top', 'right', 'bottom', 'left', 'top-left', 'top-right', 'bottom-right', 'bottom-left'];
-  const crashAt = edge => { const u = R(.15, .85), ix = m + u*(W - 2*m), iy = m + u*(H - 2*m);
-    return {top: [ix, ce], right: [W - ce, iy], bottom: [ix, H - ce], left: [ce, iy], 'top-left': [ce, ce], 'top-right': [W - ce, ce], 'bottom-right': [W - ce, H - ce], 'bottom-left': [ce, H - ce]}[edge]; };
-  const randomFlight = () => {
+  // v1.56: the end of each flight comes from the corner rule below (was: EDGES + crashAt, a crash on any of the 4 edges or 4 corners at random)
+  /* v1.56 (jay 2026.10.02): every failed flight takes its own random path (launch height, loops: count, size, centre, direction, wobble, the dive's bend and its control
+     point), then flies OFF the screen close to one of the 4 corners. the half alternates every time (a top corner, then a bottom one, then a top one...), left or right is
+     random, so it's never the same corner twice in a row. the last corner is kept for the session (sessionStorage "jtn.failCorner"), the first one is random. the exit spot
+     is random near the corner: through the top/bottom edge, or the upper/lower part of the side. no point of the path comes near the email box; only the dive may leave
+     the screen, and only near that corner */
+  let last = null; try { last = sessionStorage.getItem('jtn.failCorner'); } catch (e) {}
+  const top = /^[tb][lr]$/.test(last || '') ? last[0] === 'b' : Math.random() < .5, left = Math.random() < .5, corner = (top ? 't' : 'b') + (left ? 'l' : 'r');
+  const zw = Math.min(360, Math.max(2.5*sz, .3*W)), zh = Math.min(320, Math.max(2.5*sz, .35*H)), off = sz*1.1;   // the corner zone, and how far past the edge the path ends
+  const inZone = (x, y) => (left ? x < zw : x > W - zw) || (top ? y < zh : y > H - zh);   // (only asked of points that are off the screen)
+  const ex = a => left ? a : W - a, ey = a => top ? a : H - a;   // a distance from the corner's side / its top or bottom edge, as x / y
+  const exitAt = () => Math.random() < .5   // the exit: through the top/bottom edge near the corner, or that end of the side edge
+    ? {T: [ex(R(-off*.3, zw - sz)), ey(-off)], edge: top ? 'top' : 'bottom'}
+    : {T: [ex(-off), ey(R(-off*.3, zh - sz*.5))], edge: left ? 'left' : 'right'};
+  const onScr = (x, y) => x >= sz*.3 && x <= W - sz*.3 && y >= sz*.3 && y <= H - sz*.3;
+  const nearBox = (x, y) => x > box.left - bp && x < box.right + bp && y > box.top - bp && y < box.bottom + bp;
+  const randomFlight = (T, edge) => {
+    const lf = [S[0], S[1] - Math.min(R(.12, .3)*H, R(110, 230))];   // v1.56: the launch height (the first apex) varies too
     const loops = R(1, 2.5), dir = Math.random() < .5 ? 1 : -1, wob = R(.04, .16), k = Math.min(1, 1.6/(loops + .4));   // more loops = tighter loops, so the speed stays sane
     const rx = Math.min(R(.16, .3)*Math.min(W, 700)*k, (W - 2*m)/2 - 1), ry = Math.min(R(.09, .17)*H*k, (H - 2*m)/2 - 1);
     if (rx < sz || ry < sz) return null;
     const cx = R(m + rx, W - m - rx), cy = R(m + ry, H - m - ry);
-    const a0 = Math.atan2((lift[1] - cy)/ry, (lift[0] - cx)/rx), n = Math.max(6, Math.round(loops*8)), L = [];
+    const a0 = Math.atan2((lf[1] - cy)/ry, (lf[0] - cx)/rx), n = Math.max(6, Math.round(loops*8)), L = [];
     for (let i = 0; i <= n; i++){ const a = a0 + dir*2*Math.PI*loops*i/n, q = 1 + (Math.random() - .5)*2*wob; L.push([cx + Math.cos(a)*rx*q, cy + Math.sin(a)*ry*q]); }
-    const edge = EDGES[Math.floor(Math.random()*EDGES.length)], T = crashAt(edge), E = L[L.length - 1];
-    const dx = T[0] - E[0], dy = T[1] - E[1], bend = R(-.15, .15);   // the dive bends a little, one way or the other
-    const mid = [Math.min(W - m, Math.max(m, E[0] + dx*.55 - dy*bend)), Math.min(H - m, Math.max(m, E[1] + dy*.55 + dx*bend))];
-    const c = sample([S, lift, ...L, mid, T]);
-    for (let i = c.seg[1]; i < c.pts.length; i++) if (bad(c.pts[i][0], c.pts[i][1])) return null;
+    const E = L[L.length - 1], dx = T[0] - E[0], dy = T[1] - E[1], bend = R(-.35, .35), at2 = R(.35, .7);   // the dive bends one way or the other, its control point moves along it
+    const mid = [Math.min(W - m, Math.max(m, E[0] + dx*at2 - dy*bend)), Math.min(H - m, Math.max(m, E[1] + dy*at2 + dx*bend))];
+    const c = sample([S, lf, ...L, mid, T]), d0 = c.seg[2 + n];   // d0: where the dive starts
+    for (let i = 0; i < c.pts.length; i++){ const [x, y] = c.pts[i];
+      if (i < c.seg[1]){ if (x < S[0] - 2 && nearBox(x, y)) return null; continue; }   // the launch starts by the box, so it only may not bend towards it
+      if (nearBox(x, y) || (!onScr(x, y) && (i < d0 || !inZone(x, y)))) return null; }   // never near the box; only the dive leaves the screen, and only in the corner zone
     return Object.assign(c, {loops: +loops.toFixed(2), dir: dir > 0 ? 'cw' : 'ccw', edge, swirlEnd: 2 + n, wobAmp: R(2, 8), wobRate: R(26, 52)});
   };
-  let fly = null, tries = 0; while (!fly && tries < 60){ tries++; fly = randomFlight(); }
-  if (!fly) fly = Object.assign(clock, {loops: 1.5, dir: 'fixed', edge: 'bottom-right', swirlEnd: 7, wobAmp: 0, wobRate: 40});
+  let fly = null, tries = 0;
+  while (!fly && tries < 400){ tries++; const e = exitAt(); fly = randomFlight(e.T, e.edge); }
+  if (!fly){   // nothing fits (a tiny screen): the old loops, then off through that corner
+    fly = Object.assign(sample([...P0.slice(0, -2), [left ? W*.22 : W*.78, top ? H*.25 : H*.6], [ex(-off), ey(sz)]]), {loops: 1.5, dir: 'fixed', edge: left ? 'left' : 'right', swirlEnd: 7, wobAmp: 0, wobRate: 40});
+  }
+  try { sessionStorage.setItem('jtn.failCorner', corner); } catch (e) {}
+  { const T = fly.pts[fly.pts.length - 1]; f.exit = {corner, last, edge: fly.edge, x: Math.round(T[0]), y: Math.round(T[1]), tries, fallback: fly.dir === 'fixed'}; }
   const {P, pts, len} = fly;
   const L7 = len[fly.seg[fly.swirlEnd]], Lend = len[len.length - 1];   // L7: where the loops end and the dive begins (point 7 on the old path)
   const tSwirl = FAIL.turn, tDive = tSwirl + swirl, tCrash = tDive + FAIL.dive, tBack = tCrash + FAIL.crash, tEnd = tBack + FAIL.back;
@@ -1444,15 +1579,37 @@ const recapReady = fetch(COPY.recapData, {cache: 'no-cache'}).then(r => { if (!r
   try { store && store.setItem('jtn.recap', JSON.stringify({day, text})); } catch (e) {}
   applyRecap(text, 'recaps.json');
 }).catch(() => { state.recapError = true; });
+/* v1.56 (jay 2026.10.02): the snap: the photo + its caption line, "📸 snap of the day →" (fixed text, cut with "… →" like the others if it ever has to be), only when the newest
+   snaps.json entry is dated today or yesterday (america/chicago), the same rule + the same first-paint cache (sessionStorage "jtn.snap") as the 📝 line */
+function applySnap(e, src){   // e = {src, alt} of the snap to show (the homepage crop), or null
+  const body = e ? COPY.snapText : ''; state.snap = {src, on: !!e};
+  if (e && (!snapData || snapData.src !== e.src)){ snapData = e; snapImg.alt = e.alt || ''; snapImg.src = e.src; } else if (!e) snapData = null;
+  if (body === snapLine.body) return;
+  snapLine.body = body;
+  if (!state.egg) buildEgg(); else if (state.egg === 'landed') eggSettle();
+}
+try { const c = JSON.parse(ssGet('jtn.snap') || 'null'); if (c && c.day === chiDay()) applySnap(c.snap || null, 'session'); } catch (e) {}
+const snapReady = fetch(COPY.snapData, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(all => {
+  const day = chiDay();
+  const top = (Array.isArray(all) ? all : []).filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && typeof (e.home || e.src) === 'string' && (e.home || e.src) && e.date <= day).sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)[0];
+  const y = new Date(day + 'T12:00:00Z'); y.setUTCDate(y.getUTCDate() - 1); const yesterday = y.toISOString().slice(0, 10);
+  const snap = top && (top.date === day || top.date === yesterday) ? {src: top.home || top.src, alt: String(top.alt || '')} : null;   // the homepage uses the 3:2 crop ("home")
+  try { store && store.setItem('jtn.snap', JSON.stringify({day, snap})); } catch (e) {}
+  applySnap(snap, 'snaps.json');
+}).catch(() => { state.snapError = true; });
 
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
 cursor.remove();
 lines[0].runs[0].node.insertBefore(cursor, lines[0].runs[0].ghost);
 if (cameBack) complete();   // v1.25: fully loaded from the very first paint
-Promise.all([document.fonts.ready, Promise.race([recapReady, new Promise(r => setTimeout(r, TIMING.recapWait))])]).then(() => { fitEgg(true);   // v1.42: + the recap fetch (capped), so the egg's line count is final before anything shows
+/* v1.56: the block is centred on the screen now, so the daily lines arriving (fonts + recaps.json + snaps.json decide how many there are) would move everything else:
+   on a first load the column stays hidden (it only holds the waiting cursor at this point) until the egg is laid out, then shows in its final place */
+const copyEl = document.querySelector('.copy'); if (!cameBack && copyEl) copyEl.style.visibility = 'hidden';
+Promise.all([document.fonts.ready, Promise.race([Promise.all([recapReady, snapReady]), new Promise(r => setTimeout(r, TIMING.recapWait))])]).then(() => { fitEgg(true); if (copyEl) copyEl.style.visibility = '';   // v1.56: shown once laid out (see copyEl). v1.42: + the recap fetch (capped), so the egg's line count is final before anything shows
   rain.build(); requestAnimationFrame(rain.frame); if (cameBack) return; if (reduced){ skip(); } else intro(); });
 let lastW = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(() => { fitEgg(); rain.build(); }, 150); });
-addEventListener('orientationchange', () => setTimeout(() => fitEgg(), 250));   // v1.26: the egg refits on rotation too (fitEgg skips if the column width didn't change)
+addEventListener('orientationchange', () => setTimeout(() => fitEgg(), 250));
+addEventListener('resize', () => fitSnap());   // v1.56: the photo follows the viewport height too (fitEgg only refits on a width change)   // v1.26: the egg refits on rotation too (fitEgg skips if the column width didn't change)
 if (window.ResizeObserver){ let ro; new ResizeObserver(() => { clearTimeout(ro); ro = setTimeout(() => fitEgg(), 120); }).observe(eggEl); }   // ...and whenever the column width changes for any other reason
 })();
 </script>
