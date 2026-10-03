@@ -497,7 +497,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 <meta name="twitter:description" content="something human is in the works...">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image-v128.png">
 <meta name="twitter:image:alt" content="something human is in the works... created for misfits in 🇺🇸, designed by misfits in texas. join us as we 🚀 to the 🌕. -jay🥷">
-<link rel="stylesheet" href="/assets/rain.css?v=1.58"><script src="/assets/rain.js?v=1.58"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.59"><script src="/assets/rain.js?v=1.59"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -560,6 +560,7 @@ const COPY = {
   dayDate: "2026.10.03",   // v1.30 (jay 2026.09.30): THE DAY'S DATE, yyyy.mm.dd, shown in white as "// <date>" (v1.50; was "🗓️ <date>") above the egg lines. the daily 5am song + quote routine sets it together with lyric (the day the song + quote were published, america/chicago; never the viewer's clock). "" hides the line.
   lyric: "blood money in disguise as crypto\nchain filled with more rocks than a fish bowl\nall your dogs tellin' that, your hood respect go (aight)",   // songs preview (jay 2026.09.30): THE LYRIC. the first egg line becomes "🎧 <lyric> →" and links to lyricHref. set it by hand; "" hides the line. shown lowercase.
                                           // v1.26: always one line at the normal size; if it doesn't fit the column it's cut at a word with "… →" (the full lyric stays in the link's title + aria-label; see fitEgg)
+  songData: "/song-of-the-day/songs.json",   // v1.59 (jay 2026.10.03): the 🎧 line (the newest lyric dated today or earlier, america/chicago) and, with eggData, the date line (the newest song / quote date), read in the browser so they flip at midnight. COPY.lyric + COPY.dayDate above are only the fallbacks now (both files unreadable); the daily drop no longer edits index.html (it would leak the next day in the page source)
   lyricHref: "/song-of-the-day/",   // v1.27 (jay 2026.09.30): was "/songs/" (the old url is now a redirect stub)
   egg: "today's quote",   // v1.26 (jay 2026.09.30): the last line is TODAY'S quote, read from eggData (the same quotes.json /quote-of-the-day/ types at the top: the newest entry dated today or earlier, america/chicago). shown as "💭 <quote> →", lowercase, no author, one line (cut with "… →" if long). THIS text is only the fallback if quotes.json can't be read.
   eggData: "/quote-of-the-day/quotes.json",   // v1.26: the daily 5:10am routine updates only this file (it already does for /quote-of-the-day/); nothing on the homepage needs editing. was (<= v1.25): egg: "💭 the clearest view of a man is from below →"
@@ -706,7 +707,7 @@ const eggEl = $('.egg');
    cuts it at a word boundary and ends it with "… →" so it fits exactly (the arrow always shows). the full text stays in the link's title + aria-label */
 const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
 const EGG = [{icon: '//', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}, {icon: '📝', body: '', href: COPY.recapHref, recap: true}, {icon: '📸', body: '', href: COPY.snapHref, snap: true}];   // v1.56: + the snap line (body "" = hidden until today's snap is known)   // v1.42: + the recap line (body "" = hidden until today's recap is known)   // v1.31 PREVIEW: the date is the first egg line ("" = no line)
-const quoteLine = EGG.find(l => l.quote), recapLine = EGG.find(l => l.recap), snapLine = EGG.find(l => l.snap);
+const quoteLine = EGG.find(l => l.quote), recapLine = EGG.find(l => l.recap), snapLine = EGG.find(l => l.snap), songLine = EGG.find(l => l.song), dayLine = EGG.find(l => l.day);   // v1.59: + the song + date lines (read from the json now)
 /* v1.56: the snap photo (see the .snapfig css): one link with the photo + the canvas it digitizes on. it lives in the egg, just above the 📸 caption line */
 const snapFig = gateTap(mk('a', 'snapfig')), snapImg = mk('img'), snapCv = mk('canvas');
 snapFig.setAttribute('href', COPY.snapHref); snapFig.setAttribute('aria-label', COPY.snapText); snapCv.setAttribute('aria-hidden', 'true');
@@ -1600,58 +1601,91 @@ addEventListener('pageshow', e => { if (e.persisted && !(state.done && (state.eg
    the egg is laid out from the start with the quote this tab saw last today (sessionStorage "jtn.quote"), else COPY.egg; the fetch swaps in the real one
    (before the rain starts it's invisible; after it landed it just refits). if quotes.json can't be read, the line stays COPY.egg */
 const chiDay = () => new Intl.DateTimeFormat('en-CA', {timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit'}).format(new Date());
+const dayBefore = d => { const y = new Date(d + 'T12:00:00Z'); y.setUTCDate(y.getUTCDate() - 1); return y.toISOString().slice(0, 10); };   // the chicago day before (noon UTC, so no DST edge)
+const getJSON = u => fetch(u, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); });
+const reEgg = () => { if (!state.egg) buildEgg(); else if (state.egg === 'landed') eggSettle(); };   // falling / dumping: eggSettle picks it up as it lands
+/* v1.59 (jay 2026.10.03): the newest entry that is live today or earlier. live = its date (the drop publishes the next day's entries the night before, dated that day, so they're
+   held until midnight ct), or for a recap its optional "live" day (a recap keeps the day it's about as its date). the same rule as the 4 daily pages */
+const newest = (all, ok, day) => (Array.isArray(all) ? all : []).filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && ok(e) && (e.live || e.date) <= day).sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)[0];
+const PICK = {
+  quote: (all, day) => { const t = newest(all, e => e.quote, day); return t ? {date: t.date, text: t.quote} : null; },
+  song: (all, day) => { const t = newest(all, e => typeof e.lyric === 'string' && e.lyric.trim(), day); return t ? {date: t.date, text: t.lyric} : null; },   // v1.59: the newest lyric (a day without one keeps the last, as before)
+  recap: (all, day) => { const t = newest(all, e => typeof e.text === 'string' && e.text.trim(), day); return t && (t.live ? t.live === day : t.date === day || t.date === dayBefore(day)) ? t.text : ''; },   // v1.59: with "live", on that day only; without (older entries): its date or the day after (the 5am drops published it the morning after)
+  snap: (all, day) => { const t = newest(all, e => typeof (e.home || e.src) === 'string' && (e.home || e.src), day); return t && (t.date === day || t.date === dayBefore(day)) ? {src: t.home || t.src, alt: String(t.alt || '')} : null; }   // the homepage uses the 3:2 crop ("home")
+};
+/* v1.26: today's quote = what /quote-of-the-day/ shows at the top: the newest quotes.json entry dated today or earlier (america/chicago; same rule as quote-of-the-day/index.html).
+   the egg is laid out from the start with the quote this tab saw last today (sessionStorage "jtn.quote"), else COPY.egg; the fetch swaps in the real one
+   (before the rain starts it's invisible; after it landed it just refits). if quotes.json can't be read, the line stays COPY.egg */
 function applyQuote(q, src){
   const body = lc(q); state.quote = {src, text: body || quoteLine.body};
   if (!body || body === quoteLine.body) return;
-  quoteLine.body = body;
-  if (!state.egg) buildEgg(); else if (state.egg === 'landed') eggSettle();   // falling / dumping: eggSettle picks it up as it lands
+  quoteLine.body = body; reEgg();
 }
-try { const c = JSON.parse(ssGet('jtn.quote') || 'null'); if (c && c.day === chiDay() && c.quote) applyQuote(c.quote, 'session'); } catch (e) {}
+/* v1.59: the 🎧 line = the newest songs.json lyric dated today or earlier (was COPY.lyric, set by the 5am drop), the same way (sessionStorage "jtn.song", else COPY.lyric) */
+function applySong(text, src){
+  const body = lc(text); state.song = {src, text: body || songLine.body};
+  if (!body || body === songLine.body) return;
+  songLine.body = body; reEgg();
+}
+/* v1.59: the date line = the newest of today's song + quote dates ("yyyy.mm.dd"; was COPY.dayDate, set by the 5am drop). it's always 10 characters, so it never moves anything */
+function applyDay(d, src){
+  const body = /^\d{4}-\d{2}-\d{2}$/.test(d || '') ? d.replace(/-/g, '.') : String(d || ''); state.day = {src, text: body || dayLine.body};
+  if (!body || body === dayLine.body) return;
+  dayLine.body = body; reEgg();
+}
+const cached = k => { try { const c = JSON.parse(ssGet(k) || 'null'); return c && c.day === chiDay() ? c : null; } catch (e) { return null; } };
+const cache = (k, v) => { try { store && store.setItem(k, JSON.stringify(Object.assign({day: chiDay()}, v))); } catch (e) {} };
+{ const c = cached('jtn.quote'); if (c && c.quote) applyQuote(c.quote, 'session'); }
+{ const c = cached('jtn.song'); if (c && c.lyric) applySong(c.lyric, 'session'); }
+{ const c = cached('jtn.dd'); applyDay(c && c.date || chiDay(), c ? 'session' : 'guess'); }   // first guess: today (the drop is normally there); the fetches below confirm it
 if (!state.quote) state.quote = {src: 'fallback', text: quoteLine.body};
+if (!state.song) state.song = {src: 'fallback', text: songLine.body};
 buildEgg();
-fetch(COPY.eggData, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(all => {
-  const day = chiDay();
-  const top = (Array.isArray(all) ? all : []).filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && e.quote && e.date <= day).sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)[0];
-  if (!top) return;
-  try { store && store.setItem('jtn.quote', JSON.stringify({day, quote: top.quote})); } catch (e) {}
-  applyQuote(top.quote, 'quotes.json');
-}).catch(() => { state.quoteError = true; });
+const quoteReady = getJSON(COPY.eggData).then(all => { const q = PICK.quote(all, chiDay()); if (!q) return null; cache('jtn.quote', {quote: q.text}); applyQuote(q.text, 'quotes.json'); return q.date; }).catch(() => { state.quoteError = true; return undefined; });
+const songReady = getJSON(COPY.songData).then(all => { const q = PICK.song(all, chiDay()); if (!q) return null; cache('jtn.song', {lyric: q.text}); applySong(q.text, 'songs.json'); return q.date; }).catch(() => { state.songError = true; return undefined; });
+const dayReady = Promise.all([songReady, quoteReady]).then(ds => {
+  const known = ds.filter(d => typeof d === 'string');
+  if (!known.length){ if (ds.every(d => d === undefined)) applyDay(COPY.dayDate, 'fallback'); return; }   // both files unreadable: COPY.dayDate (the last baked date)
+  const d = known.sort().pop(); cache('jtn.dd', {date: d}); applyDay(d, 'json');
+});
 /* v1.42 (jay 2026.10.02): today's recap = the newest recaps.json entry, only if it is dated today or yesterday (america/chicago: jay writes it at night, the 5am drop publishes it the next morning). lowercase, one line, cut with "… →" like the others (fitEgg).
+   v1.59: or, with a "live" day (the night-before drop), on that day only (PICK.recap).
    no entry for today = no line. the egg is laid out before anything shows: the intro waits for this fetch (at most TIMING.recapWait), and this tab's last answer for today
    (sessionStorage "jtn.recap") is used from the first paint, so the line never pops in under the rest */
 function applyRecap(text, src){
   const body = lc(text); state.recap = {src, text: body};
   if (body === recapLine.body) return;
-  recapLine.body = body;
-  if (!state.egg) buildEgg(); else if (state.egg === 'landed') eggSettle();
+  recapLine.body = body; reEgg();
 }
-try { const c = JSON.parse(ssGet('jtn.recap') || 'null'); if (c && c.day === chiDay()) applyRecap(c.text || '', 'session'); } catch (e) {}
-const recapReady = fetch(COPY.recapData, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(all => {
-  const day = chiDay();
-  const top = (Array.isArray(all) ? all : []).filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && typeof e.text === 'string' && e.text.trim() && e.date <= day).sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)[0];
-  const y = new Date(day + 'T12:00:00Z'); y.setUTCDate(y.getUTCDate() - 1); const yesterday = y.toISOString().slice(0, 10);   // the chicago day before (noon UTC, so no DST edge)
-  const text = top && (top.date === day || top.date === yesterday) ? top.text : '';
-  try { store && store.setItem('jtn.recap', JSON.stringify({day, text})); } catch (e) {}
-  applyRecap(text, 'recaps.json');
-}).catch(() => { state.recapError = true; });
+{ const c = cached('jtn.recap'); if (c) applyRecap(c.text || '', 'session'); }
+const recapReady = getJSON(COPY.recapData).then(all => { const text = PICK.recap(all, chiDay()); cache('jtn.recap', {text}); applyRecap(text, 'recaps.json'); }).catch(() => { state.recapError = true; });
 /* v1.56 (jay 2026.10.02): the snap: the photo + its caption line, "📸 snap of the day →" (fixed text, cut with "… →" like the others if it ever has to be), only when the newest
    snaps.json entry is dated today or yesterday (america/chicago), the same rule + the same first-paint cache (sessionStorage "jtn.snap") as the 📝 line */
 function applySnap(e, src){   // e = {src, alt} of the snap to show (the homepage crop), or null
   const body = e ? COPY.snapText : ''; state.snap = {src, on: !!e};
   if (e && (!snapData || snapData.src !== e.src)){ snapData = e; snapImg.alt = e.alt || ''; snapImg.src = e.src; } else if (!e) snapData = null;
   if (body === snapLine.body) return;
-  snapLine.body = body;
-  if (!state.egg) buildEgg(); else if (state.egg === 'landed') eggSettle();
+  snapLine.body = body; reEgg();
 }
-try { const c = JSON.parse(ssGet('jtn.snap') || 'null'); if (c && c.day === chiDay()) applySnap(c.snap || null, 'session'); } catch (e) {}
-const snapReady = fetch(COPY.snapData, {cache: 'no-cache'}).then(r => { if (!r.ok) throw new Error(r.status); return r.json(); }).then(all => {
-  const day = chiDay();
-  const top = (Array.isArray(all) ? all : []).filter(e => e && /^\d{4}-\d{2}-\d{2}$/.test(e.date) && typeof (e.home || e.src) === 'string' && (e.home || e.src) && e.date <= day).sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : 0)[0];
-  const y = new Date(day + 'T12:00:00Z'); y.setUTCDate(y.getUTCDate() - 1); const yesterday = y.toISOString().slice(0, 10);
-  const snap = top && (top.date === day || top.date === yesterday) ? {src: top.home || top.src, alt: String(top.alt || '')} : null;   // the homepage uses the 3:2 crop ("home")
-  try { store && store.setItem('jtn.snap', JSON.stringify({day, snap})); } catch (e) {}
-  applySnap(snap, 'snaps.json');
-}).catch(() => { state.snapError = true; });
+{ const c = cached('jtn.snap'); if (c) applySnap(c.snap || null, 'session'); }
+const snapReady = getJSON(COPY.snapData).then(all => { const snap = PICK.snap(all, chiDay()); cache('jtn.snap', {snap}); applySnap(snap, 'snaps.json'); }).catch(() => { state.snapError = true; });
+/* v1.59 (jay 2026.10.03): midnight (america/chicago), page open: everything flips in place, no reload. rain.js watches the date (JayRain.newDay); then all four files are read
+   again for the new day. same lines as before (only their text / the photo changes): swapped in place, the new photo decoded first, so nothing moves (the date is always 10
+   characters, the lines are one line each, the photo keeps its frame). a line that comes or goes (a 📝 or a 📸 starting or ending) would move the block, so then the page reloads
+   instead (it opens on the new day as a normal visit). a file that can't be read keeps what it showed */
+if (window.JayRain && JayRain.newDay) JayRain.newDay(async day => {
+  const got = await Promise.allSettled([COPY.eggData, COPY.songData, COPY.recapData, COPY.snapData].map(getJSON));
+  const val = (i, pick) => got[i].status === 'fulfilled' ? {v: pick(got[i].value, day)} : null;
+  const q = val(0, PICK.quote), s = val(1, PICK.song), r = val(2, PICK.recap), p = val(3, PICK.snap);
+  if ((r && !!lc(r.v) !== !!recapLine.body) || (p && !!p.v !== !!snapLine.body)){ location.reload(); return; }
+  if (p && p.v && (!snapData || snapData.src !== p.v.src)){ const im = new Image(); im.src = p.v.src; try { await im.decode(); } catch (e) {} }   // the new photo is ready before it swaps in
+  if (q && q.v){ cache('jtn.quote', {quote: q.v.text}); applyQuote(q.v.text, 'midnight'); }
+  if (s && s.v){ cache('jtn.song', {lyric: s.v.text}); applySong(s.v.text, 'midnight'); }
+  const d = [q && q.v && q.v.date, s && s.v && s.v.date].filter(Boolean).sort().pop(); if (d){ cache('jtn.dd', {date: d}); applyDay(d, 'midnight'); }
+  if (r){ cache('jtn.recap', {text: r.v}); applyRecap(r.v, 'midnight'); }
+  if (p){ cache('jtn.snap', {snap: p.v}); applySnap(p.v, 'midnight'); }
+  state.newDay = {day, at: Date.now()};
+});
 
 lines.forEach(t => render(t, 0, TIMING.window));   // reserve the final layout, nothing visible yet
 cursor.remove();
@@ -1660,7 +1694,7 @@ if (cameBack) complete();   // v1.25: fully loaded from the very first paint
 /* v1.56: the block is centred on the screen now, so the daily lines arriving (fonts + recaps.json + snaps.json decide how many there are) would move everything else:
    on a first load the column stays hidden (it only holds the waiting cursor at this point) until the egg is laid out, then shows in its final place */
 const copyEl = document.querySelector('.copy'); if (!cameBack && copyEl) copyEl.style.visibility = 'hidden';
-Promise.all([document.fonts.ready, Promise.race([Promise.all([recapReady, snapReady]), new Promise(r => setTimeout(r, TIMING.recapWait))])]).then(() => { fitEgg(true); if (copyEl) copyEl.style.visibility = '';   // v1.56: shown once laid out (see copyEl). v1.42: + the recap fetch (capped), so the egg's line count is final before anything shows
+Promise.all([document.fonts.ready, Promise.race([Promise.all([recapReady, snapReady, dayReady]), new Promise(r => setTimeout(r, TIMING.recapWait))])]).then(() => { fitEgg(true); if (copyEl) copyEl.style.visibility = '';   // v1.56: shown once laid out (see copyEl). v1.42: + the recap fetch (capped), so the egg's line count is final before anything shows
   rain.build(); requestAnimationFrame(rain.frame); if (cameBack) return; if (reduced){ skip(); } else intro(); });
 let lastW = innerWidth, rt; addEventListener('resize', () => { if (innerWidth === lastW) return; lastW = innerWidth; clearTimeout(rt); rt = setTimeout(() => { fitEgg(); rain.build(); }, 150); });
 addEventListener('orientationchange', () => setTimeout(() => fitEgg(), 250));
