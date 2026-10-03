@@ -27,6 +27,8 @@
     const typed = document.createElement('span'), ghost = document.createElement('span'); ghost.className = 'gh'; ghost.textContent = THANKS; thx.append(typed, ghost);   // the whole line is laid out from the start (hidden), so it never reflows
     if (document.activeElement && foot.contains(document.activeElement)) document.activeElement.blur(); form.classList.add('sent'); window.__footSent = true;
     const r = foot.getBoundingClientRect();
+    { const rf = (window.JayRain && JayRain.ref && JayRain.ref()) || '';   // v1.65: GA4 sign_up as the page turns gold (the homepage's liftoff moment); no email, only the ?ref= tag
+      if (typeof gtag === 'function') gtag('event', 'sign_up', rf ? {method: 'email', ref: rf} : {method: 'email'}); }
     if (window.JayRain && JayRain.gold) JayRain.gold({ms: 1700, y: (r.top + r.bottom)/2, lock: true});
     let i = 0; const step = () => { i++; typed.textContent = g.slice(0, i).join(''); ghost.textContent = g.slice(i).join(''); if (i < g.length) setTimeout(step, 38); };
     if (REDUCED){ typed.textContent = THANKS; ghost.textContent = ''; } else setTimeout(step, 300);
