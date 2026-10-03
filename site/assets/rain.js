@@ -8,8 +8,8 @@
   const sm=(e0,e1,x)=>{const t=clamp((x-e0)/(e1-e0));return t*t*(3-2*t)};
   const DPR=Math.min(window.devicePixelRatio||1,2);
   const T=[26,173,179], RAIN_ORANGE=[255,77,26];
-  // v1.53: light theme (prefers-color-scheme): on white every glyph is the state colour itself (deeper teal #13888D, orange #E85D0C (v1.58; was #D93D11), gold #A67C00), no white heads
-  const LIGHT_Q=matchMedia('(prefers-color-scheme: light)'), L_TEAL=[19,136,141], L_ORANGE=[232,93,12], L_GOLD=[166,124,0];
+  // v1.53: light theme (prefers-color-scheme): on white every glyph is the state colour itself (deeper teal #127F84 (v1.60; was #13888D), orange #E85D0C (v1.58; was #D93D11), gold #A67C00), no white heads
+  const LIGHT_Q=matchMedia('(prefers-color-scheme: light)'), L_TEAL=[18,127,132], L_ORANGE=[232,93,12], L_GOLD=[166,124,0];
   const modeName=()=>document.documentElement.dataset.mode==='fast'?'fast':'normal';
 function Rain(cv, o){
   const R = {cv, o, drops:[], rects:[], ptr:{x:-9999,y:-9999}, last:0};
@@ -156,6 +156,10 @@ function Rain(cv, o){
   // burst(tape, done): the homepage's terminal dump: every remaining typing step plays in one ~1.2s burst (14ms a step at most) while the rain runs at 6x, then the rain eases back to the mode's speed
   const PATH=p=>p.replace(/index\.html$/,'').replace(/([^/])$/,'$1/'), HERE=PATH(location.pathname);
   const ss=(()=>{try{return window.sessionStorage}catch(_){return null}})(), ssGet=k=>{try{return ss&&ss.getItem(k)}catch(_){return null}}, ssSet=(k,v)=>{try{ss&&ss.setItem(k,v)}catch(_){}};
+  // v1.60 (jay 2026.10.03): where a visitor came from. ?ref=x on any page (e.g. the bio link: jaytha.ninja/?ref=x) is kept for this tab (sessionStorage "jtn.ref": lowercase
+  // a-z 0-9 . _ -, up to 40) and leaves the address bar (so a shared link doesn't carry it). the homepage sends it with a signup as its buttondown tag (no ref: "site")
+  const refNow=(()=>{try{const u=new URL(location.href);if(!u.searchParams.has('ref'))return;const r=(u.searchParams.get('ref')||'').toLowerCase().replace(/[^a-z0-9._-]/g,'').slice(0,40);u.searchParams.delete('ref');history.replaceState(history.state,'',u.pathname+u.search+u.hash);if(r)ssSet('jtn.ref',r)}catch(_){}})();
+  const ref=()=>ssGet('jtn.ref')||'';
   const via=ssGet('jtn.via')===HERE; try{ss&&ss.removeItem('jtn.via')}catch(_){}
   const navType=((performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||{}).type||'';
   document.addEventListener('click',e=>{const a=e.target.closest&&e.target.closest('a[href]');if(!a||e.defaultPrevented||e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey||(a.target&&a.target!=='_self'))return;const u=new URL(a.href,location.href);if(u.origin===location.origin&&!HOME.test(u.pathname))ssSet('jtn.via',PATH(u.pathname))},true);
@@ -233,6 +237,6 @@ function Rain(cv, o){
   const dayLoop=()=>{dayCheck();clearTimeout(dayT);dayT=setTimeout(dayLoop,Math.max(200,Math.min(toMidnight()+150,60000)))};
   dayLoop();document.addEventListener('visibilitychange',()=>{if(!document.hidden)dayCheck()});addEventListener('pageshow',e=>{if(e.persisted)dayCheck()});
   const newDay=cb=>{dayCb=cb||null};
-  window.JayRain={Rain,register,mode,dump,rendered:markRendered,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock,day:ctDay,newDay};
+  window.JayRain={Rain,register,mode,dump,rendered:markRendered,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock,day:ctDay,newDay,ref};
   if(document.readyState!=='loading')boot();else addEventListener('DOMContentLoaded',boot,{once:true});
 })();
