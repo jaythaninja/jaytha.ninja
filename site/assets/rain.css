@@ -17,6 +17,8 @@
   --f:#FFD700;--f-rgb:255,215,0;--f-lt:#FFE066;--f-dk:#C99A00;--f-pale:#FFF6C2;--f-wh:#FFFBE8;--f-lt2:#FFE766;--f-l4-rgb:255,190,0;--f-l5-rgb:255,246,194}
 /* while the pulse runs (and while it fades back) colour changes ease (--au-t, set by gold() / goldOff()) instead of snapping */
 html.au-wave body *{transition-property:color,background-color,border-color,fill,stroke,stop-color,text-shadow,box-shadow,outline-color,opacity!important;transition-duration:var(--au-t,.3s)!important;transition-delay:0s!important;transition-timing-function:ease!important}
+/* v1.55: goldOff({snap}) turns transitions off for two frames, so gold -> teal is instant */
+html.au-snap,html.au-snap *,html.au-snap *::before,html.au-snap *::after{transition:none!important}
 /* the background glows: a gold twin (made with the orange one in rain.js) shows instead while gold */
 .glow-au{opacity:0}.gld .glow:not(.glow-au),.glow.gld:not(.glow-au){opacity:0!important}.gld .glow-au,.glow-au.gld{opacity:.85!important}
 /* v1.53 (jay 2026.10.02): light + dark theme, following the system (prefers-color-scheme), on every page. dark (as before, unchanged): pure black #000 background,

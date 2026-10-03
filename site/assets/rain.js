@@ -135,7 +135,7 @@ function Rain(cv, o){
     setHintMode(modeName()==='fast'); hint.classList.add('ready'); requestAnimationFrame(()=>hint.classList.add('ready')); place();
   };
   const place=()=>{if(!hint)return;const copy=document.querySelector('.copy');if(!copy)return;const r=copy.getBoundingClientRect();const mobile=innerWidth<760;const lh=parseFloat(getComputedStyle(copy.querySelector('.hello')||copy).lineHeight)||30;hint.style.top=mobile?`calc(env(safe-area-inset-top,0px) + 11px)`:`${Math.max(11,r.top-2*lh)}px`;if(mobile){hint.style.right=`calc(env(safe-area-inset-right,0px) + 14px)`;return;}let right=0;for(const el of copy.querySelectorAll('.hello,.para,.sig,.prompt')){const range=document.createRange();range.selectNodeContents(el);for(const q of range.getClientRects())right=Math.max(right,q.right);}if(!right)right=r.right;hint.style.right=Math.max(14,innerWidth-right-16)+'px';};
-  const mode=fast=>{const next=fast?'fast':'normal';document.documentElement.dataset.mode=next;document.documentElement.classList.toggle('fast',fast);if(hint){setHintMode(fast);hint.classList.toggle('settled',fast||hint.classList.contains('settled'));}if(rain){rain.fast=fast;rain.setSpeed(fast?2:1,250);rain.setTint(fast?RAIN_ORANGE:T,250);}if(onMode)onMode(fast);};
+  const mode=(fast,ms=250)=>{const next=fast?'fast':'normal';document.documentElement.dataset.mode=next;document.documentElement.classList.toggle('fast',fast);if(hint){setHintMode(fast);hint.classList.toggle('settled',fast||hint.classList.contains('settled'));}if(rain){rain.fast=fast;rain.setSpeed(fast?2:1,ms);rain.setTint(fast?RAIN_ORANGE:T,ms);}if(onMode)onMode(fast);};
   const boot=()=>{if(booted)return;booted=true;ensure();document.addEventListener('pointerdown',e=>{down=e.isPrimary&&e.button===0&&!e.target.closest('a,button,input,label')?{x:e.clientX,y:e.clientY}:null});document.addEventListener('pointercancel',()=>down=null);document.addEventListener('pointerup',e=>{if(!down||!e.isPrimary||Math.hypot(e.clientX-down.x,e.clientY-down.y)>10||String(getSelection()))return;down=null;if(onTap&&onTap())return;mode(!document.documentElement.classList.contains('fast'));});addEventListener('resize',place);if(window.ResizeObserver){const c=document.querySelector('.copy');c&&new ResizeObserver(place).observe(c)}};
   // jay 2026.09.30 v1.25: optional tap hook. if it returns true the page used the tap (the homepage's terminal dump) and the 1x/2x toggle is skipped
   const register=(r,cb,tap)=>{rain=r;onMode=cb||null;onTap=tap||null;boot()};
@@ -158,11 +158,12 @@ function Rain(cv, o){
   addEventListener('pagehide',()=>seen());
   const burst=(tape,done,o={})=>{const total=tape.length,D=Math.max(1,Math.min(o.ms||1200,total*(o.perStep||14))),t0=performance.now();let at=0,raf=0,live=true;
     const back=ms=>{if(rain)rain.setSpeed(modeName()==='fast'?2:1,ms)};
-    if(rain)rain.setSpeed(o.rain||6,o.rainUp||220);
+    const au=o.gold!==false;   // v1.55 (jay 2026.10.02): the gold skip runs the rain at 3x (was 6x) and snaps back to teal 1x the moment it's done (no hold, no fade: a secret)
+    if(rain)rain.setSpeed(o.rain||(au?3:6),o.rainUp||220);
     if(o.gold!==false)gold({ms:o.goldMs||260,y:o.goldY});   // v1.52: the skip-to-end gold flash
-    const frame=now=>{const k=Math.min(total,Math.ceil((now-t0)/D*total));while(at<k)tape[at++]();if(at<total){raf=requestAnimationFrame(frame);return}raf=0;live=false;back(o.rainDown||1100);if(o.gold!==false)goldOff({hold:1000,ms:350,first:true});if(done)done()};
+    const frame=now=>{const k=Math.min(total,Math.ceil((now-t0)/D*total));while(at<k)tape[at++]();if(at<total){raf=requestAnimationFrame(frame);return}raf=0;live=false;if(au)goldOff({snap:true,first:true});else back(o.rainDown||1100);if(done)done()};
     raf=requestAnimationFrame(frame);
-    return {stop(){if(!live)return;live=false;cancelAnimationFrame(raf);back(250);if(o.gold!==false)goldOff({hold:1000,ms:350,first:true})}};};
+    return {stop(){if(!live)return;live=false;cancelAnimationFrame(raf);if(au)goldOff({snap:true,first:true});else back(250)}};};
   document.documentElement.dataset.mode=document.documentElement.dataset.mode==='fast'?'fast':'normal';
 
   /* v1.52 (jay 2026.10.02): gold. gold(o) turns everything coloured gold in a pulse that spreads out from a line (o.y, viewport px; default the middle of the screen) up to
@@ -170,6 +171,7 @@ function Rain(cv, o){
      flash: ~260ms). it works by putting .gld on each element (the gold values of --c / --f, see rain.css) in distance order, then .gld on <html> when the pulse is done.
      white stays white (only the colour variables change), nothing moves. o.lock (the signup) keeps it gold for the rest of the visit, speed taps included.
      goldOff(o): unless locked, hold o.hold ms (1000), then fade everything back over o.ms (350; v1.53, was 700); o.first also returns to the first state (1x, teal).
+     v1.55: o.snap = no hold, no fade: everything (colours, rain colour + speed) is back to the first state in the same frame. the skip-to-end uses it on every page
      the skip-to-end on every page (burst() here, the homepage's own dump()) flashes gold while it fast-forwards, then holds 1s and fades back to teal 1x */
   const GOLD=[255,215,0], GOLD_PALE=[255,236,150];
   let auLock=false, auTimers=[], auRaf=0;
@@ -190,6 +192,11 @@ function Rain(cv, o){
   };
   const goldOff=(o={})=>{
     if(auLock)return;auClear();const h=document.documentElement,hold=o.hold??1000,ms=REDUCED?0:(o.ms??350);
+    if(o.snap){   // v1.55 (jay 2026.10.02): the skip's gold ends in one frame: transitions off (html.au-snap) for two frames, gold off, first state, rain 1x + teal at once
+      h.classList.add('au-snap');h.classList.remove('au-wave','gld-out');if(o.first&&modeName()==='fast')mode(false,1);
+      h.classList.remove('gld');document.querySelectorAll('.gld').forEach(e=>e.classList.remove('gld'));
+      if(rain){rain.au=null;rain.setSpeed(modeName()==='fast'?2:1,1);}
+      requestAnimationFrame(()=>requestAnimationFrame(()=>h.classList.remove('au-snap')));return;}
     auTimers.push(setTimeout(()=>{if(auLock)return;if(ms){auWave(ms);h.classList.add('gld-out');}
       if(o.first&&modeName()==='fast')mode(false);
       h.classList.remove('gld');document.querySelectorAll('.gld').forEach(e=>e.classList.remove('gld'));

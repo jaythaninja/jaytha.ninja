@@ -730,21 +730,21 @@ function eggSettle(){   // the final lines: plain links (same no-wrap groups, so
   eggText = eggLines.map(x => x.text).join('\n');
   eggEl.removeAttribute('aria-hidden'); state.egg = 'landed';
 }
-let eggStarted = false, eggRun = null, eggThen = null;   // v1.50: eggThen = what runs once the egg's letters have landed (the footer)
+let eggStarted = false, eggRun = null, eggThen = null, eggRate = 1;   // v1.55: eggRate 3 = the gold skip's 3x rain-down (see dump)   // v1.50: eggThen = what runs once the egg's letters have landed (the footer)
 const eggNext = () => { const f = eggThen; eggThen = null; if (f) f(); };   // jay 2026.09.30 v1.25: eggRun = the live fall (animations, scramble, settle timers) so the dump or a full load can stop it
 function egg(){
   if (eggStarted || !eggText) return; eggStarted = true; state.egg = 'falling';
   if (reduced || !eggEl.animate){ eggSettle(); eggEl.classList.add('on', 'fade'); eggNext(); return; }
-  const fs = parseFloat(getComputedStyle(eggEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep;
+  const fs = parseFloat(getComputedStyle(eggEl).fontSize), row = fs*1.25, [s0, s1] = TIMING.eggStep, r = eggRate;
   let left = eggChars.length, last = 0, settled = false;
   const settleOnce = () => { if (settled) return; settled = true; eggSettle(); eggNext(); introEnd(); };   // v1.30: the egg landing ends the intro (if the icons are in)
-  const t0 = performance.now(); eggRun = {anims: [], timers: [], scr: 0};
+  const t0 = performance.now(); eggRun = {anims: [], timers: [], scr: 0, settle: settleOnce};
   for (const c of eggChars){
     const top = c.el.getBoundingClientRect().top;
     const rows = Math.max(8, Math.ceil((top + row*2)/row));   // start just above the viewport, drop row by row into the slot
-    const dur = Math.min(4600, Math.max(3000, rows*(s0 + Math.random()*(s1 - s0))));
+    const dur = Math.min(4600, Math.max(3000, rows*(s0 + Math.random()*(s1 - s0))))/r;
     const isDay = !!c.el.closest('p.day'), lead = eggEl.classList.contains('has-day') ? TIMING.eggDayLead : 0;   // v1.31: the date rains first (its letters staggered over eggDaySpread), the song + quote letters start eggDayLead later, same overall length
-    const delay = Math.random()*TIMING.rainJitter;   // v1.39: everything below the sign-off starts together (was: the date over eggDaySpread, then song + quote eggDayLead later, spread over eggTotal)
+    const delay = Math.random()*TIMING.rainJitter/r;   // v1.39: everything below the sign-off starts together (was: the date over eggDaySpread, then song + quote eggDayLead later, spread over eggTotal)
     last = Math.max(last, delay + dur);
     const tr = mk('span', 'tr'); c.trail = Array.from({length: 4 + Math.floor(Math.random()*4)}, rg); tr.textContent = c.trail.join('\n');
     c.tr = tr; c.el.appendChild(tr); c.el.firstChild.textContent = rg(); c.el.classList.add('fall');
@@ -754,21 +754,30 @@ function egg(){
     an.finished.then(() => {
       c.done = true; c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall'); c.el.classList.add('land');
       tr.classList.add('off'); setTimeout(() => tr.remove(), 750);
-      if (--left === 0){ clearInterval(scr); eggRun.timers.push(setTimeout(settleOnce, 1200)); eggNext(); }   // v1.50: all landed: the footer starts
+      if (--left === 0){ clearInterval(eggRun.scr); eggRun.timers.push(setTimeout(settleOnce, 1200/eggRate)); eggNext(); }   // v1.50: all landed: the footer starts
     }, () => {});   // cancelled by eggStop(): nothing to do
   }
   state.eggMs = Math.round(last);
-  eggRun.timers.push(setTimeout(settleOnce, last + 1400));
+  eggRun.timers.push(setTimeout(settleOnce, last + 1400/r));
   eggEl.classList.add('on');
   const scr = setInterval(() => {   // scramble: heads flicker, trails shift like the rain columns; the real letter shows just before it lands
     const now = performance.now();
     for (const c of eggChars){
       if (c.done) continue;
-      c.el.firstChild.textContent = c.end - now < 260 ? c.ch : Math.random() < .7 ? rg() : c.el.firstChild.textContent;
+      c.el.firstChild.textContent = c.end - now < 260/eggRate ? c.ch : Math.random() < .7 ? rg() : c.el.firstChild.textContent;
       c.trail.pop(); c.trail.unshift(rg()); c.tr.textContent = c.trail.join('\n');
     }
   }, 90);
   eggRun.scr = scr;
+}
+/* v1.55 (jay 2026.10.02): the gold skip lets the daily lines rain down at 3x instead of skipping them. eggFast() speeds up a fall already under way (each letter's
+   remaining drop, its reveal and the settle) or makes the next egg() run at 3x */
+function eggFast(rate){
+  eggRate = rate; if (!eggRun) return;
+  const now = performance.now(); let last = now;
+  eggRun.anims.forEach(a => { try { a.updatePlaybackRate ? a.updatePlaybackRate(rate) : (a.playbackRate = rate); } catch (e) {} });
+  for (const c of eggChars) if (!c.done && c.end){ c.end = now + Math.max(0, c.end - now)/rate; last = Math.max(last, c.end); }
+  eggRun.timers.forEach(clearTimeout); eggRun.timers = [setTimeout(eggRun.settle, last - now + 1400/rate)];
 }
 function eggStop(){   // jay 2026.09.30 v1.25: stop a live fall. landed letters stay; the rest go back to their resting glyph (the dump hides + types them)
   eggStarted = true; eggThen = null; if (!eggRun) return;
@@ -1183,6 +1192,7 @@ function cursorHome(){
 }
 function finishUp(){
   if (state.done) return;
+  dumpSnap();   // v1.55: the gold skip ends here, in one frame
   cursorHome(); state.done = true; hint.classList.add('ready'); JayRain.dump(false); markSeen();
 }
 let iconsIn = false;
@@ -1343,17 +1353,19 @@ function complete(){
    then the egg types out in its own orange, the 🎧 lyric first and the 💭 quote last of all. one step per character, spread over ~1.2s whatever is left.
    the dump only ever starts from 2x, so the rain is already fast orange and stays there: the page lands on orange › (2x), and the next tap is 1x */
 const DUMP = {ms: 1200, perStep: 14, eggWindow: 3,   // total budget (ms); per-step cap so a short remainder still reads as a burst; egg letters that scramble at once
-  rain: 6, rainUp: 220, rainDown: 1100};   // v1.33 (jay 2026.09.30): while the dump fast-forwards, the rain runs at 6x (3x the orange 2x), ramping up over rainUp ms; when the page lands it eases back to 2x over rainDown ms
-let dumping = false, dumpRaf = 0, rainBoost = false;
+  rain: 3, rainUp: 220, rainDown: 1100, egg: 3};   // v1.55 (jay 2026.10.02): the gold skip's rain runs at 3x (was 6x), the daily lines rain down at 3x (egg) instead of being typed into the burst   // v1.33 (jay 2026.09.30): while the dump fast-forwards, the rain runs at 6x (3x the orange 2x), ramping up over rainUp ms; when the page lands it eases back to 2x over rainDown ms
+let dumping = false, dumpRaf = 0, rainBoost = false, dumpGold = false;
+/* v1.55 (jay 2026.10.02): once everything has landed (the daily lines too), the gold snaps back to teal 1x and the rain to 1x in one frame (no hold, no fade) */
+const dumpSnap = () => { if (!dumpGold) return; dumpGold = false; dumping = false; rainBoost = false; state.rainBoost = 'off'; JayRain.goldOff({snap: true, first: true}); };
 const unboost = ms => { if (!rainBoost) return; rainBoost = false; rain.setSpeed(fastNow() ? 2 : 1, ms); state.rainBoost = 'easing'; };   // v1.33: back to the mode's speed (always 2x after a dump)
-function stopDump(){ if (dumpRaf){ cancelAnimationFrame(dumpRaf); JayRain.goldOff({hold: 1000, ms: 350, first: true}); } dumpRaf = 0; dumping = false; unboost(250); }
+function stopDump(){ if (dumpRaf) cancelAnimationFrame(dumpRaf); dumpRaf = 0; dumpSnap(); dumping = false; unboost(250); }
 function dump(){
   if (dumping || state.done) return;
   if (reduced) return complete();
   dumping = true; skipped = true; current && current.stop(); iconTimers.forEach(clearTimeout); iconStop(); bottomStop();
   if (curLi.classList.contains('in')) cursorRow();   // v1.43: mid-icons, the cursor goes straight to its spot after linkedin (only not-yet-shown icons move), so the burst never shifts a visible icon   // v1.39: + the bottom rain   // v1.38: icons still raining land at once
   if (document.documentElement.dataset.mode !== 'fast') JayRain.mode(true);   // always already 2x via the tap flow; kept so the dump can never end in a teal/orange mismatch
-  { const r = $('.cta').getBoundingClientRect(); JayRain.gold({ms: 260, y: (r.top + r.bottom)/2}); }   // v1.52 (jay 2026.10.02): the skip-to-end gold flash: a quick pulse out from the signup line while it fast-forwards
+  { const r = $('.cta').getBoundingClientRect(); JayRain.gold({ms: 260, y: (r.top + r.bottom)/2}); dumpGold = true; }   // v1.52 (jay 2026.10.02): the skip-to-end gold flash: a quick pulse out from the signup line while it fast-forwards
   rainBoost = true; rain.setSpeed(DUMP.rain, DUMP.rainUp); state.rainBoost = 'on';   // v1.33: the rain fast-forwards with the text (colour stays the orange 2x)
   const tape = [], win = TIMING.window;
   for (let j = lineAt; j < lines.length; j++){
@@ -1361,19 +1373,10 @@ function dump(){
     for (let h = (j === lineAt ? state.head : 0) + 1; h <= t.n + win; h++) tape.push(() => render(t, h, win));
     if (j === LAST) tape.push(() => { document.body.classList.remove('typing'); form.classList.remove('rk-wait'); if (!form.classList.contains('in')) showForm(); });   // v1.30: after the icons the cursor is already home; leave it
   }
-  const scrambling = new Set(), eggLeft = [];
+  const scrambling = new Set();
   icons.forEach(li => { if (li.classList.contains('in')) return; const a = li.querySelector('a');   // v1.51: the icons, then the daily lines (as before v1.50)
     tape.push(() => { li.classList.add('in'); setTimeout(() => revealTap(a), 300); }, () => {}); });
-  if (eggText && state.egg !== 'landed'){
-    eggStop(); state.egg = 'dumping';
-    for (const c of eggChars) if (!c.done){ c.el.style.visibility = 'hidden'; eggLeft.push(c); }
-    eggEl.classList.add('on');
-    const W = DUMP.eggWindow, land = c => { scrambling.delete(c); c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall'); };
-    for (let k = 0; k < eggLeft.length + W; k++) tape.push(() => {
-      const c = eggLeft[k]; if (c){ c.el.style.visibility = ''; c.el.classList.add('fall'); scrambling.add(c); }
-      if (k - W >= 0) land(eggLeft[k - W]);
-    });
-  }
+  if (eggText && state.egg !== 'landed') eggFast(DUMP.egg);   // v1.55: the daily lines keep (or get) their rain-down, at 3x. was (v1.25-v1.54): typed into the burst
   const total = tape.length, D = Math.min(DUMP.ms, total*DUMP.perStep), t0 = performance.now();
   let at = 0;
   state.dump = {steps: total, ms: Math.round(D), t0, from: {line: lineAt, head: state.head}};
@@ -1382,11 +1385,9 @@ function dump(){
     while (at < k) tape[at++]();
     for (const c of scrambling) c.el.firstChild.textContent = rg();
     if (at < total){ dumpRaf = requestAnimationFrame(frame); return; }
-    dumpRaf = 0; dumping = false; state.dump.took = Math.round(performance.now() - t0); unboost(DUMP.rainDown); JayRain.goldOff({hold: 1000, ms: 350, first: true});   // v1.52: hold the gold 1s, then fade back to the first state (teal, 1x)
-      // v1.33: landed, so the rain eases back to the orange 2x
+    dumpRaf = 0; state.dump.took = Math.round(performance.now() - t0);   // v1.55: still dumping (taps swallowed) until the daily lines land; then dumpSnap. was: hold the gold 1s, fade back over 350ms
     state.line = 3; state.icons = icons.length;
-    if (eggText && state.egg === 'dumping') eggSettle();
-    finishUp();
+    iconsIn = true; cursorHome(); egg(); introEnd();   // = popIcons' done(): the daily lines rain (3x, see eggFast) if they haven't yet; introEnd -> finishUp -> dumpSnap once they've landed
   };
   dumpRaf = requestAnimationFrame(frame);
 }
