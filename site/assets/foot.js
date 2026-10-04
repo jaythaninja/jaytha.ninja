@@ -52,12 +52,13 @@ const nativeOk = v => !(v.valueMissing || v.typeMismatch || v.patternMismatch ||
 const looksDone = () => nativeOk(emailIn.validity) && /@[^@\s]+\.[^@\s.]{2,}$/.test(emailIn.value.trim());
 const rkBtn = form.querySelector('.rkb'), SVGNS = 'http://www.w3.org/2000/svg';
 
-/* ---- the charging line (the homepage's cable: track, 3 fills, the white flow; one colour, see foot.css) ---- */
+/* ---- the charging line (the homepage's cable: one track, one fill, the white flow; one colour, see foot.css) ---- */
 const PORT = (() => { const dx = 100 - 128, dy = 168 + 6 - 128, c = Math.SQRT1_2; return [(128 + (dx - dy)*c)/256, (128 + (dx + dy)*c)/256]; })();
 const svgEl = (tag, attrs) => { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
 const cblSvg = k => svgEl('svg', {class: 'cbl ' + k, 'aria-hidden': 'true', focusable: 'false'});
-const cblT = cblSvg('cbl-t'), cblF = [1, 2, 3].map(i => cblSvg('cbl-f cbl-f' + i)), cblW = cblSvg('cbl-w');
-const segT = [1, 2, 3].map(i => svgEl('path', {class: 's' + i})), segF = [1, 2, 3].map(() => svgEl('path', {class: 'fill', pathLength: 100})), flowP = svgEl('path', {class: 'flow', pathLength: 100});
+/* v1.67 (jay 2026.10.03): one track path + one fill path (was 3 abutting segments each, which left faint joins at 1/3 and 2/3); the fill is one dash that grows along the whole line */
+const cblT = cblSvg('cbl-t'), cblF = [cblSvg('cbl-f cbl-f1')], cblW = cblSvg('cbl-w');
+const segT = [svgEl('path', {class: 's1'})], segF = [svgEl('path', {class: 'fill', pathLength: 100})], flowP = svgEl('path', {class: 'flow', pathLength: 100});
 cblT.append(...segT); cblF.forEach((sv, i) => sv.appendChild(segF[i])); cblW.appendChild(flowP);
 form.append(cblT, ...cblF, cblW); form.classList.add('cabled');
 const cblAll = [cblT, ...cblF, cblW];
@@ -67,7 +68,7 @@ const placeCable = () => {
   const xp = rkBtn.offsetLeft + bw*PORT[0], yp = Math.min(yb, rkBtn.offsetTop + bh*PORT[1]), pad = 12, run = bw*.6, xs = Math.max(x0, xp - run), d = Math.min(8, (yb - yp)*.5);
   const L = x0 - pad, T = yp - pad, X = v => (v - L).toFixed(2), Y = v => (v - T).toFixed(2);
   const curve = `C${X(xs + (xp - xs)*.55)} ${Y(yb)} ${X(xp - d)} ${Y(yp + d)} ${X(xp)} ${Y(yp)}`, a = x0 + (xs - x0)/3, b = x0 + (xs - x0)*2/3;
-  const seg = [`M${X(x0)} ${Y(yb)}H${X(a)}`, `M${X(a)} ${Y(yb)}H${X(b)}`, `M${X(b)} ${Y(yb)}H${X(xs)}${curve}`];
+  const seg = [`M${X(x0)} ${Y(yb)}H${X(xs)}${curve}`];
   for (const sv of cblAll){ sv.style.left = L + 'px'; sv.style.top = T + 'px'; sv.setAttribute('width', (xp - x0 + 2*pad).toFixed(2)); sv.setAttribute('height', (yb - yp + 2*pad).toFixed(2)); }
   seg.forEach((d, i) => { segT[i].setAttribute('d', d); segF[i].setAttribute('d', d); });
   flowP.setAttribute('d', `M${X(x0)} ${Y(yb)}H${X(xs)}${curve}`);

@@ -191,7 +191,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .notify .rkb{position:relative;display:block;width:54px;height:54px;padding:0;margin:-9px -6px -9px -4px;border-radius:12px;line-height:0;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
 .notify .rkb .rk{display:block;width:100%;height:100%;overflow:visible;transform-origin:50% 50%;transition:opacity .35s ease,filter .35s ease,transform .25s cubic-bezier(.34,1.56,.64,1)}
 .rk .rk-fl{transform-box:fill-box;transform-origin:50% 0}
-.notify .rkb:hover,.notify .rkb:focus-visible{background:rgba(var(--c-rgb),.08)}
+.notify .rkb:focus-visible{background:rgba(var(--c-rgb),.08)}.notify .rkb:hover:not(:focus-visible){background:transparent}   /* v1.67 (jay 2026.10.03): no hover tint any more, only the keyboard one. a tapped / hovered rocket kept a rounded square behind its glow (sticky :hover on phones, worst in gold); the hover feedback is the rocket itself (full opacity, faster pulse when ready) */
 .notify .rkb:active .rk{transform:scale(.92)}
 .notify .rkb{transition:color .15s ease,background-color .15s ease,opacity .35s ease-out}.notify.rk-wait .rkb{opacity:0;pointer-events:none}
 .notify .rkb[disabled]{background:transparent}
@@ -229,20 +229,20 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .notify .cbl-t path{stroke-width:var(--tw);transition:stroke .2s ease,stroke-width .2s ease}
 /* v1.67 (jay 2026.10.03): the charging line is one colour, the speed state's --c (teal 1x, orange after a speed tap, the light-theme shades too), track and fill; was teal / orange / gold thirds.
    it still turns full gold exactly as before: a valid email = data-chg 3 + .gold-ok (--c/--f gold, the chg-full pulse), and every .gld state */
-.notify .cbl-t .s1,.notify .cbl-t .s2,.notify .cbl-t .s3{stroke:rgba(var(--c-rgb),var(--to))}
+.notify .cbl-t .s1{stroke:rgba(var(--c-rgb),var(--to))}
 .notify.cabled input,.notify.cabled input:hover,.notify.cabled input:focus{border-bottom-color:transparent}
 .notify.cabled input:focus{box-shadow:0 10px 18px -12px rgba(var(--c-rgb),.9)}
 .notify.cabled .rk .rk-flap{transform:scaleX(.14);transition-delay:0s}
 .notify .cbl-f{opacity:var(--fill-o);transition:opacity .45s ease,filter .45s ease}
-.notify .cbl-f1,.notify .cbl-f2,.notify .cbl-f3{filter:drop-shadow(0 0 var(--fill-g) rgba(var(--c-rgb),.95))}
-.notify .cbl-f .fill{stroke-width:2;transition:stroke-dasharray .45s cubic-bezier(.22,1,.36,1),stroke .3s ease}
-.notify .cbl-f1 .fill{stroke:var(--c);stroke-dasharray:var(--d1) 200}.notify .cbl-f2 .fill{stroke:var(--c);stroke-dasharray:var(--d2) 200;transition-delay:.12s,0s}.notify .cbl-f3 .fill{stroke:var(--c);stroke-dasharray:var(--d3) 200;transition-delay:.24s,0s}
+.notify .cbl-f1{filter:drop-shadow(0 0 var(--fill-g) rgba(var(--c-rgb),.95))}
+.notify .cbl-f .fill{stroke-width:2;transition:stroke-dasharray .6s cubic-bezier(.22,1,.36,1),stroke .3s ease}
+.notify .cbl-f1 .fill{stroke:var(--c);stroke-dasharray:var(--fd) 200}   /* --fd = how far along the whole line (pathLength 100) it's charged: the same 1/10, 1/3, 2/3 of the straight run, then all of it, as the old 3 segments */
 .notify[data-chg="0"] .cbl-f .fill,.notify[data-chg="1"] .cbl-f .fill{transition-delay:0s}
 .notify .cbl-w .flow{stroke:var(--c-wh);stroke-width:2;stroke-dasharray:var(--flow-l) 300;stroke-dashoffset:var(--flow-l);opacity:var(--flow-o);animation:cbl-flow var(--chg-t) cubic-bezier(.55,0,.85,.45) infinite;transition:opacity .45s ease}
-.notify{--d1:30;--d2:0;--d3:0;--flow-dash:calc(var(--cbl-s,90)*.1);--flow-l:9;--fill-o:.62;--fill-g:2px;--flow-o:.55;--chg-t:4s;--rk-s:1;--rk-g:5px;--rk-a:.38;--rk-o:.8}
-.notify[data-chg="1"]{--d1:100;--flow-dash:calc(var(--cbl-s,90)/3);--fill-o:.75;--fill-g:3px;--flow-o:.6;--chg-t:2.4s;--rk-s:1.01;--rk-g:8px;--rk-a:.52;--rk-o:.86}
-.notify[data-chg="2"]{--d1:100;--d2:100;--flow-dash:calc(var(--cbl-s,90)*2/3);--fill-o:.88;--fill-g:4.5px;--flow-o:.65;--chg-t:1.3s;--rk-s:1.02;--rk-g:11px;--rk-a:.7;--rk-o:.93}
-.notify[data-chg="3"]{--d1:100;--d2:100;--d3:100;--fill-o:1;--fill-g:7px;--flow-o:0;--chg-t:1.3s;--rk-s:1.035;--rk-g:15px;--rk-a:.92;--rk-o:1}
+.notify{--fd:calc(var(--cbl-s,90)*.1);--flow-dash:calc(var(--cbl-s,90)*.1);--flow-l:9;--fill-o:.62;--fill-g:2px;--flow-o:.55;--chg-t:4s;--rk-s:1;--rk-g:5px;--rk-a:.38;--rk-o:.8}
+.notify[data-chg="1"]{--fd:calc(var(--cbl-s,90)/3);--flow-dash:calc(var(--cbl-s,90)/3);--fill-o:.75;--fill-g:3px;--flow-o:.6;--chg-t:2.4s;--rk-s:1.01;--rk-g:8px;--rk-a:.52;--rk-o:.86}
+.notify[data-chg="2"]{--fd:calc(var(--cbl-s,90)*2/3);--flow-dash:calc(var(--cbl-s,90)*2/3);--fill-o:.88;--fill-g:4.5px;--flow-o:.65;--chg-t:1.3s;--rk-s:1.02;--rk-g:11px;--rk-a:.7;--rk-o:.93}
+.notify[data-chg="3"]{--fd:100;--fill-o:1;--fill-g:7px;--flow-o:0;--chg-t:1.3s;--rk-s:1.035;--rk-g:15px;--rk-a:.92;--rk-o:1}
 .notify.gold-ok,.rk-sky.gold{--c:#FFD700;--c-rgb:255,215,0;--c-lt:#FFE066;--c-dk:#C99A00;--c-pale:#FFF6C2;--c-hot:#FFFBE8;--c-wh:#FFFBE8;--c-lt-rgb:255,230,102;--c-lt2:#FFE766;
   --c-l1-rgb:255,224,102;--c-l2-rgb:255,231,120;--c-l3-rgb:255,236,150;--c-l4-rgb:255,190,0;--c-l5-rgb:255,246,194;
   --f:#FFD700;--f-rgb:255,215,0;--f-lt:#FFE066;--f-dk:#C99A00;--f-pale:#FFF6C2;--f-wh:#FFFBE8;--f-lt2:#FFE766;--f-l4-rgb:255,190,0;--f-l5-rgb:255,246,194}
@@ -817,8 +817,9 @@ const rkBtn = form.querySelector('.rkb'), SVGNS = 'http://www.w3.org/2000/svg';
 const PORT = (() => { const dx = 100 - 128, dy = 168 + 6 - 128, c = Math.SQRT1_2; return [(128 + (dx - dy)*c)/256, (128 + (dx + dy)*c)/256]; })();
 const svgEl = (tag, attrs) => { const e = document.createElementNS(SVGNS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e; };
 const cblSvg = k => svgEl('svg', {class: 'cbl ' + k, 'aria-hidden': 'true', focusable: 'false'});
-const cblT = cblSvg('cbl-t'), cblF = [1, 2, 3].map(i => cblSvg('cbl-f cbl-f' + i)), cblW = cblSvg('cbl-w');
-const segT = [1, 2, 3].map(i => svgEl('path', {class: 's' + i})), segF = [1, 2, 3].map(() => svgEl('path', {class: 'fill', pathLength: 100})), flowP = svgEl('path', {class: 'flow', pathLength: 100});
+/* v1.67 (jay 2026.10.03): one track path + one fill path (was 3 abutting segments each, which left faint joins at 1/3 and 2/3); the fill is one dash that grows along the whole line */
+const cblT = cblSvg('cbl-t'), cblF = [cblSvg('cbl-f cbl-f1')], cblW = cblSvg('cbl-w');
+const segT = [svgEl('path', {class: 's1'})], segF = [svgEl('path', {class: 'fill', pathLength: 100})], flowP = svgEl('path', {class: 'flow', pathLength: 100});
 cblT.append(...segT); cblF.forEach((sv, i) => sv.appendChild(segF[i])); cblW.appendChild(flowP);
 form.append(cblT, ...cblF, cblW); form.classList.add('cabled');
 const cblAll = [cblT, ...cblF, cblW];
@@ -827,7 +828,7 @@ const placeCable = () => {
   const xp = rkBtn.offsetLeft + bw*PORT[0], yp = Math.min(yb, rkBtn.offsetTop + bh*PORT[1]), pad = 12, run = bw*.6, xs = Math.max(x0, xp - run), d = Math.min(8, (yb - yp)*.5);
   const L = x0 - pad, T = yp - pad, X = v => (v - L).toFixed(2), Y = v => (v - T).toFixed(2);
   const curve = `C${X(xs + (xp - xs)*.55)} ${Y(yb)} ${X(xp - d)} ${Y(yp + d)} ${X(xp)} ${Y(yp)}`, a = x0 + (xs - x0)/3, b = x0 + (xs - x0)*2/3;
-  const seg = [`M${X(x0)} ${Y(yb)}H${X(a)}`, `M${X(a)} ${Y(yb)}H${X(b)}`, `M${X(b)} ${Y(yb)}H${X(xs)}${curve}`];
+  const seg = [`M${X(x0)} ${Y(yb)}H${X(xs)}${curve}`];
   for (const sv of cblAll){ sv.style.left = L + 'px'; sv.style.top = T + 'px'; sv.setAttribute('width', (xp - x0 + 2*pad).toFixed(2)); sv.setAttribute('height', (yb - yp + 2*pad).toFixed(2)); }
   seg.forEach((d, i) => { segT[i].setAttribute('d', d); segF[i].setAttribute('d', d); });
   flowP.setAttribute('d', `M${X(x0)} ${Y(yb)}H${X(xs)}${curve}`);
