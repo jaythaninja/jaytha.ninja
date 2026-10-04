@@ -1,29 +1,198 @@
-/* v1.61 (jay 2026.10.03): the subpages' footer signup (/song-of-the-day/, /quote-of-the-day/, /snap-of-the-day/, /daily-update/), one partial for all four (ref/gen: apply_v161.py).
-   the homepage's signup line + field, in the copy column under everything: "drop us your email if you want to help", the field (teal underline) and an orange → (tappable).
-   the same buttondown form as the homepage (double opt-in, cors fetch, anything but a 2xx hands off to buttondown's page). the thank-you types in gold in the field's slot
-   (one grid cell, so nothing moves). the page's min-height keeps the footer below the first screen, so the archive filling in above it never moves anything you can see
-   (the 12px top padding keeps even the text-shadow's ink below the fold on the first frame) */
-.foot{position:relative;z-index:2;margin-left:var(--left);width:min(60ch,calc(100vw - 48px));padding:12px 0 clamp(56px,9vh,100px);font-size:16px;line-height:1.5;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
-.foot .fs-l{display:block;color:var(--white);line-height:1.7}
-.foot .teal{color:var(--c);white-space:nowrap}
-.foot .fs-slot{display:grid;margin-top:10px}
-.foot .fs-slot > *{grid-area:1/1}
-.foot .fs-row{display:flex;align-items:baseline;gap:14px;transition:opacity .35s ease,visibility 0s}
-.foot .fs-in{flex:0 1 23ch;min-width:0;font:inherit;font-size:16px;line-height:1.5;color:var(--white);background:transparent;border:0;border-bottom:1px solid rgba(var(--c-rgb),.55);border-radius:0;padding:4px 0 5px;caret-color:var(--c);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s ease,box-shadow .2s ease,text-shadow .2s ease}
-.foot .fs-in::placeholder{color:rgba(var(--ink-rgb),.34);opacity:1;transition:color .2s ease}
-.foot .fs-in:hover{border-bottom-color:rgba(var(--c-rgb),.8)}
-.foot .fs-in:focus{border-bottom-color:var(--c);box-shadow:0 1px 0 var(--c),0 10px 18px -12px rgba(var(--c-rgb),.9)}
-.foot .fs-go{flex:none;font:inherit;font-size:18px;line-height:1.5;color:var(--f);background:transparent;border:0;border-radius:8px;padding:6px 10px;margin:-6px -10px;cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation;transition:color .15s ease,text-shadow .2s ease}
-.foot .fs-go:hover,.foot .fs-go:focus-visible{text-shadow:0 0 12px rgba(var(--f-rgb),.7)}
-.foot .fs-go:focus-visible{outline:2px solid var(--f);outline-offset:2px}
-.foot .fs-go[disabled]{opacity:.55;cursor:default}
-.foot form.ok .fs-go{text-shadow:0 0 12px rgba(var(--f-rgb),.8)}
-/* an incomplete email: nothing is sent, the placeholder / text glows teal twice (colour + shadow only) */
-.foot form.bad input[type=email],.foot form.bad input[type=email]::placeholder{animation:fs-bad .5s ease-in-out 2}
-@keyframes fs-bad{50%{color:var(--c);text-shadow:0 0 10px rgba(var(--c-rgb),.95)}}
-.foot .fs-thx{align-self:baseline;white-space:nowrap;color:var(--au);text-shadow:0 0 12px rgba(var(--au-rgb),.55);padding:4px 0 5px;visibility:hidden}
-.foot form.sent .fs-row{opacity:0;visibility:hidden;transition:opacity .35s ease,visibility 0s .35s}
-.foot form.sent .fs-thx{visibility:visible}
-.foot .fs-thx .gh{visibility:hidden}
-@media (max-width:760px){.foot{margin-left:24px;width:calc(100vw - 48px);padding-bottom:22px;font-size:14px}.foot .fs-slot{margin-top:6px}}
-@media (prefers-reduced-motion:reduce){.foot .fs-row,.foot form.sent .fs-row{transition:none}.foot form.bad input[type=email],.foot form.bad input[type=email]::placeholder{animation:none;color:var(--c)}}
+/* v1.67 (jay 2026.10.03): the shared footer (every subpage, built by assets/foot.js): the homepage's whole signup + icon row at the end of the page.
+   everything below the footer box rules is the homepage's own css, copied by tools/build_foot.py (the classes are the same: .cta / .prompt / .signup / .notify / .social
+   and the liftoff's .rk-sky), so the field, the one-colour charging line, the rocket, the liftoff + the failed liftoff look and move exactly as on the homepage and
+   follow the page states (--c / --f: teal, orange after a speed tap, gold). the sizes are the homepage's (18px, 14px on phones) and the spacing too (field 29px under
+   the prompt, 13px on phones; the row 29.5px / 18px under the field). the footer sits at the end of the content, under everything (the page's min-height keeps it below
+   the first screen, so building it never moves anything you can see). was (v1.61-v1.66): "drop us your email if you want to help" + a plain → */
+.foot{--fs:18px;--pgap:32px;--su:29px;--sec-a:29.5px;--k:.9167;--kx:.8;--ich:48px;--igap:12px;
+  position:relative;z-index:2;margin-left:var(--left);width:min(72ch,calc(100vw - var(--left) - 24px));padding:12px 0 clamp(56px,9vh,100px);min-height:calc(186px + clamp(56px,9vh,100px));font-size:var(--fs);line-height:1.5;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
+.foot .cta{margin-top:0}
+.foot .social li{opacity:1}
+.foot .status{white-space:nowrap}
+@media (max-width:760px){
+  .foot{--fs:14px;--pgap:20px;--su:13px;--sec-a:18px;--k:.8333;--kx:.7143;--ich:40px;margin-left:24px;width:calc(100vw - 48px);padding-bottom:22px;min-height:163px}
+  .foot .notify{gap:14px}
+  .foot .notify button{font-size:16px}
+  .foot .notify .rkb{width:48px;height:48px;margin:-7px -6px -7px -4px;border-radius:11px}
+  .foot .notify input{font-size:16px;flex:0 0 auto;width:calc((100% - 52px)/.875);margin-right:calc((100% - 52px)*(1 - 1/.875));transform:scale(.875);transform-origin:0 100%}
+  .foot .signup{--hint-r:14px;--chev-in:2.4px;margin-right:calc(var(--hint-r) + var(--chev-in) - 24px)}
+}
+@media (min-width:761px){.foot .notify input{flex:1 1 0}.foot .signup{margin-right:6px}}
+@media (max-width:329px){.foot{min-height:187px}}   /* the prompt wraps to two lines this narrow */
+/* the empty footer already has the built one's height (min-height = padding + prompt + field + row), so the page is as tall from the first frame and building it moves nothing (not even a scrollbar appearing) */
+/* ---- the homepage's css (generated, don't edit here: edit the homepage + re-run tools/build_foot.py) ---- */
+.prompt .teal{color:var(--c);white-space:nowrap}
+.spamcan{--spam-body:#1AADB3;--spam-body-edge:#0B5B5E;--spam-rim:#F2B632;--spam-rim-edge:#6E4A06;--spam-ink:#021213}
+.spamcan.is-orange,:root[data-mode="fast"] .spamcan{--spam-body:#FF4D1A;--spam-body-edge:#8A2208;--spam-ink:#2A0A02}
+.spamcan.is-gold,:root[data-mode] .gld .spamcan,:root[data-mode] .spamcan.gld,:root[data-mode].gld .spamcan,:root[data-mode] .cta:has(.notify.gold-ok) .spamcan{--spam-body:#FFD700;--spam-body-edge:#7A5C00;--spam-rim:#FFFBE8;--spam-rim-edge:#7A5C00;--spam-ink:#5A4300}
+@media (prefers-color-scheme:light){
+  .spamcan{--spam-body:#0E7C81;--spam-body-edge:#064346;--spam-ink:#fff}
+  .spamcan.is-orange,:root[data-mode="fast"] .spamcan{--spam-ink:#2A0A02}
+  .spamcan.is-gold,:root[data-mode] .gld .spamcan,:root[data-mode] .spamcan.gld,:root[data-mode].gld .spamcan,:root[data-mode] .cta:has(.notify.gold-ok) .spamcan{--spam-body:#E0B400;--spam-body-edge:#7A5C00;--spam-ink:#3D2E00}
+}
+.cta{margin-top:var(--pgap);font-size:var(--fs);line-height:1.5}
+.prompt{color:var(--white);line-height:1.7}
+.prompt{text-wrap:balance}
+.signup{position:relative}
+.signup{display:grid;grid-template-columns:minmax(0,1fr);margin-top:6px}
+.signup > *{grid-area:1/1}
+.notify{display:flex;min-width:0;align-items:baseline;gap:18px;transition:opacity .45s ease-out,transform .5s cubic-bezier(.22,1,.36,1),visibility 0s}
+.js .notify.gone{opacity:0;transform:translateY(-4px);visibility:hidden;transition:opacity .2s ease-in,transform .2s ease-in,visibility 0s .2s}
+.notify input{flex:0 1 23ch;min-width:0;font:inherit;font-size:var(--fs);line-height:1.5;color:var(--white);background:transparent;border:0;border-bottom:1px solid rgba(var(--c-rgb),.55);border-radius:0;padding:4px 0 5px;caret-color:var(--c);outline:none;-webkit-appearance:none;appearance:none;transition:border-color .2s ease,box-shadow .2s ease}
+.notify input::placeholder{color:rgba(var(--ink-rgb),.34);opacity:1}
+.notify input{color:var(--eg-c,var(--white));text-shadow:var(--eg-s,none)}
+.notify input::placeholder{color:var(--eg-pc,rgba(var(--ink-rgb),.34));text-shadow:var(--eg-s,none)}
+.notify input:hover{border-bottom-color:rgba(var(--c-rgb),.8)}
+.notify input:focus{border-bottom-color:var(--c);box-shadow:0 1px 0 var(--c),0 10px 18px -12px rgba(var(--c-rgb),.9)}
+.notify input:-webkit-autofill{-webkit-text-fill-color:var(--white);-webkit-box-shadow:0 0 0 60px var(--bg) inset;caret-color:var(--c);transition:background-color 9999s}
+.notify button{flex:none;font:inherit;font-size:18px;line-height:1.5;color:var(--c);background:transparent;border:0;border-radius:6px;padding:4px 6px;margin:0 -6px;cursor:pointer;white-space:nowrap;font-weight:400;transition:color .15s ease,background-color .15s ease}
+.notify button:hover,.notify button:focus-visible{color:var(--c);background:rgba(var(--c-rgb),.08)}
+.notify button[disabled]{cursor:default;color:var(--ink-3);background:transparent}
+.status{align-self:center;color:var(--au);font-size:var(--fs);line-height:1.5}
+.status:empty{display:none}
+.glue{white-space:nowrap}
+.social{display:flex;flex-wrap:nowrap;align-items:center;gap:0 var(--igap);list-style:none}
+.social li:not(.cur){flex:none;display:flex;align-items:center;height:var(--ich)}
+.social a{display:flex;align-items:center;justify-content:center;padding:5px;margin:-5px;box-sizing:content-box;border-radius:8px}
+.social a:hover{background:rgba(var(--c-rgb),.08)}
+a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2px}
+.notify input:focus-visible{outline:none}
+@media (prefers-reduced-motion:reduce){.notify{transition:none!important}}
+.ic{width:calc(var(--s)*var(--k)*1px);height:calc(var(--s)*var(--k)*1px);flex:none}
+.social li{position:relative}
+.social .who-t{display:flex;align-items:center;gap:calc(2px*var(--k));font-size:calc(17px*var(--k));line-height:1;color:var(--c);white-space:nowrap;font-weight:400}
+.social .who-t .nj{display:block;flex:none;width:calc(24px*var(--k));height:calc(24px*var(--k))}
+.social a.who-t{padding:12px;margin:-12px;border-radius:12px;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.social a.who-t:hover{background:none}
+.social a.who-t:focus-visible{outline:2px solid var(--c);outline-offset:-8px}   /* v1.67 (yuki): a keyboard ring on the ninja link, in the state colour, inside its 44px tap target (clear of the next icon) */
+.social .who-t,.social .who-t *{transition:color .15s ease,fill .15s ease,stroke .15s ease,stop-color .15s ease}
+.nj{--nj-a-lt:var(--c-lt);--nj-a:var(--c);--nj-a-dk:var(--c-dk);--nj-a-hl:#A6F0F2;--nj-a-tail:#128E93;--nj-a-sash:#9BEBEE;--nj-k-lt:var(--f-lt);--nj-k:var(--f);--nj-k-dk:var(--f-dk);--nj-k-wrap:#5a1604}
+:root[data-mode="fast"] .nj{--nj-a-hl:var(--c-pale);--nj-a-tail:var(--c-dk);--nj-a-sash:var(--c-pale);--nj-k-wrap:#053638}
+:root[data-mode] .gld .nj,:root[data-mode] .nj.gld,:root[data-mode].gld .nj{--nj-a-hl:var(--c-pale);--nj-a-tail:var(--c-dk);--nj-a-sash:var(--c-pale);--nj-k-wrap:#5a4300}
+.elsewhere{margin-top:var(--sec-a)}
+.cta .signup{margin-top:var(--su)}
+.signup > .notify,.signup > .status{align-self:baseline}
+.signup > .status{top:0}
+@media (max-width:760px){.signup > .status{top:1.5px}}
+.notify{align-items:center}
+.notify .rkb{position:relative;display:block;width:54px;height:54px;padding:0;margin:-9px -6px -9px -4px;border-radius:12px;line-height:0;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+.notify .rkb .rk{display:block;width:100%;height:100%;overflow:visible;transform-origin:50% 50%;transition:opacity .35s ease,filter .35s ease,transform .25s cubic-bezier(.34,1.56,.64,1)}
+.rk .rk-fl{transform-box:fill-box;transform-origin:50% 0}
+.notify .rkb:focus-visible{background:rgba(var(--c-rgb),.08)}.notify .rkb:hover:not(:focus-visible){background:transparent}   /* v1.67 (jay 2026.10.03): no hover tint any more, only the keyboard one. a tapped / hovered rocket kept a rounded square behind its glow (sticky :hover on phones, worst in gold); the hover feedback is the rocket itself (full opacity, faster pulse when ready) */
+.notify .rkb:active .rk{transform:scale(.92)}
+.notify .rkb{transition:color .15s ease,background-color .15s ease,opacity .35s ease-out}.notify.rk-wait .rkb{opacity:0;pointer-events:none}
+.notify .rkb[disabled]{background:transparent}
+@media (max-width:760px){.notify .rkb{width:48px;height:48px;margin:-7px -6px -7px -4px;border-radius:11px}}
+@media (max-width:760px){.notify input{flex:1 1 0}}
+@media (min-width:761px){.notify input{flex:1 1 0}.signup{margin-right:6px}}
+@media (max-width:760px){.notify input{font-size:16px;flex:0 0 auto;width:calc((100% - 52px)/.875);margin-right:calc((100% - 52px)*(1 - 1/.875));transform:scale(.875);transform-origin:0 100%}}
+@media (max-width:760px){.signup{--hint-r:14px;--chev-in:2.4px;margin-right:calc(var(--hint-r) + var(--chev-in) - 24px)}}
+.notify:not(.ok) .rkb .rk{opacity:.8}
+.notify:not(.ok) .rkb:hover .rk{opacity:1}
+.notify:not(.ok) .rk .rk-fl{opacity:.85;transform:scaleY(.92)}
+.rk .rk-fl{transition:opacity .35s ease,transform .35s ease}
+.notify.ok .rkb .rk{opacity:1;animation:rk-pulse 1.9s ease-in-out infinite}
+.notify.ok .rk .rk-fl{animation:rk-flick .42s ease-in-out infinite}
+.notify.ok .rkb:hover .rk,.notify.ok .rkb:focus-visible .rk{animation-duration:1.1s}
+.notify .rkb[disabled] .rk{animation:none;opacity:.55}
+.rk .rk-flap{transform-box:fill-box;transform-origin:0 50%;transition:transform .3s cubic-bezier(.3,1.35,.6,1) .22s}
+.rk .rk-led{opacity:0;transition:opacity .3s ease .22s}
+.notify[data-chg]:not([data-chg="0"]) .rk .rk-flap{transform:scaleX(.14);transition-delay:0s}
+.notify[data-chg]:not([data-chg="0"]) .rk .rk-led{opacity:var(--fill-o);transition-delay:.12s}
+@keyframes rk-pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 3px rgba(var(--c-rgb),.45))}50%{transform:scale(1.05);filter:drop-shadow(0 0 11px rgba(var(--c-rgb),.85)) drop-shadow(0 0 4px rgba(var(--c-rgb),.45))}}
+@keyframes rk-flick{0%,100%{transform:scale(1,1);opacity:1}22%{transform:scale(.93,1.2);opacity:.9}48%{transform:scale(1.05,.88);opacity:1}74%{transform:scale(.96,1.13);opacity:.85}}
+@media (prefers-reduced-motion:reduce){
+  .notify .rkb .rk,.rk .rk-fl{transition:none}
+  .notify.ok .rkb .rk{animation:none;filter:drop-shadow(0 0 8px rgba(var(--c-rgb),.7))}
+  .notify.ok .rk .rk-fl{animation:none}
+  .notify .rkb:active .rk{transform:none}}
+.notify{position:relative}
+.notify .rkb{z-index:1}
+.notify .cbl{position:absolute;left:0;top:0;overflow:visible;pointer-events:none;z-index:0}
+.notify .cbl path{fill:none;stroke-linecap:butt;stroke-linejoin:round}
+.notify{--to:.55;--tw:1}
+.notify:has(input:hover){--to:.8}
+.notify:focus-within{--to:1;--tw:1.6}
+.notify .cbl-t path{stroke-width:var(--tw);transition:stroke .2s ease,stroke-width .2s ease}
+/* v1.67 (jay 2026.10.03): the charging line is one colour, the speed state's --c (teal 1x, orange after a speed tap, the light-theme shades too), track and fill; was teal / orange / gold thirds.
+   it still turns full gold exactly as before: a valid email = data-chg 3 + .gold-ok (--c/--f gold, the chg-full pulse), and every .gld state */
+.notify .cbl-t .s1{stroke:rgba(var(--c-rgb),var(--to))}
+.notify.cabled input,.notify.cabled input:hover,.notify.cabled input:focus{border-bottom-color:transparent}
+.notify.cabled input:focus{box-shadow:0 10px 18px -12px rgba(var(--c-rgb),.9)}
+.notify.cabled .rk .rk-flap{transform:scaleX(.14);transition-delay:0s}
+.notify .cbl-f{opacity:var(--fill-o);transition:opacity .45s ease,filter .45s ease}
+.notify .cbl-f1{filter:drop-shadow(0 0 var(--fill-g) rgba(var(--c-rgb),.95))}
+.notify .cbl-f .fill{stroke-width:2;transition:stroke-dasharray .6s cubic-bezier(.22,1,.36,1),stroke .3s ease}
+.notify .cbl-f1 .fill{stroke:var(--c);stroke-dasharray:var(--fd) 200}   /* --fd = how far along the whole line (pathLength 100) it's charged: the same 1/10, 1/3, 2/3 of the straight run, then all of it, as the old 3 segments */
+.notify[data-chg="0"] .cbl-f .fill,.notify[data-chg="1"] .cbl-f .fill{transition-delay:0s}
+.notify .cbl-w .flow{stroke:var(--c-wh);stroke-width:2;stroke-dasharray:var(--flow-l) 300;stroke-dashoffset:var(--flow-l);opacity:var(--flow-o);animation:cbl-flow var(--chg-t) cubic-bezier(.55,0,.85,.45) infinite;transition:opacity .45s ease}
+.notify{--fd:calc(var(--cbl-s,90)*.1);--flow-dash:calc(var(--cbl-s,90)*.1);--flow-l:9;--fill-o:.62;--fill-g:2px;--flow-o:.55;--chg-t:4s;--rk-s:1;--rk-g:5px;--rk-a:.38;--rk-o:.8}
+.notify[data-chg="1"]{--fd:calc(var(--cbl-s,90)/3);--flow-dash:calc(var(--cbl-s,90)/3);--fill-o:.75;--fill-g:3px;--flow-o:.6;--chg-t:2.4s;--rk-s:1.01;--rk-g:8px;--rk-a:.52;--rk-o:.86}
+.notify[data-chg="2"]{--fd:calc(var(--cbl-s,90)*2/3);--flow-dash:calc(var(--cbl-s,90)*2/3);--fill-o:.88;--fill-g:4.5px;--flow-o:.65;--chg-t:1.3s;--rk-s:1.02;--rk-g:11px;--rk-a:.7;--rk-o:.93}
+.notify[data-chg="3"]{--fd:100;--fill-o:1;--fill-g:7px;--flow-o:0;--chg-t:1.3s;--rk-s:1.035;--rk-g:15px;--rk-a:.92;--rk-o:1}
+.notify.gold-ok,.rk-sky.gold{--c:#FFD700;--c-rgb:255,215,0;--c-lt:#FFE066;--c-dk:#C99A00;--c-pale:#FFF6C2;--c-hot:#FFFBE8;--c-wh:#FFFBE8;--c-lt-rgb:255,230,102;--c-lt2:#FFE766;
+  --c-l1-rgb:255,224,102;--c-l2-rgb:255,231,120;--c-l3-rgb:255,236,150;--c-l4-rgb:255,190,0;--c-l5-rgb:255,246,194;
+  --f:#FFD700;--f-rgb:255,215,0;--f-lt:#FFE066;--f-dk:#C99A00;--f-pale:#FFF6C2;--f-wh:#FFFBE8;--f-lt2:#FFE766;--f-l4-rgb:255,190,0;--f-l5-rgb:255,246,194}
+@media (prefers-color-scheme:light){.notify.gold-ok,.rk-sky.gold{--c:#A67C00;--c-rgb:166,124,0;--c-hot:#7A5C00;--c-wh:#7A5C00;--f:#A67C00;--f-rgb:166,124,0;--f-lt2:#C99A00;--f-l4-rgb:184,134,11;--c-l2-rgb:201,154,0;--c-l3-rgb:184,134,11}}
+.notify[data-chg="3"] .cbl-w .flow{animation:none;opacity:0;visibility:hidden;transition:none}
+.notify[data-chg="3"] .cbl-f .fill{transition:stroke .3s ease;animation:chg-full 1.8s ease-in-out infinite}
+.notify[data-chg="3"] .cbl-f{transition:none;animation:chg-glow 1.8s ease-in-out infinite}
+.notify:not(.ok) .rkb .rk{opacity:var(--rk-o);transform:scale(var(--rk-s));filter:drop-shadow(0 0 var(--rk-g) rgba(var(--c-rgb),var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(var(--c-l1-rgb),calc(var(--rk-a)*.7)));
+  animation:rk-chg var(--chg-t) ease-in-out infinite}
+.notify.ok .rkb .rk{opacity:1;animation:rk-au 1.8s ease-in-out infinite}
+.notify.ok .rkb:hover .rk,.notify.ok .rkb:focus-visible .rk{animation-duration:1.8s}
+.notify .rkb:active .rk{animation:none;transform:scale(.92)}
+.notify .rkb[disabled] .rk{animation:none;opacity:.55}
+@keyframes cbl-flow{from{stroke-dashoffset:var(--flow-l)}to{stroke-dashoffset:calc(var(--flow-l) - var(--flow-dash))}}
+@keyframes chg-full{0%,100%{stroke:var(--f)}50%{stroke:var(--f-lt2)}}
+@keyframes chg-glow{0%,100%{filter:drop-shadow(0 0 6px rgba(var(--f-rgb),.95))}50%{filter:drop-shadow(0 0 11px rgba(var(--f-l4-rgb),1))}}
+@keyframes rk-chg{0%,100%{transform:scale(var(--rk-s));filter:drop-shadow(0 0 calc(var(--rk-g)*.82) rgba(var(--c-rgb),calc(var(--rk-a)*.85))) drop-shadow(0 0 calc(var(--rk-g)*.3) rgba(var(--c-l1-rgb),calc(var(--rk-a)*.6)))}
+  55%{transform:scale(calc(var(--rk-s) + .008));filter:drop-shadow(0 0 var(--rk-g) rgba(var(--c-rgb),var(--rk-a))) drop-shadow(0 0 calc(var(--rk-g)*.35) rgba(var(--c-l1-rgb),calc(var(--rk-a)*.7)))}}
+@keyframes rk-full{0%,100%{transform:scale(1.035);filter:drop-shadow(0 0 15px rgba(var(--c-rgb),.92)) drop-shadow(0 0 5px rgba(var(--c-l2-rgb),.8))}
+  50%{transform:scale(1.045);filter:drop-shadow(0 0 18px rgba(var(--c-rgb),1)) drop-shadow(0 0 6px rgba(var(--c-l3-rgb),.9))}}
+@keyframes rk-au{0%,100%{transform:scale(1.035);filter:drop-shadow(0 0 10px rgba(var(--c-rgb),.75)) drop-shadow(0 0 4px rgba(var(--c-l2-rgb),.7))}
+  50%{transform:scale(1.07);filter:drop-shadow(0 0 24px rgba(var(--c-rgb),1)) drop-shadow(0 0 8px rgba(var(--c-l3-rgb),1))}}
+.notify.gold-ok.ign .rkb .rk{filter:drop-shadow(0 0 26px rgba(var(--c-rgb),1)) drop-shadow(0 0 10px rgba(var(--c-l3-rgb),1)) drop-shadow(0 0 3px #fff)}
+.notify.gold-ok.ign .cbl-f{animation:none;filter:drop-shadow(0 0 12px rgba(var(--c-rgb),1)) drop-shadow(0 0 4px rgba(var(--c-l3-rgb),1))}
+@media (prefers-reduced-motion:reduce){
+  .notify .cbl-f{animation:none!important;transition:none}
+  .notify .cbl-t path,.rk .rk-flap,.rk .rk-led{transition:none!important}
+  .notify .cbl-f .fill{transition:none;animation:none!important}
+  .notify .cbl-w .flow{animation:none;opacity:0}
+  .notify:not(.ok) .rkb .rk{animation:none}
+  .notify .rkb:active .rk{transform:none}
+  .notify.ok .rkb .rk{animation:none;transform:scale(1.035);filter:drop-shadow(0 0 15px rgba(var(--c-rgb),.92)) drop-shadow(0 0 5px rgba(var(--c-l2-rgb),.8))}}
+.notify.ign .rkb .rk{opacity:1;animation:rk-rumble .09s linear infinite;filter:drop-shadow(0 0 12px rgba(var(--c-rgb),.9)) drop-shadow(0 0 6px rgba(var(--c-rgb),.6))}
+.notify.ign .rk .rk-fl{opacity:1;animation:rk-flick-hot .13s linear infinite}
+.rk stop[stop-color="#FF8A5E"]{stop-color:var(--c-lt)}.rk stop[stop-color="#FF4D1A"]{stop-color:var(--c)}.rk stop[stop-color="#B8300A"]{stop-color:var(--c-dk)}
+.rk stop[stop-color="#5FD6DA"]{stop-color:var(--f-lt)}.rk stop[stop-color="#1AADB3"]{stop-color:var(--f)}.rk stop[stop-color="#0E7C81"]{stop-color:var(--f-dk)}
+.rk [fill="#C9F3F4"]{fill:var(--f-pale)}.rk [stroke="#FFC2A8"]{stroke:var(--c-pale)}.rk [stroke="#FF4D1A"]{stroke:var(--f)}
+.rk-sky{position:fixed;inset:0;z-index:29;pointer-events:none;overflow:hidden}
+.rk-sky .rk{position:absolute;display:block;overflow:visible;will-change:transform;filter:drop-shadow(0 0 12px rgba(var(--c-rgb),.85)) drop-shadow(0 0 6px rgba(var(--c-rgb),.6))}
+.rk-sky .rk .rk-fl{opacity:1;animation:rk-flick-long .1s linear infinite}
+.rk-sky .wk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:var(--c);text-shadow:0 0 8px rgba(var(--c-rgb),.9);will-change:transform,opacity}
+.rk-sky .wk.hot{color:var(--c-wh);text-shadow:0 0 8px rgba(var(--fg-rgb),var(--gk)),0 0 14px rgba(var(--c-rgb),.95)}
+.rk-sky.gold .wk{color:var(--au);text-shadow:0 0 4px #FFF6C2,0 0 10px rgba(var(--au-rgb),.95),0 0 22px rgba(255,190,0,.65)}
+.rk-sky.gold .wk.hot{color:var(--au-hot);text-shadow:0 0 6px rgba(var(--fg-rgb),var(--gk)),0 0 12px #FFE766,0 0 26px rgba(var(--au-rgb),.9)}
+.rk-sky .puff{position:absolute;border-radius:50%;background:radial-gradient(closest-side,rgba(var(--c-rgb),.55),rgba(var(--c-rgb),.18) 55%,rgba(var(--c-rgb),0));will-change:transform,opacity}
+@keyframes rk-rumble{0%,100%{transform:translate(0,0)}25%{transform:translate(.6px,-.4px)}50%{transform:translate(-.5px,.5px)}75%{transform:translate(.4px,.6px)}}
+@keyframes rk-flick-hot{0%,100%{transform:scale(1.05,1.45)}50%{transform:scale(.95,1.75)}}
+@keyframes rk-flick-long{0%,100%{transform:scale(1.1,2.4)}33%{transform:scale(.92,2.9)}66%{transform:scale(1.02,2.1)}}
+.rk-sky .rk.au{filter:drop-shadow(0 0 14px rgba(var(--au-rgb),.95)) drop-shadow(0 0 5px rgba(255,246,194,.9))}
+.rk-sky .rk.au .rk-fl{animation:rk-flick-gold .08s linear infinite}
+.rk-sky .rk.au-band{filter:drop-shadow(0 0 10px rgba(var(--fg-rgb),var(--gk))) drop-shadow(0 0 18px rgba(var(--au-rgb),.95))}
+.rk-sky .rk.au-band .rk-fl{animation:rk-flick-gold .08s linear infinite}
+@keyframes rk-flick-gold{0%,100%{transform:scale(1.3,3.3)}25%{transform:scale(1.05,4)}50%{transform:scale(1.4,2.8)}75%{transform:scale(1.12,3.7)}}
+.rk-sky .plm{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(closest-side,rgba(255,252,240,.8),rgba(232,222,190,.42) 50%,rgba(210,196,150,0));will-change:transform,opacity}
+.rk-sky .plm.g{background:radial-gradient(closest-side,rgba(214,214,206,.7),rgba(190,182,160,.32) 55%,rgba(190,182,160,0))}
+.rk-sky .plm.au{background:radial-gradient(closest-side,rgba(255,240,170,.85),rgba(255,215,0,.35) 50%,rgba(255,215,0,0))}
+.rk-sky.gold .puff{background:radial-gradient(closest-side,rgba(255,236,150,.6),rgba(255,215,0,.2) 55%,rgba(255,215,0,0))}
+@media (prefers-reduced-motion:reduce){.notify.ign .rkb .rk,.notify.ign .rk .rk-fl{animation:none}}
+.rk-sky .puff.smoke{background:radial-gradient(closest-side,rgba(170,186,188,.5),rgba(var(--c-rgb),.16) 60%,rgba(var(--c-rgb),0))}
+.rk-sky .wk.dim{color:var(--dim-w);text-shadow:0 0 6px rgba(var(--c-rgb),.5)}
+.rk-sky .rk.sput .rk-fl{animation:rk-sputter .3s steps(1,end) infinite}
+@keyframes rk-sputter{0%{opacity:1;transform:scale(1,1.7)}22%{opacity:0}40%{opacity:.85;transform:scale(.9,1.15)}62%{opacity:0}78%{opacity:.5;transform:scale(.8,.8)}90%{opacity:0}}
+.rk-sky .smk{position:absolute;left:0;top:0;border-radius:50%;background:radial-gradient(closest-side,rgba(255,255,255,.75),rgba(255,255,255,.28) 55%,rgba(255,255,255,0));will-change:transform,opacity;pointer-events:none}
+.rk-sky .smk.grey{background:radial-gradient(closest-side,rgba(190,198,199,.6),rgba(190,198,199,.2) 55%,rgba(190,198,199,0))}
+.rk-sky .smk.hot{background:radial-gradient(closest-side,rgba(var(--f-l5-rgb),.95),rgba(var(--f-rgb),.55) 45%,rgba(var(--f-rgb),0))}
+.rk-sky .spk{position:absolute;left:0;top:0;font:500 13px/1 var(--mono);color:var(--f);text-shadow:0 0 8px rgba(var(--f-rgb),.9);will-change:transform,opacity}
