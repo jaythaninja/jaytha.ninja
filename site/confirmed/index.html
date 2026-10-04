@@ -81,7 +81,8 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 <meta name="twitter:description" content="you're in, thanks for confirming">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image.png">
 <meta name="twitter:image:alt" content="jaytha.ninja: a human building something human, with a little help from his 🤖 team">
-<link rel="stylesheet" href="/assets/rain.css?v=1.66"><script src="/assets/rain.js?v=1.66"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.67"><script src="/assets/rain.js?v=1.67"></script>
+<link rel="stylesheet" href="/assets/foot.css?v=1.67"><script src="/assets/foot.js?v=1.67" defer></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -102,6 +103,9 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
     <noscript><p class="qt">thanks 💛 just signed up? check your inbox to confirm! just confirmed? you're in</p></noscript>
   </div>
 </main>
+<footer class="foot" data-ref="confirmed">   <!-- v1.67 (jay 2026.10.03): the shared footer (the homepage's signup + icon row), built by assets/foot.js (deferred, in the head); same one on every subpage -->
+  <noscript><p class="ns-foot"><a href="https://buttondown.com/jaythaninja">drop your email, we promise no 🥫</a></p></noscript>
+</footer>
 
 <script>
 const SHARE_URL = "https://jaytha.ninja/?ref=friend";
@@ -197,7 +201,7 @@ const rain = JayRain.Rain(document.getElementById('rain'), {
   palette: (x, w, r) => r < .84 ? T : PALE_TEAL,
   bands: (w, H) => [{y0: 0, y1: H, perCol: mob() ? 1.6 : 2.1, lenMin: 8, lenMax: 30, alpha: .56, stepMin: 60, stepMax: 170, colDensity: () => 1}],
   alphaAt: (x, y, R) => 1 - .45*JayRain.smooth(R.H*.55, R.H, y),
-  partSel: '.copy', partPad: 50, partFloor: .3
+  partSel: '.copy, .foot', partPad: 50, partFloor: .3
 });
 const fastNow = () => document.documentElement.dataset.mode === 'fast';
 let lines = [], ready = false, skipped = false, dumping = false, current = null, lineAt = 0, burst = null, wantNow = false;

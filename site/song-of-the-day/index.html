@@ -110,8 +110,8 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 <meta name="twitter:description" content="a song a day, straight from jay's playlist">
 <meta name="twitter:image" content="https://jaytha.ninja/og/song.png?d=2026-10-03">
 <meta name="twitter:image:alt" content="today's song of the day on jaytha.ninja: the album art, a lyric and the artist">
-<link rel="stylesheet" href="/assets/rain.css?v=1.66"><script src="/assets/rain.js?v=1.66"></script>
-<link rel="stylesheet" href="/assets/foot.css?v=1.66"><script src="/assets/foot.js?v=1.66" defer></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.67"><script src="/assets/rain.js?v=1.67"></script>
+<link rel="stylesheet" href="/assets/foot.css?v=1.67"><script src="/assets/foot.js?v=1.67" defer></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -134,20 +134,8 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
     <noscript><p class="none">turn on javascript to see today's song (or read <a href="/song-of-the-day/songs.json">songs.json</a>)</p></noscript>
   </div>
 </main>
-<footer class="foot" data-ref="song">   <!-- v1.61 (jay 2026.10.03): the shared footer signup (same partial on every subpage, see assets/foot.css + foot.js) -->
-  <form action="https://buttondown.com/api/emails/embed-subscribe/jaythaninja" method="post" novalidate>
-    <label class="fs-l" for="fs-email">drop us your email if you <span class="teal">want to help</span></label>
-    <div class="fs-slot">
-      <div class="fs-row">
-        <input id="fs-email" class="fs-in" type="email" name="email" required placeholder="you@email.com" autocomplete="email" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="send">
-        <input type="hidden" name="embed" value="1">
-        <input type="hidden" name="tag" value="song">
-        <button type="submit" class="fs-go" aria-label="sign up" title="sign up">→</button>
-      </div>
-      <p class="fs-thx" role="status" aria-live="polite"></p>
-    </div>
-    <p class="sr fs-note" role="status" aria-live="polite"></p>
-  </form>
+<footer class="foot" data-ref="song">   <!-- v1.67 (jay 2026.10.03): the shared footer (the homepage's signup + icon row), built by assets/foot.js (deferred, in the head); same one on every subpage -->
+  <noscript><p class="ns-foot"><a href="https://buttondown.com/jaythaninja">drop your email, we promise no 🥫</a></p></noscript>
 </footer>
 
 <script>
