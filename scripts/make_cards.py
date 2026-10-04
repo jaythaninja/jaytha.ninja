@@ -87,7 +87,7 @@ def cards(repo, day, generic):
         except Exception as ex:
             print('song art: oembed failed, keeping the old song card:', ex, file=sys.stderr)
     if so and art:
-        lyric = '\n'.join((so.get('lyric') or '').lower().split('\n')[:2])
+        lyric = '\n'.join([l for l in (so.get('lyric') or '').lower().split('\n') if l.strip()][:2])   # the first 2 lines, never a blank verse-break line (v1.68)
         track = re.sub(r'\s*\((from|feat\.?|with)\b[^)]*\)\s*$', '', so['track'], flags=re.I)
         artist = so['artist'].split(',')[0].strip()
         ly = '<br>'.join(e(x) for x in lyric.split('\n')) if lyric else ''
