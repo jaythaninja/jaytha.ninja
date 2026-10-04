@@ -120,6 +120,10 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .social li.rain:not(.shown) a,.social li.rain:not(.shown) .who-t{visibility:hidden}
 .social .who-t{display:flex;align-items:center;gap:calc(2px*var(--k));font-size:calc(17px*var(--k));line-height:1;color:var(--c);white-space:nowrap;font-weight:400}
 .social .who-t .nj{display:block;flex:none;width:calc(24px*var(--k));height:calc(24px*var(--k))}
+/* v1.66: the ninja is a link (to /now/) that doesn't look like one: no hover tint, no landing glow (as before), a ~44px tap target from padding that the negative margin cancels (no layout change) */
+.social a.who-t{padding:12px;margin:-12px;border-radius:12px;text-decoration:none;-webkit-tap-highlight-color:transparent}
+.social a.who-t:hover{background:none}
+.social li.land a.who-t{animation:none}
 .social .who-t,.social .who-t *{transition:color .15s ease,fill .15s ease,stroke .15s ease,stop-color .15s ease}
 .nj{--nj-a-lt:var(--c-lt);--nj-a:var(--c);--nj-a-dk:var(--c-dk);--nj-a-hl:#A6F0F2;--nj-a-tail:#128E93;--nj-a-sash:#9BEBEE;--nj-k-lt:var(--f-lt);--nj-k:var(--f);--nj-k-dk:var(--f-dk);--nj-k-wrap:#5a1604}
 :root[data-mode="fast"] .nj{--nj-a-hl:var(--c-pale);--nj-a-tail:var(--c-dk);--nj-a-sash:var(--c-pale);--nj-k-wrap:#053638}
@@ -384,7 +388,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 <meta name="twitter:image" content="https://jaytha.ninja/og/home.png?d=2026-10-03">
 <meta name="twitter:image:alt" content="the intro on jaytha.ninja: the internet was a place to make genuine connections with other humans, somewhere along the way, we messed up, my team and i hope to run it back">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "jay", "url": "https://jaytha.ninja/", "sameAs": ["https://x.com/jaythaninja", "https://www.instagram.com/jaythaninja", "https://www.threads.com/jaythaninja", "https://github.com/jaythaninja", "https://www.strava.com/athletes/64153021", "https://www.linkedin.com/in/jaythaninja"]}</script>
-<link rel="stylesheet" href="/assets/rain.css?v=1.65"><script src="/assets/rain.js?v=1.65"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.66"><script src="/assets/rain.js?v=1.66"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -468,7 +472,6 @@ const COPY = {
   snapHref: "/snap-of-the-day/",
   snapText: "snap of the day",
   eggHref: "/quote-of-the-day/",
-  socialsLead: ":",
   socials: [
     {label: "𝕏",                icon: "x",         href: "https://x.com/jaythaninja"},
     {label: "instagram",        icon: "instagram", href: "https://www.instagram.com/jaythaninja"},
@@ -586,7 +589,9 @@ const NJ_SVG = "<svg class=\"nj\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\
 const iconLink = s => { const a = gateTap(mk('a')); a.setAttribute('href', s.href); a.setAttribute('aria-label', s.label); a.title = s.label;
   if (/^https?:/.test(s.href)){ a.target = '_blank'; a.rel = 'noopener'; }
   a.innerHTML = ICONS[s.icon] || ''; return a; };
-{ const li = mk('li', 'who'), t = mk('span', 'who-t'), c = mk('span', 'who-c'); li.setAttribute('aria-hidden', 'true'); t.innerHTML = NJ_SVG; c.textContent = COPY.socialsLead; t.appendChild(c); li.appendChild(t); ul.appendChild(li); }
+/* v1.66 (jay 2026.10.03): the row starts with just our ninja (no colon), and the ninja is an easter egg: a quiet link to /now/ (aria-label "now", no link styling,
+   the state colours as before). gated like the icons until it lands (gateTap / revealTap); rain.js' tap-for-speed already ignores taps on links */
+{ const li = mk('li', 'who'), t = gateTap(mk('a', 'who-t')); t.setAttribute('href', '/now/'); t.setAttribute('aria-label', 'now'); t.innerHTML = NJ_SVG; li.appendChild(t); ul.appendChild(li); }
 COPY.socials.forEach(s => { const li = mk('li'); li.appendChild(iconLink(s)); ul.appendChild(li); });
 const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const curHold = cursor.cloneNode(); curHold.style.visibility = 'hidden'; curLi.appendChild(curHold); ul.appendChild(curLi);
 
@@ -826,12 +831,12 @@ const placeCable = () => {
 };
 const fitRow = () => { const W = emailIn.getBoundingClientRect().width; if (!W) return;
   const items = [...ul.children].filter(li => li !== curLi), n = items.length;
-  const gw = items.reduce((t, li) => { const e = li.querySelector('svg.ic') || li.querySelector('.who-t'); return t + (e ? (e.matches('svg') ? parseFloat(getComputedStyle(e).width) || 0 : e.offsetWidth) : 0); }, 0);
+  const gw = items.reduce((t, li) => { const e = li.querySelector('svg.ic') || li.querySelector('svg.nj'); return t + (e ? (e.matches('svg') ? parseFloat(getComputedStyle(e).width) || 0 : e.offsetWidth) : 0); }, 0);
   const cw = .58*parseFloat(getComputedStyle(curLi).fontSize);
   if (matchMedia('(max-width:760px)').matches){ const V = document.documentElement.clientWidth, s = Math.max(2, (V - gw - cw)/(n + 2)); ul.style.marginLeft = '0px'; const x0 = ul.getBoundingClientRect().left;
     ul.style.setProperty('--igap', s.toFixed(2) + 'px'); ul.style.marginLeft = (s - x0).toFixed(2) + 'px'; return; }
   ul.style.marginLeft = ''; ul.style.setProperty('--igap', Math.max(2, (W - cw - gw)/n).toFixed(2) + 'px'); };
-fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver){ const ro = new ResizeObserver(fitRow); ro.observe(form); const wt = ul.querySelector('.who-t'); if (wt) ro.observe(wt); } if (document.fonts) document.fonts.ready.then(fitRow);
+fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver){ const ro = new ResizeObserver(fitRow); ro.observe(form); const wt = ul.querySelector('svg.nj'); if (wt) ro.observe(wt); } if (document.fonts) document.fonts.ready.then(fitRow);
 placeCable(); addEventListener('resize', placeCable); if (window.ResizeObserver) new ResizeObserver(placeCable).observe(form); if (document.fonts) document.fonts.ready.then(placeCable);
 const chgStep = () => { const v = emailIn.value, n = String(looksDone() ? 3 : v.includes('@') ? 2 : v.length ? 1 : 0); if (form.dataset.chg !== n) form.dataset.chg = n; };
 const syncOk = () => { const ok = looksDone(); form.classList.toggle('ok', ok); form.classList.toggle('gold-ok', ok); chgStep(); };
