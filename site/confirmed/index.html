@@ -81,7 +81,7 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 <meta name="twitter:description" content="you're in, thanks for confirming">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image.png">
 <meta name="twitter:image:alt" content="jaytha.ninja: a human building something human, with a little help from his 🤖 team">
-<link rel="stylesheet" href="/assets/rain.css?v=1.65"><script src="/assets/rain.js?v=1.65"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.66"><script src="/assets/rain.js?v=1.66"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -225,6 +225,8 @@ addEventListener('pageshow', e => { if (!e.persisted || state.done) return; if (
 async function main(){
   await document.fonts.ready;
   const c = pick();
+  /* v1.66 (jay 2026.10.03): GA4 "confirm", only in the real confirmed state (not ?check), once per browser (localStorage "jtn.ga.confirm"), so a reload or a later visit never sends it again. no PII: only the ?ref= tag when this tab has one */
+  if (c === COPY.confirmed){ try { if (!localStorage.getItem('jtn.ga.confirm')){ localStorage.setItem('jtn.ga.confirm', '1'); const r = (window.JayRain && JayRain.ref && JayRain.ref()) || ''; if (typeof gtag === 'function') gtag('event', 'confirm', r ? {ref: r} : {}); } } catch (e) {} }
   document.title = c.title || document.title;
   lines = [prepare($('.kicker'), c.kicker), prepare($('.qt'), c.line)];
   for (const [sel, v] of [['.qt2', c.extra], ['.share', c.share]]){ const el = $(sel); if (!el || !v) continue; el.hidden = false; lines.push(prepare(el, v)); }   // v1.61: extra lines, typed in order (only the ones this state has; the rest stay hidden, so they take no space)
