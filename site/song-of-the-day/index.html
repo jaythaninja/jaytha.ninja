@@ -223,14 +223,7 @@ const ID = /^[A-Za-z0-9]{22}$/;
 const trackUrl = e => 'https://open.spotify.com/track/' + e.id;   // always built from the id, so a bad url in the data can't point somewhere else
 const credit = e => COPY.credit.replace('{artist}', e.artist).replace('{track}', e.track);
 const lyricOf = e => typeof e.lyric === 'string' ? e.lyric.trim() : '';   // null / "" = jay hasn't sent it yet
-const blank = l => !l.trim();
-function spaced(t){   // v1.68 (jay 2026.10.04): lyrics are single-spaced, always: one line break between lines, at most one blank line between verses (was v1.34-v1.67: a blank line added between every line). songs.json is single-spaced when published (pick.py single_spaced); this is the safeguard, same rule: a double-spaced paste (no two lines touching) loses its single blank lines and each run of 2+ becomes one; otherwise each run of blank lines becomes one
-  const ls = t.replace(/\r\n?/g, '\n').split('\n').map(l => l.replace(/\s+$/, ''));
-  const doubled = ls.some(blank) && !ls.some((l, i) => i > 0 && !blank(l) && !blank(ls[i - 1]));
-  const out = []; let run = 0;
-  for (const l of ls){ if (blank(l)){ run++; continue; } if (out.length && run >= (doubled ? 2 : 1)) out.push(''); out.push(l); run = 0; }
-  return out.join('\n');
-}
+const spaced = t => t.split(/\r\n?|\n/).map(l => l.replace(/\s+$/, '')).filter(l => l.trim()).join('\n\n');   // v1.69 (jay 2026.10.04): exactly one blank line between every lyric line, uniformly: no lines touching, no bigger gap at a verse break (the non-blank lines joined by a blank line, today's and the archive). songs.json stores one line per line (pick.py lyric_lines), this adds the gaps. .qt/.aq are pre-line, so a long line that wraps stays tight. (v1.68: single-spaced with one blank line at verse breaks, which misread jay; v1.34-v1.67: a blank line after every line break, so a stored verse break showed as 3)
 function creditLink(e){ const a = mk('a'); a.href = trackUrl(e); a.target = '_blank'; a.rel = 'noopener'; a.textContent = credit(e); return a; }
 function archiveItem(e){
   const li = mk('li'), d = mk('p', 'd'), b = mk('p', 'ab');

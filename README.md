@@ -16,7 +16,7 @@ The homepage's daily lines (top half) each read one file; the daily pages read t
 | `📝 <update> →` (only when the newest entry is dated today or yesterday, America/Chicago) | /daily-update/ | `site/daily-update/recaps.json` |
 | photo + `📸 snap of the day →` caption, centred (only when the newest entry is dated today or yesterday, America/Chicago) | /snap-of-the-day/ | `site/snap-of-the-day/snaps.json` + `site/snap-of-the-day/snaps/` |
 
-Lyrics are single-spaced, always (v1.68, jay 2026.10.04): one line break between lines and at most one blank line between verses. A paste from a lyrics site often comes double-spaced (a blank line after every line); `pick.py` (`single_spaced`, in /home/box/jaytha-songs) undoes that when the drop stages the song: single blank lines go, and a run of 2+ blank lines (a real verse break) becomes exactly one. /song-of-the-day/ applies the same rule when it shows a lyric, as a safeguard. Only lyrics: daily updates keep exactly the spacing jay pastes.
+Lyrics have exactly one blank line between every line (v1.69, jay 2026.10.04): no lines touching and no bigger gap at verse breaks. `songs.json` stores the lyric one line per line (no blank lines); `pick.py` (`lyric_lines`, in /home/box/jaytha-songs) does that when the drop stages the song, whatever spacing the paste came with (lyrics sites often double-space). /song-of-the-day/ then shows the non-blank lines with one blank line between each, today's and the archive. The homepage 🎧 line runs the lyric together on one line as before. Only lyrics: daily updates keep exactly the spacing jay pastes.
 
 Every page shows the newest entry dated today or earlier (America/Chicago) at the top and the older ones below it, newest first. Future-dated entries stay hidden until their day.
 
