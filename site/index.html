@@ -371,13 +371,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 /* v1.71 (jay 2026.10.05): the row's box is in this stylesheet, before paint: glyph height matches the
    ninja (24px * --k) and the gap above it is the same token as the other homepage rows (--pgap).
    gold hides it with visibility, never display, so the box stays and nothing below jumps.
-   v1.70: idle is the dim gray (--dim-w), never teal. a correct press picks up the live speed colour
-   (--c: teal, or orange in fast) and the glow steps up by 1/11 per press. never gold here.
-   a miss blinks every glyph red, then back to gray. */
+   v1.70: idle is the dim gray (--dim-w). a miss blinks every glyph red, then back to gray.
+   v1.72: from the first correct press the row uses the launch-hold gold pulse (kos-gold),
+   and the glow still steps up by 1/11 per press. */
 .pad{--pad-k:0;--pad-glyph:calc(24px * var(--k));--pad-hit:40px;--bad:#FF4B6E;--bad-glow:rgba(255,75,110,.92);display:flex;justify-content:space-between;align-items:center;gap:0;margin-top:var(--pgap);min-height:var(--pad-glyph);color:var(--dim-w);user-select:none}
 .js .pad:not(.in){opacity:0;pointer-events:none}
 .pad.in{transition:opacity .35s ease}
-.pad.go{color:var(--c);opacity:calc(.55 + .45 * var(--pad-k) / 11);transition:none}
+.pad.go{color:#FFD700;opacity:calc(.55 + .45 * var(--pad-k) / 11);transition:none}
+.pad.go button{text-shadow:none;animation:kos-gold 4.5s ease-in-out infinite}
 .pad button{position:relative;flex:0 0 auto;width:var(--pad-glyph);height:var(--pad-glyph);box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;color:inherit;font:500 var(--pad-glyph)/1 var(--mono);letter-spacing:-.03em;white-space:nowrap;overflow:visible;cursor:pointer;--br:1;-webkit-tap-highlight-color:transparent;text-shadow:0 0 calc(2px + 12px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11));filter:brightness(var(--br)) drop-shadow(0 0 calc(1px + 9px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11)))}
 .pad button::before{content:"";position:absolute;left:50%;top:50%;width:max(100%,var(--pad-hit));height:var(--pad-hit);transform:translate(-50%,-50%)}
 .pad button svg{width:var(--pad-glyph);height:var(--pad-glyph);display:block;overflow:visible}
@@ -406,6 +407,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 @media (prefers-color-scheme:light){.pad{--bad:#C4173A;--bad-glow:rgba(196,23,58,.75)}}
 @media (prefers-reduced-motion:reduce){
   .pad,.pad.in,.pad.go{transition:none}
+  .pad.go button{animation:none;filter:drop-shadow(0 0 12px rgba(255,215,0,.85));text-shadow:none}
   .pad.bad button{animation:none;color:var(--bad);filter:drop-shadow(0 0 6px var(--bad-glow));text-shadow:none}
 }
 .konami.rk-sky{z-index:40;background:transparent;pointer-events:auto}
@@ -912,10 +914,12 @@ const fitRow = () => { const W = emailIn.getBoundingClientRect().width; if (!W) 
   else { ul.style.marginLeft = ''; ul.style.setProperty('--igap', Math.max(2, (W - cw - gw)/n).toFixed(2) + 'px'); }
   syncPad(); };
 fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver){ const ro = new ResizeObserver(fitRow); ro.observe(form); const wt = ul.querySelector('svg.nj'); if (wt) ro.observe(wt); } if (document.fonts) document.fonts.ready.then(fitRow);
-/* v1.70 (jay 2026.10.05): konami. buttons need up up down down left right left right b a start.
-   keyboard is the same arrows then b a (enter optional, start not required) and only outside a text field.
-   idle glyphs stay --dim-w. progress uses the live speed colour (--c), one eleventh of the glow per press, never gold.
-   a miss blinks the whole row red and clears the glow. gold hides the row in place (visibility, the box stays). */
+/* v1.72 (jay 2026.10.05): konami. buttons need up up down down left right left right b a start.
+   keyboard is the same arrows then b a, and Enter is start. a alone does not launch.
+   Enter is ignored while an input has focus. any other key on the start step is a miss.
+   idle glyphs stay --dim-w. progress is the launch-hold gold pulse, one eleventh per press.
+   a miss blinks the whole row red and clears the glow. gold hides the row in place (visibility, the box stays).
+   liftoff flies the successful-launch gold rocket; the flight itself is unchanged. */
 const CODE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'start'];
 const KEY = {ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right'};
 let at = 0, lock = false, goldLatch = false, goldBusy = false;
@@ -1001,7 +1005,7 @@ function press(k, fromKey){
     failRow(); return true;
   }
   if (k === CODE[at]){
-    if ((fromKey && k === 'a') || k === 'start'){ succeed(); return true; }
+    if (k === 'start'){ succeed(); return true; }
     at++; pad.classList.add('go'); pad.style.setProperty('--pad-k', String(at)); pad.dataset.step = String(at);
     haptic.tick();
     return true;
@@ -1042,8 +1046,19 @@ function starField(canvas){
   resize(); frame(); addEventListener('resize', resize);
   return { boost(n){ target = n; }, stop(){ live = false; cancelAnimationFrame(raf); removeEventListener('resize', resize); } };
 }
+/* the successful-launch gold rocket: same stop colours, au class, and glow as launchRocket. */
+function goldRocket(svg, sky, cls, band){
+  const AU = {'rk-b': ['#FFF3B0', '#FFD700', '#B8860B'], 'rk-w': ['#FFFFFF', '#FFF1C4'], 'rk-f': ['#FFFBE0', '#FFE066', '#FFB800'], 'rk-n': ['#E8C860', '#7A5A10'], 'rk-g': ['#FFF0A0', '#C99A00', '#5A4200']};
+  const c = svg.cloneNode(true); c.classList.add(cls); c.style.opacity = ''; c.style.transform = '';
+  c.querySelectorAll('[id]').forEach(g => { const cols = AU[g.id]; g.id = g.id + '-' + cls; if (cols) g.querySelectorAll('stop').forEach((s, i) => s.setAttribute('stop-color', band ? '#FFF8DC' : cols[Math.min(i, cols.length - 1)])); });
+  c.querySelectorAll('[fill^="url(#"]').forEach(e => e.setAttribute('fill', e.getAttribute('fill').replace(/\)$/, '-' + cls + ')')));
+  if (band) c.querySelectorAll('[fill="#fff"], [fill="#C9F3F4"]').forEach(e => e.setAttribute('fill', '#FFF8DC'));
+  else c.querySelectorAll('[fill="#C9F3F4"]').forEach(e => e.setAttribute('fill', '#FFFBE0'));
+  c.querySelectorAll('[stroke="#FFC2A8"]').forEach(e => e.setAttribute('stroke', '#FFF3B0'));
+  sky.appendChild(c); return c;
+}
 function launchSpace(){
-  const nj = ul.querySelector('svg.nj'), root = mk('div', 'konami rk-sky');
+  const nj = ul.querySelector('svg.nj'), root = mk('div', 'konami rk-sky gold');
   const space = mk('div', 'kos-space'), stars = document.createElement('canvas'), mask = mk('div', 'kos-mask'), hold = mk('div', 'kos-hold'), lives = mk('p', 'kos-lives');
   stars.className = 'kos-stars'; lives.setAttribute('aria-live', 'polite');
   const ninja = nj ? cloneSvg(nj, '-k') : mk('span');
@@ -1084,7 +1099,7 @@ function launchSpace(){
     }, flight + 200);
   };
   if (b && b.width > 2 && getComputedStyle(src).opacity !== '0'){
-    fly = cloneSvg(src, '-k');
+    fly = goldRocket(src, root, 'au', false);
     fly.style.left = b.left + 'px'; fly.style.top = b.top + 'px'; fly.style.width = b.width + 'px'; fly.style.height = b.height + 'px'; fly.style.zIndex = '3';
     const puff = mk('span', 'puff'), ps = b.width * 2.2;
     puff.style.left = (b.left + b.width / 2 - ps / 2) + 'px'; puff.style.top = (b.top + b.height * .7 - ps / 2) + 'px'; puff.style.width = ps + 'px'; puff.style.height = ps + 'px';
@@ -1202,15 +1217,7 @@ const launchRocket = () => new Promise(done => {
   Object.assign(puff.style, {left: (r.left + r.width/2 - ps/2) + 'px', top: (r.top + r.height*.7 - ps/2) + 'px', width: ps + 'px', height: ps + 'px'});
   sky.insertBefore(puff, svg);
   puff.animate([{opacity: 0, transform: 'scale(.3)'}, {opacity: 1, transform: 'scale(.8)', offset: .25}, {opacity: 0, transform: 'scale(1.6)'}], {duration: LIFTOFF.puff, delay: LIFTOFF.turn*.6, easing: 'ease-out', fill: 'both'});
-  const AU = {'rk-b': ['#FFF3B0', '#FFD700', '#B8860B'], 'rk-w': ['#FFFFFF', '#FFF1C4'], 'rk-f': ['#FFFBE0', '#FFE066', '#FFB800'], 'rk-n': ['#E8C860', '#7A5A10'], 'rk-g': ['#FFF0A0', '#C99A00', '#5A4200']};
-  const goldCopy = (cls, band) => { const c = svg.cloneNode(true); c.classList.add(cls); c.style.opacity = ''; c.style.transform = '';
-    c.querySelectorAll('[id]').forEach(g => { const cols = AU[g.id]; g.id = g.id + '-' + cls; if (cols) g.querySelectorAll('stop').forEach((s, i) => s.setAttribute('stop-color', band ? '#FFF8DC' : cols[Math.min(i, cols.length - 1)])); });
-    c.querySelectorAll('[fill^="url(#"]').forEach(e => e.setAttribute('fill', e.getAttribute('fill').replace(/\)$/, '-' + cls + ')')));
-    if (band) c.querySelectorAll('[fill="#fff"], [fill="#C9F3F4"]').forEach(e => e.setAttribute('fill', '#FFF8DC'));
-    else c.querySelectorAll('[fill="#C9F3F4"]').forEach(e => e.setAttribute('fill', '#FFFBE0'));
-    c.querySelectorAll('[stroke="#FFC2A8"]').forEach(e => e.setAttribute('stroke', '#FFF3B0'));
-    sky.appendChild(c); return c; };
-  const au = goldCopy('au', false), band = goldCopy('au-band', true);
+  const au = goldRocket(svg, sky, 'au', false), band = goldRocket(svg, sky, 'au-band', true);
   const cut = u => `polygon(-200% ${-200 - u}%, 300% ${300 - u}%, 300% 400%, -200% 400%)`;
   const strip = u => `polygon(-200% ${-200 - u}%, 300% ${300 - u}%, 300% ${314 - u}%, -200% ${-186 - u}%)`;
   const burnOpt = {duration: LIFTOFF.burn, easing: 'cubic-bezier(.35,.1,.5,1)', fill: 'both'};
