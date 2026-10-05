@@ -385,8 +385,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .pad button svg path{stroke-width:1.47}
 .pad button[data-k="b"],.pad button[data-k="a"],.pad button[data-k="start"]{font-weight:400;font-size:calc(var(--pad-glyph) * .68);letter-spacing:-.04em}
 /* the em box is centered; these shifts put each glyph's ink box on that same center */
-.pad button[data-k="b"]{--ink-dy:.09em}
-.pad button[data-k="start"]{--ink-dy:.07em}
+.pad button[data-k="b"]{--ink-dy:.055em}
+.pad button[data-k="a"]{--ink-dy:-.02em}
+.pad button[data-k="start"]{--ink-dy:.05em}
 .pad button[data-k="b"] > span,.pad button[data-k="a"] > span,.pad button[data-k="start"] > span{display:block;transform:translateY(var(--ink-dy,0))}
 .pad button[data-k="start"]{width:auto;min-width:var(--pad-glyph)}
 .pad button:hover,.pad button:focus-visible,.pad button:active{--br:1.32}
