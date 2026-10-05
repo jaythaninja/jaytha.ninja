@@ -372,11 +372,12 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
    once a correct press lands, the whole row picks up the live speed colour (--c: teal, or orange in fast)
    and the glow steps up by 1/11 per press (shadow alpha + a share of the opacity). never gold here.
    a miss blinks every glyph red, then back to gray. html.gld / .off hides the row (signup gold, gold flash). */
-.pad{--pad-k:0;--pad-hit:44px;--pad-gap:8px;--bad:#FF4B6E;--bad-glow:rgba(255,75,110,.92);display:flex;justify-content:space-between;align-items:center;gap:var(--pad-gap);margin-top:36px;color:var(--dim-w);user-select:none}
+.pad{--pad-k:0;--pad-box:44px;--pad-hit:44px;--pad-gap:8px;--bad:#FF4B6E;--bad-glow:rgba(255,75,110,.92);display:flex;justify-content:center;align-items:center;gap:var(--pad-gap);margin-top:36px;color:var(--dim-w);user-select:none}
 .js .pad:not(.in){opacity:0;pointer-events:none}
 .pad.in{transition:opacity .35s ease}
 .pad.go{color:var(--c);opacity:calc(.55 + .45 * var(--pad-k) / 11);transition:none}
-.pad button{flex:0 0 var(--pad-hit);width:var(--pad-hit);height:var(--pad-hit);min-width:40px;min-height:40px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;color:inherit;font:400 12px/1 var(--mono);letter-spacing:-.03em;white-space:nowrap;cursor:pointer;--br:1;-webkit-tap-highlight-color:transparent;text-shadow:0 0 calc(2px + 12px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11));filter:brightness(var(--br)) drop-shadow(0 0 calc(1px + 9px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11)))}
+.pad button{position:relative;flex:0 0 var(--pad-box);width:var(--pad-box);height:var(--pad-box);box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;color:inherit;font:400 12px/1 var(--mono);letter-spacing:-.03em;white-space:nowrap;overflow:visible;cursor:pointer;--br:1;-webkit-tap-highlight-color:transparent;text-shadow:0 0 calc(2px + 12px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11));filter:brightness(var(--br)) drop-shadow(0 0 calc(1px + 9px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11)))}
+.pad button::before{content:"";position:absolute;left:50%;top:50%;width:var(--pad-hit);height:var(--pad-hit);transform:translate(-50%,-50%)}
 .pad button svg{width:13px;height:13px;display:block;overflow:visible}
 .pad button:hover,.pad button:focus-visible,.pad button:active{--br:1.32}
 .pad button:focus-visible{outline:1px solid rgba(var(--c-rgb),.7);outline-offset:3px}
@@ -392,10 +393,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 }
 .gld .pad,html.gld .pad,:root.gld .pad,.pad.gld,.pad:has(.gld),.pad.off{display:none!important}
 @media (prefers-color-scheme:light){.pad{--bad:#C4173A;--bad-glow:rgba(196,23,58,.75)}}
-@media (max-width:379px){
-  .pad{--pad-hit:40px;--pad-gap:6px}
+@media (max-width:389px){
   .pad button{font-size:10px}
   .pad button svg{width:10px;height:10px}
+}
+@media (max-width:359px){
+  .pad{--pad-box:36px;--pad-hit:40px;--pad-gap:4px}
+  .pad button[data-k="start"]{font-size:9px;letter-spacing:-.05em}
 }
 @media (prefers-reduced-motion:reduce){
   .pad,.pad.in,.pad.go{transition:none}
@@ -928,26 +932,34 @@ const haptic = (() => {
 function syncPad(){
   const pad = document.querySelector('.pad'); if (!pad || !ul.offsetWidth) return;
   const n = pad.querySelectorAll('button').length || 7, gaps = Math.max(1, n - 1);
-  const vw = document.documentElement.clientWidth;
-  const u = ul.getBoundingClientRect(), parent = pad.parentElement.getBoundingClientRect();
-  const narrow = vw < 380;
-  let hit = narrow ? 40 : 44, gap = narrow ? 6 : 8;
-  let width = hit * n + gap * gaps;
-  if (!narrow){
-    const row = Math.min(vw, Math.round(u.width));
-    const spread = (row - hit * n) / gaps;
-    if (spread >= 8){ gap = spread; width = row; }
-    else if ((vw - hit * n) / gaps >= 8){ gap = 8; width = hit * n + gap * gaps; }
-    else { hit = 40; gap = Math.min(6, Math.max(4, Math.floor((vw - hit * n) / gaps))); width = hit * n + gap * gaps; }
-  } else {
-    gap = Math.min(6, Math.max(4, Math.floor((vw - hit * n) / gaps)));
-    width = hit * n + gap * gaps;
+  const vw = document.documentElement.clientWidth, side = 12, maxW = vw - side * 2;
+  const parent = pad.parentElement.getBoundingClientRect();
+  let box = 44, gap = 8, hit = 44;
+  if (vw < 360){ box = 36; gap = 4; hit = 40; }
+  else if (box * n + gap * gaps > maxW){
+    box = 40; hit = 40;
+    gap = Math.min(8, Math.max(4, Math.floor((maxW - box * n) / gaps)));
   }
-  if (width > vw){ gap = Math.max(4, gap - 1); width = hit * n + gap * gaps; }
-  let left = Math.max(0, Math.round(u.left));
-  if (left + width > vw) left = Math.max(0, vw - width);
-  pad.style.width = width + 'px';
+  let width = box * n + gap * gaps;
+  if (width > maxW){
+    gap = 4; box = Math.max(36, Math.floor((maxW - gap * gaps) / n)); hit = Math.max(box, 40);
+    width = box * n + gap * gaps;
+  }
+  let left = (vw - width) / 2;
+  if (vw >= 761){
+    const u = ul.getBoundingClientRect(), socialW = u.width;
+    const spread = (Math.min(socialW, maxW) - 44 * n) / gaps;
+    if (spread >= 8){
+      box = 44; hit = 44; gap = spread; width = 44 * n + gap * gaps;
+      left = u.left + (u.width - width) / 2;
+      if (left < side || left + width > vw - side){ box = 44; hit = 44; gap = 8; width = 44 * n + 8 * gaps; left = (vw - width) / 2; }
+    }
+  }
+  left = Math.round(left);
+  pad.style.width = (Math.round(width * 100) / 100) + 'px';
   pad.style.marginLeft = Math.round(left - parent.left) + 'px';
+  pad.style.marginRight = '0px';
+  pad.style.setProperty('--pad-box', box + 'px');
   pad.style.setProperty('--pad-hit', hit + 'px');
   pad.style.setProperty('--pad-gap', (Math.round(gap * 100) / 100) + 'px');
 }
