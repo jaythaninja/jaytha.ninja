@@ -367,6 +367,47 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
   .copy>.egg,.copy>.egg.has-day,.copy>.egg.has-snap{grid-column:2;grid-row:1 / span 3;margin:0;align-self:center}
   .copy>.egg::before{content:"";position:absolute;left:-28px;top:0;bottom:0;border-left:1px solid rgba(var(--c-rgb),.18);pointer-events:none}
 }
+/* v1.70 (jay 2026.10.05): konami row. idle is the dim gray (--dim-w), never teal.
+   once a correct press lands, the whole row picks up the live speed colour (--c: teal, or orange in fast)
+   and the glow steps up by 1/11 per press (shadow alpha + a share of the opacity). never gold here.
+   a miss blinks every glyph red, then back to gray. html.gld / .off hides the row (signup gold, gold flash). */
+.pad{--pad-k:0;--bad:#FF4B6E;--bad-glow:rgba(255,75,110,.92);display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:36px;color:var(--dim-w);user-select:none}
+.js .pad:not(.in){opacity:0;pointer-events:none}
+.pad.in{transition:opacity .35s ease}
+.pad.go{color:var(--c);opacity:calc(.55 + .45 * var(--pad-k) / 11);transition:none}
+.pad button{flex:0 0 44px;width:44px;height:44px;min-width:44px;min-height:44px;box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;color:inherit;font:400 12px/1 var(--mono);letter-spacing:-.03em;white-space:nowrap;cursor:pointer;--br:1;-webkit-tap-highlight-color:transparent;text-shadow:0 0 calc(2px + 12px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11));filter:brightness(var(--br)) drop-shadow(0 0 calc(1px + 9px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11)))}
+.pad button svg{width:13px;height:13px;display:block;overflow:visible}
+.pad button:hover,.pad button:focus-visible,.pad button:active{--br:1.32}
+.pad button:focus-visible{outline:1px solid rgba(var(--c-rgb),.7);outline-offset:3px}
+.pad.bad{opacity:1;color:var(--dim-w)}
+.pad.bad button{animation:pad-bad .48s linear both}
+@keyframes pad-bad{
+  0%,11%{color:var(--bad);filter:drop-shadow(0 0 7px var(--bad-glow));text-shadow:none}
+  20%,30%{color:var(--dim-w);filter:none;text-shadow:none}
+  34%,45%{color:var(--bad);filter:drop-shadow(0 0 7px var(--bad-glow));text-shadow:none}
+  54%,64%{color:var(--dim-w);filter:none;text-shadow:none}
+  68%,80%{color:var(--bad);filter:drop-shadow(0 0 7px var(--bad-glow));text-shadow:none}
+  90%,100%{color:var(--dim-w);filter:none;text-shadow:none}
+}
+.gld .pad,html.gld .pad,:root.gld .pad,.pad.gld,.pad:has(.gld),.pad.off{display:none!important}
+@media (prefers-color-scheme:light){.pad{--bad:#C4173A;--bad-glow:rgba(196,23,58,.75)}}
+@media (max-width:375px){
+  .pad button{font-size:10px}
+  .pad button svg{width:10px;height:10px}
+}
+@media (prefers-reduced-motion:reduce){
+  .pad,.pad.in,.pad.go{transition:none}
+  .pad.bad button{animation:none;color:var(--bad);filter:drop-shadow(0 0 6px var(--bad-glow));text-shadow:none}
+}
+.konami.rk-sky{z-index:40;background:transparent;pointer-events:auto}
+.kos-space{position:absolute;inset:0;background:#000;opacity:0}
+.kos-stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.kos-mask{position:absolute;inset:0;background:var(--bg,#000);opacity:0}
+.kos-hold{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none}
+.konami .nj{--c:#FFD700;--c-rgb:255,215,0;--c-lt:#FFE066;--c-dk:#C99A00;--c-pale:#FFF6C2;--f:#FFD700;--f-lt:#FFE066;--f-dk:#C99A00;--nj-a-hl:var(--c-pale);--nj-a-tail:var(--c-dk);--nj-a-sash:var(--c-pale);--nj-k-wrap:#5a4300;width:84px;height:84px;display:block}
+.kos-lives{margin:0;font:500 13px/1.2 var(--mono);color:#FFD700;text-shadow:0 0 10px rgba(255,215,0,.65)}
+.hap{position:fixed;left:0;top:0;width:1px;height:1px;margin:0;padding:0;overflow:hidden;opacity:0;border:0;clip:rect(0 0 0 0)}
+.hap input,.hap label{position:absolute;width:1px;height:1px;margin:0;padding:0}
 </style>
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
@@ -446,6 +487,16 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
     </div>
     <nav class="elsewhere" data-part aria-label="elsewhere">
       <ul class="social"></ul>
+      <div class="pad" role="group">
+        <button type="button" data-k="up" aria-label="up"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 18V6M7 11l5-5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" data-k="down" aria-label="down"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M7 13l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" data-k="left" aria-label="left"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 12H6M11 7l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" data-k="right" aria-label="right"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 12h12M13 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button type="button" data-k="b" aria-label="b">b</button>
+        <button type="button" data-k="a" aria-label="a">a</button>
+        <button type="button" data-k="start" aria-label="start">start</button>
+      </div>
+      <div class="hap" aria-hidden="true"><input type="checkbox" switch id="hap-sw" tabindex="-1" aria-hidden="true" autocomplete="off"><label for="hap-sw" tabindex="-1" aria-hidden="true"></label></div>
       <noscript><p class="ns-links"><a href="https://x.com/jaythaninja">𝕏</a> <a href="https://www.instagram.com/jaythaninja">instagram</a> <a href="https://www.threads.com/jaythaninja">threads</a> <a href="https://github.com/jaythaninja">github</a> <a href="https://www.strava.com/athletes/64153021">strava</a> <a href="https://open.spotify.com/playlist/4agJs1yW7WQcFx1Lg5VVZq">spotify</a> <a href="https://www.linkedin.com/in/jaythaninja">linkedin</a></p></noscript>
     </nav>
     <div class="egg" aria-hidden="true"></div>
@@ -840,9 +891,221 @@ const fitRow = () => { const W = emailIn.getBoundingClientRect().width; if (!W) 
   const gw = items.reduce((t, li) => { const e = li.querySelector('svg.ic') || li.querySelector('svg.nj'); return t + (e ? (e.matches('svg') ? parseFloat(getComputedStyle(e).width) || 0 : e.offsetWidth) : 0); }, 0);
   const cw = .58*parseFloat(getComputedStyle(curLi).fontSize);
   if (matchMedia('(max-width:760px)').matches){ const V = document.documentElement.clientWidth, s = Math.max(2, (V - gw - cw)/(n + 2)); ul.style.marginLeft = '0px'; const x0 = ul.getBoundingClientRect().left;
-    ul.style.setProperty('--igap', s.toFixed(2) + 'px'); ul.style.marginLeft = (s - x0).toFixed(2) + 'px'; return; }
-  ul.style.marginLeft = ''; ul.style.setProperty('--igap', Math.max(2, (W - cw - gw)/n).toFixed(2) + 'px'); };
+    ul.style.setProperty('--igap', s.toFixed(2) + 'px'); ul.style.marginLeft = (s - x0).toFixed(2) + 'px'; }
+  else { ul.style.marginLeft = ''; ul.style.setProperty('--igap', Math.max(2, (W - cw - gw)/n).toFixed(2) + 'px'); }
+  syncPad(); };
 fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver){ const ro = new ResizeObserver(fitRow); ro.observe(form); const wt = ul.querySelector('svg.nj'); if (wt) ro.observe(wt); } if (document.fonts) document.fonts.ready.then(fitRow);
+/* v1.70 (jay 2026.10.05): konami. buttons need up up down down left right left right b a start.
+   keyboard is the same arrows then b a (enter optional, start not required) and only outside a text field.
+   idle glyphs stay --dim-w. progress uses the live speed colour (--c), one eleventh of the glow per press, never gold.
+   a miss blinks the whole row red and clears the glow. the row is display:none while the page is gold. */
+const CODE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'start'];
+const KEY = {ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right'};
+let at = 0, lock = false, goldLatch = false, goldBusy = false;
+/* ios 18+ safari plays a haptic tick when a <input type=checkbox switch> flips. iphone has no
+   vibrate(), so a 1px switch (out of tab order, aria-hidden) is toggled by clicking its label
+   inside the press. android and desktop use navigator.vibrate. silent if neither works, and the
+   glow never waits on it. easy to delete if apple drops the switch tick. */
+const haptic = (() => {
+  const box = document.querySelector('.hap input'), lab = document.querySelector('.hap label');
+  if (box) box.addEventListener('focus', () => { try { box.blur(); } catch (e) {} });
+  const vibe = pat => { try { return typeof navigator.vibrate === 'function' && navigator.vibrate(pat) === true; } catch (e) { return false; } };
+  const ios = n => { if (!lab) return; let i = 0; const one = () => {
+    const x = scrollX, y = scrollY, ae = document.activeElement;
+    try { lab.click(); } catch (e) {}
+    if (box && document.activeElement === box){ try { box.blur(); } catch (e2) {} if (ae && ae !== box) { try { ae.focus({preventScroll: true}); } catch (e3) {} } }
+    if (scrollX !== x || scrollY !== y) scrollTo(x, y);
+    if (++i < n) setTimeout(one, 80);
+  }; one(); };
+  return {
+    tick(){ if (!vibe(10)) ios(1); },
+    error(){ if (!vibe([30, 40, 30, 40, 30])) ios(3); },
+    success(){ if (!vibe([25, 40, 25, 40, 70])) ios(2); }
+  };
+})();
+function syncPad(){
+  const pad = document.querySelector('.pad'); if (!pad || !ul.offsetWidth) return;
+  const n = pad.querySelectorAll('button').length || 7, need = 44 * n + 8 * (n - 1);
+  const u = ul.getBoundingClientRect(), w = Math.max(Math.round(u.width), need);
+  const parent = pad.parentElement, p = parent.getBoundingClientRect();
+  let left = u.left;
+  if (w > innerWidth - 2) left = Math.max(0, (innerWidth - w) / 2);
+  else if (left + w > innerWidth - 2) left = Math.max(0, innerWidth - w - 2);
+  pad.style.width = w + 'px';
+  pad.style.marginLeft = Math.round(left - p.left) + 'px';
+}
+function goldNow(){
+  const pad = document.querySelector('.pad');
+  if (document.documentElement.classList.contains('gld')) return true;
+  if (pad){
+    if (pad.classList.contains('gld') || pad.querySelector('.gld')) return true;
+    for (let n = pad.parentElement; n; n = n.parentElement) if (n.classList.contains('gld')) return true;
+  }
+  try { if (window.JayRain && JayRain.golden && JayRain.golden()) return true; } catch (e) {}
+  return false;
+}
+function idle(){
+  at = 0; const pad = document.querySelector('.pad'); if (!pad) return;
+  pad.classList.remove('go', 'bad'); pad.style.setProperty('--pad-k', '0'); pad.dataset.step = '0';
+}
+function failRow(){
+  const pad = document.querySelector('.pad'); if (!pad) return;
+  at = 0; lock = true; pad.classList.remove('go'); pad.style.setProperty('--pad-k', '0'); pad.dataset.step = '0'; pad.classList.add('bad');
+  haptic.error();
+  setTimeout(() => { pad.classList.remove('bad'); lock = false; }, reduced ? 480 : 540);
+}
+function succeed(){
+  if (lock || goldNow()) return;
+  const pad = document.querySelector('.pad'); if (!pad) return;
+  lock = true; at = 0;
+  try { if (state.fail && state.fail.abort) state.fail.abort(); } catch (e) {}
+  pad.classList.remove('bad'); pad.classList.add('go'); pad.style.setProperty('--pad-k', '11'); pad.dataset.step = '11';
+  haptic.success();
+  try { if (typeof gtag === 'function') gtag('event', 'konami'); } catch (e) {}
+  try { state.konami = {playing: true, t0: performance.now()}; } catch (e) {}
+  setTimeout(() => { try { launchSpace(); } catch (e) { idle(); lock = false; } }, reduced ? 180 : 420);
+}
+function press(k, fromKey){
+  if (lock || goldNow()) return false;
+  const pad = document.querySelector('.pad'); if (!pad) return false;
+  if (k === 'enter'){
+    if (!fromKey || at === 0) return false;
+    if (at === CODE.length - 1){ succeed(); return true; }
+    failRow(); return true;
+  }
+  if (k === CODE[at]){
+    if ((fromKey && k === 'a') || k === 'start'){ succeed(); return true; }
+    at++; pad.classList.add('go'); pad.style.setProperty('--pad-k', String(at)); pad.dataset.step = String(at);
+    haptic.tick();
+    return true;
+  }
+  if (fromKey && at === 0 && CODE.indexOf(k) < 0) return false;
+  failRow(); return true;
+}
+function typing(){
+  const a = document.activeElement; if (!a || (a.closest && a.closest('.hap'))) return false;
+  return a.tagName === 'INPUT' || a.tagName === 'TEXTAREA' || a.isContentEditable;
+}
+function cloneSvg(el, suf){
+  const svg = el.cloneNode(true);
+  [svg, ...svg.querySelectorAll('*')].forEach(n => {
+    if (n.id) n.id += suf;
+    [...n.attributes].forEach(a => { if (a.value && a.value.indexOf('url(#') !== -1) n.setAttribute(a.name, a.value.replace(/url\(#([^)]+)\)/g, (_, id) => 'url(#' + id + suf + ')')); });
+  });
+  return svg;
+}
+function starField(canvas){
+  const ctx = canvas.getContext('2d'), dpr = Math.min(2, devicePixelRatio || 1);
+  let w = 0, h = 0, stars = [], raf = 0, v = 0, target = 0, live = true;
+  const resize = () => {
+    w = innerWidth; h = innerHeight; canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+    canvas.style.width = w + 'px'; canvas.style.height = h + 'px'; ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    if (!stars.length) stars = Array.from({length: 72}, () => ({x: Math.random() * w, y: Math.random() * h, z: Math.random(), s: Math.random() * 1.2 + .4}));
+  };
+  const frame = () => {
+    if (!live) return;
+    v += (target - v) * .08; ctx.clearRect(0, 0, w, h);
+    for (const st of stars){
+      st.y += (4 + st.z * 22) * v; if (st.y > h + 6){ st.y = -6; st.x = Math.random() * w; }
+      ctx.globalAlpha = .25 + st.z * .7; ctx.fillStyle = st.z > .88 ? '#FFF6C2' : '#fff';
+      ctx.fillRect(st.x, st.y, st.s, st.s + (1 + st.z * 14) * v);
+    }
+    ctx.globalAlpha = 1; raf = requestAnimationFrame(frame);
+  };
+  resize(); frame(); addEventListener('resize', resize);
+  return { boost(n){ target = n; }, stop(){ live = false; cancelAnimationFrame(raf); removeEventListener('resize', resize); } };
+}
+function launchSpace(){
+  const nj = ul.querySelector('svg.nj'), root = mk('div', 'konami rk-sky');
+  const space = mk('div', 'kos-space'), stars = document.createElement('canvas'), mask = mk('div', 'kos-mask'), hold = mk('div', 'kos-hold'), lives = mk('p', 'kos-lives');
+  stars.className = 'kos-stars'; lives.setAttribute('aria-live', 'polite');
+  const ninja = nj ? cloneSvg(nj, '-k') : mk('span');
+  if (ninja.tagName === 'svg'){ ninja.classList.add('gld'); ninja.setAttribute('aria-hidden', 'true'); }
+  hold.append(ninja, lives);
+  [space, stars, mask].forEach(el => el.setAttribute('aria-hidden', 'true'));
+  root.append(space, stars, mask, hold); document.body.appendChild(root);
+  const sky = starField(stars);
+  const done = () => { sky.stop(); root.remove(); idle(); lock = false; try { if (state.konami) state.konami.playing = false; } catch (e) {} };
+  const say = () => {
+    if (nj) nj.classList.add('gld');
+    lives.textContent = ''; requestAnimationFrame(() => { lives.textContent = '+30 lives'; });
+    if (hold.animate) hold.animate([{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'none'}], {duration: reduced ? 280 : 480, easing: 'ease', fill: 'forwards'});
+    else hold.style.opacity = '1';
+  };
+  const fadeOut = ms => { idle(); const a = root.animate ? root.animate([{opacity: 1}, {opacity: 0}], {duration: ms, easing: 'ease', fill: 'forwards'}) : null; if (a && a.finished) a.finished.then(done); else setTimeout(done, ms); };
+  if (reduced || !root.animate){
+    if (space.animate) space.animate([{opacity: 0}, {opacity: 1}], {duration: 360, fill: 'forwards'}); else space.style.opacity = '1';
+    say(); setTimeout(() => fadeOut(420), 2200); return;
+  }
+  const src = form.querySelector('.rkb .rk'), b = src && src.getBoundingClientRect();
+  let fly = null, dx = 0, dy = 0;
+  const climb = () => {
+    const stage = document.getElementById('stage'), rect = stage.getBoundingClientRect(), clone = stage.cloneNode(true);
+    clone.querySelectorAll('[id]').forEach(n => n.removeAttribute('id')); clone.removeAttribute('id'); clone.inert = true; clone.classList.add('kos-page');
+    clone.style.cssText = 'position:fixed;left:' + rect.left + 'px;top:' + rect.top + 'px;width:' + rect.width + 'px;height:' + rect.height + 'px;margin:0;min-height:0;pointer-events:none;z-index:1';
+    root.insertBefore(clone, hold);
+    mask.animate([{opacity: 0}, {opacity: 1}], {duration: 180, fill: 'forwards'}); sky.boost(1);
+    const flight = 1500;
+    clone.animate([{transform: 'translateY(0)', opacity: 1}, {transform: 'translateY(70vh)', opacity: 0}], {duration: flight, easing: 'cubic-bezier(.4,0,.7,1)', fill: 'forwards', delay: 160});
+    mask.animate([{opacity: 1}, {opacity: 0}], {duration: flight, easing: 'ease', fill: 'forwards', delay: 200});
+    space.animate([{opacity: 0}, {opacity: 1}], {duration: Math.round(flight * .85), easing: 'ease', fill: 'forwards', delay: 180});
+    setTimeout(() => {
+      sky.boost(0);
+      if (fly) fly.animate([{transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(-45deg)', opacity: 1}, {transform: 'translate(' + dx + 'px,' + (dy - innerHeight * .22) + 'px) rotate(-45deg)', opacity: 0}], {duration: 640, easing: 'ease-in', fill: 'forwards'});
+      say(); setTimeout(() => fadeOut(640), 2000);
+    }, flight + 200);
+  };
+  if (b && b.width > 2 && getComputedStyle(src).opacity !== '0'){
+    fly = cloneSvg(src, '-k');
+    fly.style.left = b.left + 'px'; fly.style.top = b.top + 'px'; fly.style.width = b.width + 'px'; fly.style.height = b.height + 'px'; fly.style.zIndex = '3';
+    const puff = mk('span', 'puff'), ps = b.width * 2.2;
+    puff.style.left = (b.left + b.width / 2 - ps / 2) + 'px'; puff.style.top = (b.top + b.height * .7 - ps / 2) + 'px'; puff.style.width = ps + 'px'; puff.style.height = ps + 'px';
+    root.append(puff, fly);
+    puff.animate([{opacity: 0, transform: 'scale(.3)'}, {opacity: 1, transform: 'scale(.8)', offset: .25}, {opacity: 0, transform: 'scale(1.6)'}], {duration: 650, easing: 'ease-out', fill: 'forwards'});
+    dx = innerWidth / 2 - (b.left + b.width / 2); dy = innerHeight * .46 - (b.top + b.height / 2);
+    fly.animate([{transform: 'translate(0px,0px) rotate(0deg)'}, {transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(-45deg)'}], {duration: 720, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards'}).finished.then(climb);
+  } else setTimeout(climb, 160);
+}
+function showPad(){
+  const pad = document.querySelector('.pad'); if (!pad) return;
+  pad.classList.add('in'); if (!goldNow()) pad.querySelectorAll('button').forEach(revealTap); syncPad();
+}
+function applyGold(){
+  if (goldBusy) return; goldBusy = true;
+  try {
+    const pad = document.querySelector('.pad'); if (!pad) return;
+    const on = goldNow();
+    if (on && !goldLatch){ idle(); pad.querySelectorAll('button').forEach(gateTap); }
+    else if (!on && goldLatch && pad.classList.contains('in')) pad.querySelectorAll('button').forEach(revealTap);
+    goldLatch = on;
+    if (pad.classList.contains('off') !== on) pad.classList.toggle('off', on);
+  } finally { goldBusy = false; }
+}
+function armGold(){
+  if (armGold.done || !window.JayRain) return; armGold.done = true;
+  const g = JayRain.gold, off = JayRain.goldOff;
+  if (typeof g === 'function') JayRain.gold = function (){ const r = g.apply(this, arguments); applyGold(); return r; };
+  if (typeof off === 'function') JayRain.goldOff = function (){ const r = off.apply(this, arguments); applyGold(); return r; };
+  applyGold();
+}
+{
+  const pad = document.querySelector('.pad');
+  if (pad) pad.querySelectorAll('button').forEach(gateTap);
+  if (pad) pad.addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; press(b.getAttribute('data-k'), false); });
+  addEventListener('keydown', e => {
+    if (e.repeat || e.metaKey || e.ctrlKey || e.altKey || lock) return;
+    if (typing() || goldNow()) return;
+    const inPad = e.target && e.target.closest && e.target.closest('.pad');
+    if (inPad && (e.key === 'Enter' || e.key === ' ')) return;
+    let k = KEY[e.key] || '';
+    if (!k && e.key === 'Enter') k = 'enter';
+    else if (!k && e.key.length === 1) k = e.key.toLowerCase();
+    if (k && press(k, true)) e.preventDefault();
+  });
+  if (pad){ const mo = new MutationObserver(applyGold); mo.observe(document.documentElement, {attributes: true, attributeFilter: ['class']}); mo.observe(document.body, {attributes: true, attributeFilter: ['class'], subtree: true}); }
+  document.addEventListener('DOMContentLoaded', armGold);
+  applyGold();
+}
 placeCable(); addEventListener('resize', placeCable); if (window.ResizeObserver) new ResizeObserver(placeCable).observe(form); if (document.fonts) document.fonts.ready.then(placeCable);
 const chgStep = () => { const v = emailIn.value, n = String(looksDone() ? 3 : v.includes('@') ? 2 : v.length ? 1 : 0); if (form.dataset.chg !== n) form.dataset.chg = n; };
 const syncOk = () => { const ok = looksDone(); form.classList.toggle('ok', ok); form.classList.toggle('gold-ok', ok); chgStep(); };
@@ -1199,7 +1462,7 @@ function finishUp(){
 let iconsIn = false;
 const introEnd = () => { if (iconsIn && (!eggText || state.egg === 'landed')) finishUp(); };
 function popIcons(instant){
-  const done = () => { iconsIn = true; cursorHome(); egg(); introEnd(); };
+  const done = () => { iconsIn = true; cursorHome(); showPad(); egg(); introEnd(); };
   icons.forEach((li, i) => {
     const a = li.querySelector('a');
     if (instant){ li.classList.add('in'); revealTap(a); state.icons = i + 1; return; }
@@ -1334,7 +1597,7 @@ function complete(){
   lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window));
   if (!form.classList.contains('gone')){ form.classList.add('in'); formTaps.forEach(revealTap); }
   icons.forEach(li => { li.classList.add('in'); revealTap(li.querySelector('a')); }); state.icons = icons.length;
-  state.line = 3; finishUp();
+  showPad(); state.line = 3; finishUp();
   if (eggText && state.egg !== 'landed'){ eggStop(); eggSettle(); eggEl.classList.add('on'); }
 }
 
@@ -1409,7 +1672,7 @@ function dump(){
     if (at < total){ dumpRaf = requestAnimationFrame(frame); return; }
     dumpRaf = 0; state.dump.took = Math.round(performance.now() - t0);
     state.line = 3; state.icons = icons.length;
-    iconsIn = true; cursorHome(); egg(); introEnd();
+    iconsIn = true; cursorHome(); showPad(); egg(); introEnd();
   };
   dumpRaf = requestAnimationFrame(frame);
 }
