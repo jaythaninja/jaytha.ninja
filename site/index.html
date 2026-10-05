@@ -415,6 +415,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
   .pad.bad button{animation:none;color:var(--bad);filter:drop-shadow(0 0 6px var(--bad-glow));text-shadow:none}
 }
 .konami.rk-sky{z-index:40;background:transparent;pointer-events:auto}
+.konami.rk-sky>.rk-sky{position:absolute;inset:0;z-index:3;overflow:visible}
 .kos-space{position:absolute;inset:0;background:#000;opacity:0}
 .kos-stars{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
 .kos-mask{position:absolute;inset:0;background:var(--bg,#000);opacity:0}
@@ -455,7 +456,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 <meta name="twitter:image" content="https://jaytha.ninja/og/home.png?d=2026-10-04">
 <meta name="twitter:image:alt" content="the intro on jaytha.ninja: the internet was a place to make genuine connections with other humans, somewhere along the way, we messed up, my team and i hope to run it back">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "jay", "url": "https://jaytha.ninja/", "sameAs": ["https://x.com/jaythaninja", "https://www.instagram.com/jaythaninja", "https://www.threads.com/jaythaninja", "https://github.com/jaythaninja", "https://www.strava.com/athletes/64153021", "https://www.linkedin.com/in/jaythaninja"]}</script>
-<link rel="stylesheet" href="/assets/rain.css?v=1.67"><script src="/assets/rain.js?v=1.67"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.67"><script src="/assets/rain.js?v=1.74"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -924,7 +925,10 @@ fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver){ const 
    idle glyphs stay --dim-w. progress is the launch-hold gold pulse, one eleventh per press.
    v1.73: a correct press also bumps that glyph (scale ~1.15, bright gold, 250ms). transform only.
    a miss blinks the whole row red and clears the glow. gold hides the row in place (visibility, the box stays).
-   liftoff flies the successful-launch gold rocket; the flight itself is unchanged. */
+   liftoff flies the successful-launch gold rocket; the flight itself is unchanged.
+   v1.74: the win uses that launch's gold pass (trackGold → JayRain.gold track). text and icons
+   turn gold as the rocket's centre passes them. the page clone is not inside the gold sky,
+   so it is not born gold. reduced motion locks gold immediately. */
 const CODE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'start'];
 const KEY = {ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right'};
 let at = 0, lock = false, goldLatch = false, goldBusy = false;
@@ -1074,8 +1078,12 @@ function goldRocket(svg, sky, cls, band){
   c.querySelectorAll('[stroke="#FFC2A8"]').forEach(e => e.setAttribute('stroke', '#FFF3B0'));
   sky.appendChild(c); return c;
 }
+/* the email liftoff's gold pass: .gld as this element's centre climbs past each node (rain.js goldTrack). */
+function trackGold(el){
+  return JayRain.gold({lock: true, track: () => { if (!el || !el.isConnected || el.style.visibility === 'hidden') return -Infinity; const b = el.getBoundingClientRect(); return (b.top + b.bottom)/2; }});
+}
 function launchSpace(){
-  const nj = ul.querySelector('svg.nj'), root = mk('div', 'konami rk-sky gold');
+  const nj = ul.querySelector('svg.nj'), root = mk('div', 'konami rk-sky');
   const space = mk('div', 'kos-space'), stars = document.createElement('canvas'), mask = mk('div', 'kos-mask'), hold = mk('div', 'kos-hold'), lives = mk('p', 'kos-lives');
   stars.className = 'kos-stars'; lives.setAttribute('aria-live', 'polite');
   const ninja = nj ? cloneSvg(nj, '-k') : mk('span');
@@ -1095,6 +1103,7 @@ function launchSpace(){
   const fadeOut = ms => { idle(); const a = root.animate ? root.animate([{opacity: 1}, {opacity: 0}], {duration: ms, easing: 'ease', fill: 'forwards'}) : null; if (a && a.finished) a.finished.then(done); else setTimeout(done, ms); };
   if (reduced || !root.animate){
     if (space.animate) space.animate([{opacity: 0}, {opacity: 1}], {duration: 360, fill: 'forwards'}); else space.style.opacity = '1';
+    JayRain.gold({lock: true});
     say(); setTimeout(() => fadeOut(420), 4500); return;
   }
   const src = form.querySelector('.rkb .rk'), b = src && src.getBoundingClientRect();
@@ -1111,20 +1120,22 @@ function launchSpace(){
     space.animate([{opacity: 0}, {opacity: 1}], {duration: Math.round(flight * .85), easing: 'ease', fill: 'forwards', delay: 180});
     setTimeout(() => {
       sky.boost(0);
-      if (fly) fly.animate([{transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(-45deg)', opacity: 1}, {transform: 'translate(' + dx + 'px,' + (dy - innerHeight * .22) + 'px) rotate(-45deg)', opacity: 0}], {duration: 640, easing: 'ease-in', fill: 'forwards'});
+      if (fly) fly.animate([{transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(-45deg)', opacity: 1}, {transform: 'translate(' + dx + 'px,' + (dy - innerHeight * .22) + 'px) rotate(-45deg)', opacity: 0}], {duration: 640, easing: 'ease-in', fill: 'forwards'}).finished.then(() => { fly.style.visibility = 'hidden'; });
       say(); setTimeout(() => fadeOut(640), 4500);
     }, flight + 200);
   };
   if (b && b.width > 2 && getComputedStyle(src).opacity !== '0'){
-    fly = goldRocket(src, root, 'au', false);
-    fly.style.left = b.left + 'px'; fly.style.top = b.top + 'px'; fly.style.width = b.width + 'px'; fly.style.height = b.height + 'px'; fly.style.zIndex = '3';
+    const rig = mk('div', 'rk-sky gold'); rig.setAttribute('aria-hidden', 'true'); root.appendChild(rig);
+    fly = goldRocket(src, rig, 'au', false);
+    fly.style.left = b.left + 'px'; fly.style.top = b.top + 'px'; fly.style.width = b.width + 'px'; fly.style.height = b.height + 'px';
     const puff = mk('span', 'puff'), ps = b.width * 2.2;
     puff.style.left = (b.left + b.width / 2 - ps / 2) + 'px'; puff.style.top = (b.top + b.height * .7 - ps / 2) + 'px'; puff.style.width = ps + 'px'; puff.style.height = ps + 'px';
-    root.append(puff, fly);
+    rig.append(puff, fly);
     puff.animate([{opacity: 0, transform: 'scale(.3)'}, {opacity: 1, transform: 'scale(.8)', offset: .25}, {opacity: 0, transform: 'scale(1.6)'}], {duration: 650, easing: 'ease-out', fill: 'forwards'});
     dx = innerWidth / 2 - (b.left + b.width / 2); dy = innerHeight * .46 - (b.top + b.height / 2);
+    trackGold(fly);
     fly.animate([{transform: 'translate(0px,0px) rotate(0deg)'}, {transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(-45deg)'}], {duration: 720, easing: 'cubic-bezier(.3,.6,.4,1)', fill: 'forwards'}).finished.then(climb);
-  } else setTimeout(climb, 160);
+  } else { JayRain.gold({lock: true}); setTimeout(climb, 160); }
 }
 function showPad(){
   const pad = document.querySelector('.pad'); if (!pad) return;
@@ -1227,7 +1238,7 @@ const launchRocket = () => new Promise(done => {
   const r = btn.getBoundingClientRect(), sky = mk('div', 'rk-sky gold'); sky.setAttribute('aria-hidden', 'true'); document.body.appendChild(sky);
   Object.assign(svg.style, {left: r.left + 'px', top: r.top + 'px', width: r.width + 'px', height: r.height + 'px'});
   sky.appendChild(svg);
-  JayRain.gold({lock: true, track: () => { if (!svg.isConnected || svg.style.visibility === 'hidden') return -Infinity; const b = svg.getBoundingClientRect(); return (b.top + b.bottom)/2; }});
+  trackGold(svg);
   const dist = r.bottom + r.height*2.5 + 40;
   const climb = Math.round(Math.min(LIFTOFF.climbMax, Math.max(LIFTOFF.climbMin, dist*LIFTOFF.perPx)));
   const puff = mk('span', 'puff'), ps = r.width*2.2;

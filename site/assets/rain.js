@@ -208,14 +208,26 @@ function Rain(cv, o){
   };
   /* v1.57 (jay 2026.10.02): the liftoff's gold wave. o.track() = the wave's line now (viewport px; the rocket's centre), -Infinity once it's gone. every element whose centre
      is below the line turns gold (so everything under the rocket at once: the icons), the rest as the rocket passes them, top last (the hint); the rain the same way,
-     with a soft o.soft px edge under the line. when the line is gone: everything gold (html.gld), as at the end of the old pulse */
+     with a soft o.soft px edge under the line. when the line is gone: everything gold (html.gld), as at the end of the old pulse.
+     v1.74: that centre is read every frame, and nodes that show up mid-flight join the same list. a still page (the email liftoff) crosses the line when the rocket
+     climbs past it. a page that rides past the rocket (konami) crosses the same line, with the same .gld fade, instead of being born gold. */
   const goldTrack=o=>{
     const h=document.documentElement,trk=o.track,fade=o.fade??320;auWave(fade);
     if(rain)rain.au={trk:()=>{const y=trk();return y===-Infinity?-Infinity:y+scrollY},soft:o.soft??70,out:null};
-    const els=[...document.body.querySelectorAll('*')].filter(e=>{const tg=e.tagName.toLowerCase();if(tg!=='svg'&&e.closest('svg'))return false;if(/^(script|style|canvas|br|noscript)$/.test(tg))return false;if(e.classList.contains('glow'))return true;const r=e.getBoundingClientRect();return r.height<=160&&(r.width>0||r.height>0);})
-      .map(e=>{const r=e.getBoundingClientRect();return{e,y:e.classList.contains('glow')?-1e9:(r.top+r.bottom)/2};}).sort((a,b)=>b.y-a.y);
-    return new Promise(res=>{let i=0;const step=()=>{const y=trk();while(i<els.length&&(y===-Infinity||els[i].y>=y))els[i++].e.classList.add('gld');
-      if(y!==-Infinity){auRaf=requestAnimationFrame(step);return;}auRaf=0;h.classList.add('gld');if(rain)rain.au={y:0,t0:-1e9,ms:0,maxD:1,fade:1,out:null};
+    const skip=e=>{const tg=e.tagName.toLowerCase();return(tg!=='svg'&&!!e.closest('svg'))||/^(script|style|canvas|br|noscript)$/.test(tg);};
+    const seen=new Set(),pending=[];
+    const collect=()=>{document.body.querySelectorAll('*').forEach(e=>{
+      if(seen.has(e)||skip(e))return;seen.add(e);
+      if(e.classList.contains('glow')){pending.push({e,y:-1e9});return;}
+      const r=e.getBoundingClientRect();if(r.height<=160&&(r.width>0||r.height>0))pending.push({e,y:(r.top+r.bottom)/2});
+    });};
+    collect();
+    return new Promise(res=>{const step=()=>{const y=trk();
+      if(y!==-Infinity){collect();for(const row of pending)if(row.y!==-1e9&&row.e.isConnected){const r=row.e.getBoundingClientRect();row.y=(r.top+r.bottom)/2;}pending.sort((a,b)=>b.y-a.y);}
+      let i=0;while(i<pending.length&&(y===-Infinity||pending[i].y>=y))pending[i++].e.classList.add('gld');
+      if(i)pending.splice(0,i);
+      if(y!==-Infinity){auRaf=requestAnimationFrame(step);return;}
+      auRaf=0;h.classList.add('gld');if(rain)rain.au={y:0,t0:-1e9,ms:0,maxD:1,fade:1,out:null};
       auTimers.push(setTimeout(()=>h.classList.remove('au-wave'),fade+60));res();};auRaf=requestAnimationFrame(step);});
   };
   const goldOff=(o={})=>{
