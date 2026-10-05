@@ -106,7 +106,7 @@ a:hover{color:var(--c)}
 
 :root{--k:.9167;--kx:.8;--ich:48px;--igap:12px}
 @media (max-width:760px){:root{--k:.8333;--kx:.7143;--ich:40px}}
-.social{display:flex;flex-wrap:nowrap;align-items:center;gap:0 var(--igap);list-style:none}
+.social{display:flex;flex-wrap:nowrap;align-items:center;gap:0 var(--igap);list-style:none;min-height:var(--ich)}
 .social li:not(.cur){flex:none;display:flex;align-items:center;height:var(--ich)}
 .social li{opacity:0;transform:scale(.55) translateY(6px);transition:opacity .28s ease-out,transform .38s cubic-bezier(.34,1.56,.64,1)}
 .social li.in{opacity:1;transform:none}.revealed .social li.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .sig .ninja.in{opacity:1!important;transform:none!important;transition:none!important}.revealed .notify.in:not(.gone){opacity:1!important;transform:none!important;visibility:visible;transition:none!important}.revealed .egg.fade,.revealed .social.fade{opacity:1!important;animation:none!important}
@@ -368,11 +368,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
   .copy>.egg,.copy>.egg.has-day,.copy>.egg.has-snap{grid-column:2;grid-row:1 / span 3;margin:0;align-self:center}
   .copy>.egg::before{content:"";position:absolute;left:-28px;top:0;bottom:0;border-left:1px solid rgba(var(--c-rgb),.18);pointer-events:none}
 }
-/* v1.70 (jay 2026.10.05): konami row. idle is the dim gray (--dim-w), never teal.
-   once a correct press lands, the whole row picks up the live speed colour (--c: teal, or orange in fast)
-   and the glow steps up by 1/11 per press (shadow alpha + a share of the opacity). never gold here.
-   a miss blinks every glyph red, then back to gray. html.gld / .off hides the row (signup gold, gold flash). */
-.pad{--pad-k:0;--pad-glyph:20px;--pad-hit:40px;--bad:#FF4B6E;--bad-glow:rgba(255,75,110,.92);display:flex;justify-content:space-between;align-items:center;gap:0;margin-top:36px;color:var(--dim-w);user-select:none}
+/* v1.71 (jay 2026.10.05): the row's box is in this stylesheet, before paint: glyph height matches the
+   ninja (24px * --k) and the gap above it is the same token as the other homepage rows (--pgap).
+   gold hides it with visibility, never display, so the box stays and nothing below jumps.
+   v1.70: idle is the dim gray (--dim-w), never teal. a correct press picks up the live speed colour
+   (--c: teal, or orange in fast) and the glow steps up by 1/11 per press. never gold here.
+   a miss blinks every glyph red, then back to gray. */
+.pad{--pad-k:0;--pad-glyph:calc(24px * var(--k));--pad-hit:40px;--bad:#FF4B6E;--bad-glow:rgba(255,75,110,.92);display:flex;justify-content:space-between;align-items:center;gap:0;margin-top:var(--pgap);min-height:var(--pad-glyph);color:var(--dim-w);user-select:none}
 .js .pad:not(.in){opacity:0;pointer-events:none}
 .pad.in{transition:opacity .35s ease}
 .pad.go{color:var(--c);opacity:calc(.55 + .45 * var(--pad-k) / 11);transition:none}
@@ -380,6 +382,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .pad button::before{content:"";position:absolute;left:50%;top:50%;width:max(100%,var(--pad-hit));height:var(--pad-hit);transform:translate(-50%,-50%)}
 .pad button svg{width:var(--pad-glyph);height:var(--pad-glyph);display:block;overflow:visible}
 .pad button svg path{stroke-width:2.4}
+.pad button[data-k="b"],.pad button[data-k="a"],.pad button[data-k="start"]{font-weight:400;font-size:calc(var(--pad-glyph) * .68);letter-spacing:-.04em}
 .pad button[data-k="start"]{width:auto;min-width:var(--pad-glyph)}
 .pad button:hover,.pad button:focus-visible,.pad button:active{--br:1.32}
 .pad button:focus-visible{outline:1px solid rgba(var(--c-rgb),.7);outline-offset:3px}
@@ -393,7 +396,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
   68%,80%{color:var(--bad);filter:drop-shadow(0 0 7px var(--bad-glow));text-shadow:none}
   90%,100%{color:var(--dim-w);filter:none;text-shadow:none}
 }
-.gld .pad,html.gld .pad,:root.gld .pad,.pad.gld,.pad:has(.gld),.pad.off{display:none!important}
+.gld .pad,html.gld .pad,:root.gld .pad,.pad.gld,.pad:has(.gld),.pad.off{visibility:hidden!important;pointer-events:none!important}
 @media (prefers-color-scheme:light){.pad{--bad:#C4173A;--bad-glow:rgba(196,23,58,.75)}}
 @media (prefers-reduced-motion:reduce){
   .pad,.pad.in,.pad.go{transition:none}
@@ -406,6 +409,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .kos-hold{position:absolute;inset:0;z-index:4;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;opacity:0;pointer-events:none}
 .konami .nj{--c:#FFD700;--c-rgb:255,215,0;--c-lt:#FFE066;--c-dk:#C99A00;--c-pale:#FFF6C2;--f:#FFD700;--f-lt:#FFE066;--f-dk:#C99A00;--nj-a-hl:var(--c-pale);--nj-a-tail:var(--c-dk);--nj-a-sash:var(--c-pale);--nj-k-wrap:#5a4300;width:84px;height:84px;display:block}
 .kos-lives{margin:0;font:500 13px/1.2 var(--mono);color:#FFD700;text-shadow:0 0 10px rgba(255,215,0,.65)}
+@keyframes kos-gold{
+  0%,24%,54%,100%{filter:drop-shadow(0 0 1px rgba(255,215,0,.22))}
+  12%,42%,72%{filter:drop-shadow(0 0 18px rgba(255,215,0,.95)) drop-shadow(0 0 6px rgba(255,246,194,.88))}
+}
+.kos-hold.kos-pulse .nj,.kos-hold.kos-pulse .kos-lives{animation:kos-gold 4.5s ease-in-out both}
+@media (prefers-reduced-motion:reduce){
+  .kos-hold.kos-pulse .nj,.kos-hold.kos-pulse .kos-lives{animation:none;filter:drop-shadow(0 0 12px rgba(255,215,0,.85))}
+}
 .hap{position:fixed;left:0;top:0;width:1px;height:1px;margin:0;padding:0;overflow:hidden;opacity:0;border:0;clip:rect(0 0 0 0)}
 .hap input,.hap label{position:absolute;width:1px;height:1px;margin:0;padding:0}
 </style>
@@ -898,7 +909,7 @@ fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver){ const 
 /* v1.70 (jay 2026.10.05): konami. buttons need up up down down left right left right b a start.
    keyboard is the same arrows then b a (enter optional, start not required) and only outside a text field.
    idle glyphs stay --dim-w. progress uses the live speed colour (--c), one eleventh of the glow per press, never gold.
-   a miss blinks the whole row red and clears the glow. the row is display:none while the page is gold. */
+   a miss blinks the whole row red and clears the glow. gold hides the row in place (visibility, the box stays). */
 const CODE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'start'];
 const KEY = {ArrowUp: 'up', ArrowDown: 'down', ArrowLeft: 'left', ArrowRight: 'right'};
 let at = 0, lock = false, goldLatch = false, goldBusy = false;
@@ -927,16 +938,22 @@ function syncPad(){
   const pad = document.querySelector('.pad'); if (!pad || !ul.offsetWidth) return;
   const ninja = ul.querySelector('svg.nj'), caret = curLi.querySelector('.cursor');
   if (!ninja || !caret) return;
-  const nl = ninja.getBoundingClientRect(), cr = caret.getBoundingClientRect();
-  const parent = pad.parentElement.getBoundingClientRect();
-  const icons = [...ul.querySelectorAll('svg.ic')];
-  const iconH = icons.length ? icons.reduce((s, el) => s + el.getBoundingClientRect().height, 0) / icons.length : nl.height;
-  const glyph = Math.max(14, Math.round(Math.max(iconH, nl.height)));
+  const parent = pad.parentElement;
+  const unscaled = el => {
+    const a = el.getBoundingClientRect();
+    let s = 1, n = el.parentElement;
+    while (n && n !== parent){
+      const t = getComputedStyle(n).transform;
+      if (t && t !== 'none'){ const m = new DOMMatrix(t); if (m.a) s *= m.a; }
+      n = n.parentElement;
+    }
+    const mid = (a.left + a.right) / 2, half = (a.width / 2) / (s || 1);
+    return {left: mid - half, right: mid + half};
+  };
+  const nl = unscaled(ninja), cr = unscaled(caret), pr = parent.getBoundingClientRect();
   pad.style.width = (cr.right - nl.left) + 'px';
-  pad.style.marginLeft = (nl.left - parent.left) + 'px';
+  pad.style.marginLeft = (nl.left - pr.left) + 'px';
   pad.style.marginRight = '0px';
-  pad.style.setProperty('--pad-glyph', glyph + 'px');
-  pad.style.setProperty('--pad-hit', Math.max(40, glyph) + 'px');
 }
 function goldNow(){
   const pad = document.querySelector('.pad');
@@ -1033,13 +1050,14 @@ function launchSpace(){
   const say = () => {
     if (nj) nj.classList.add('gld');
     lives.textContent = ''; requestAnimationFrame(() => { lives.textContent = '+30 lives'; });
+    hold.classList.add('kos-pulse');
     if (hold.animate) hold.animate([{opacity: 0, transform: 'translateY(10px)'}, {opacity: 1, transform: 'none'}], {duration: reduced ? 280 : 480, easing: 'ease', fill: 'forwards'});
     else hold.style.opacity = '1';
   };
   const fadeOut = ms => { idle(); const a = root.animate ? root.animate([{opacity: 1}, {opacity: 0}], {duration: ms, easing: 'ease', fill: 'forwards'}) : null; if (a && a.finished) a.finished.then(done); else setTimeout(done, ms); };
   if (reduced || !root.animate){
     if (space.animate) space.animate([{opacity: 0}, {opacity: 1}], {duration: 360, fill: 'forwards'}); else space.style.opacity = '1';
-    say(); setTimeout(() => fadeOut(420), 2200); return;
+    say(); setTimeout(() => fadeOut(420), 4500); return;
   }
   const src = form.querySelector('.rkb .rk'), b = src && src.getBoundingClientRect();
   let fly = null, dx = 0, dy = 0;
@@ -1056,7 +1074,7 @@ function launchSpace(){
     setTimeout(() => {
       sky.boost(0);
       if (fly) fly.animate([{transform: 'translate(' + dx + 'px,' + dy + 'px) rotate(-45deg)', opacity: 1}, {transform: 'translate(' + dx + 'px,' + (dy - innerHeight * .22) + 'px) rotate(-45deg)', opacity: 0}], {duration: 640, easing: 'ease-in', fill: 'forwards'});
-      say(); setTimeout(() => fadeOut(640), 2000);
+      say(); setTimeout(() => fadeOut(640), 4500);
     }, flight + 200);
   };
   if (b && b.width > 2 && getComputedStyle(src).opacity !== '0'){
@@ -1083,6 +1101,8 @@ function applyGold(){
     else if (!on && goldLatch && pad.classList.contains('in')) pad.querySelectorAll('button').forEach(revealTap);
     goldLatch = on;
     if (pad.classList.contains('off') !== on) pad.classList.toggle('off', on);
+    if (on){ pad.setAttribute('aria-hidden', 'true'); pad.setAttribute('inert', ''); }
+    else { pad.removeAttribute('aria-hidden'); pad.removeAttribute('inert'); }
   } finally { goldBusy = false; }
 }
 function armGold(){
