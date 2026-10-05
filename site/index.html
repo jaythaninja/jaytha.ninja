@@ -381,8 +381,13 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .pad button{position:relative;flex:0 0 auto;width:var(--pad-glyph);height:var(--pad-glyph);box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;color:inherit;font:500 var(--pad-glyph)/1 var(--mono);letter-spacing:-.03em;white-space:nowrap;overflow:visible;cursor:pointer;--br:1;-webkit-tap-highlight-color:transparent;text-shadow:0 0 calc(2px + 12px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11));filter:brightness(var(--br)) drop-shadow(0 0 calc(1px + 9px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11)))}
 .pad button::before{content:"";position:absolute;left:50%;top:50%;width:max(100%,var(--pad-hit));height:var(--pad-hit);transform:translate(-50%,-50%)}
 .pad button svg{width:var(--pad-glyph);height:var(--pad-glyph);display:block;overflow:visible}
-.pad button svg path{stroke-width:2.4}
+/* stroke matches JetBrains Mono 400 at the letter size (stem ~0.09em, letters are 0.68 of the 24-unit box) */
+.pad button svg path{stroke-width:1.47}
 .pad button[data-k="b"],.pad button[data-k="a"],.pad button[data-k="start"]{font-weight:400;font-size:calc(var(--pad-glyph) * .68);letter-spacing:-.04em}
+/* the em box is centered; these shifts put each glyph's ink box on that same center */
+.pad button[data-k="b"]{--ink-dy:.09em}
+.pad button[data-k="start"]{--ink-dy:.07em}
+.pad button[data-k="b"] > span,.pad button[data-k="a"] > span,.pad button[data-k="start"] > span{display:block;transform:translateY(var(--ink-dy,0))}
 .pad button[data-k="start"]{width:auto;min-width:var(--pad-glyph)}
 .pad button:hover,.pad button:focus-visible,.pad button:active{--br:1.32}
 .pad button:focus-visible{outline:1px solid rgba(var(--c-rgb),.7);outline-offset:3px}
@@ -503,9 +508,9 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
         <button type="button" data-k="down" aria-label="down"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6v12M7 13l5 5 5-5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button type="button" data-k="left" aria-label="left"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M18 12H6M11 7l-5 5 5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
         <button type="button" data-k="right" aria-label="right"><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 12h12M13 7l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-        <button type="button" data-k="b" aria-label="b">b</button>
-        <button type="button" data-k="a" aria-label="a">a</button>
-        <button type="button" data-k="start" aria-label="start">start</button>
+        <button type="button" data-k="b" aria-label="b"><span>b</span></button>
+        <button type="button" data-k="a" aria-label="a"><span>a</span></button>
+        <button type="button" data-k="start" aria-label="start"><span>start</span></button>
       </div>
       <div class="hap" aria-hidden="true"><input type="checkbox" switch id="hap-sw" tabindex="-1" aria-hidden="true" autocomplete="off"><label for="hap-sw" tabindex="-1" aria-hidden="true"></label></div>
       <noscript><p class="ns-links"><a href="https://x.com/jaythaninja">𝕏</a> <a href="https://www.instagram.com/jaythaninja">instagram</a> <a href="https://www.threads.com/jaythaninja">threads</a> <a href="https://github.com/jaythaninja">github</a> <a href="https://www.strava.com/athletes/64153021">strava</a> <a href="https://open.spotify.com/playlist/4agJs1yW7WQcFx1Lg5VVZq">spotify</a> <a href="https://www.linkedin.com/in/jaythaninja">linkedin</a></p></noscript>
