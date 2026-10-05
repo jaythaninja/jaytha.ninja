@@ -373,13 +373,15 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
    gold hides it with visibility, never display, so the box stays and nothing below jumps.
    v1.70: idle is the dim gray (--dim-w). a miss blinks every glyph red, then back to gray.
    v1.72: from the first correct press the row uses the launch-hold gold pulse (kos-gold),
-   and the glow still steps up by 1/11 per press. */
-.pad{--pad-k:0;--pad-glyph:calc(24px * var(--k));--pad-hit:40px;--bad:#FF4B6E;--bad-glow:rgba(255,75,110,.92);display:flex;justify-content:space-between;align-items:center;gap:0;margin-top:var(--pgap);min-height:var(--pad-glyph);color:var(--dim-w);user-select:none}
+   and the glow still steps up by 1/11 per press.
+   v1.73: the glyph just pressed bumps to about 1.15 with a bright gold flash (~250ms),
+   then settles back into that pulse. transform only. reduced motion flashes brightness, no scale. */
+.pad{--pad-k:0;--pad-glyph:calc(24px * var(--k));--pad-hit:40px;--bad:#FF4B6E;--bad-glow:rgba(255,75,110,.92);display:flex;justify-content:space-between;align-items:center;gap:0;margin-top:var(--pgap);min-height:var(--pad-glyph);color:var(--dim-w);user-select:none;touch-action:manipulation}
 .js .pad:not(.in){opacity:0;pointer-events:none}
 .pad.in{transition:opacity .35s ease}
 .pad.go{color:#FFD700;opacity:calc(.55 + .45 * var(--pad-k) / 11);transition:none}
 .pad.go button{text-shadow:none;animation:kos-gold 4.5s ease-in-out infinite}
-.pad button{position:relative;flex:0 0 auto;width:var(--pad-glyph);height:var(--pad-glyph);box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;color:inherit;font:500 var(--pad-glyph)/1 var(--mono);letter-spacing:-.03em;white-space:nowrap;overflow:visible;cursor:pointer;--br:1;-webkit-tap-highlight-color:transparent;text-shadow:0 0 calc(2px + 12px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11));filter:brightness(var(--br)) drop-shadow(0 0 calc(1px + 9px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11)))}
+.pad button{position:relative;flex:0 0 auto;width:var(--pad-glyph);height:var(--pad-glyph);box-sizing:border-box;display:flex;align-items:center;justify-content:center;padding:0;margin:0;border:0;background:none;color:inherit;font:500 var(--pad-glyph)/1 var(--mono);letter-spacing:-.03em;white-space:nowrap;overflow:visible;cursor:pointer;touch-action:manipulation;--br:1;-webkit-tap-highlight-color:transparent;text-shadow:0 0 calc(2px + 12px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11));filter:brightness(var(--br)) drop-shadow(0 0 calc(1px + 9px * var(--pad-k) / 11) rgba(var(--c-rgb),calc(var(--pad-k) / 11)))}
 .pad button::before{content:"";position:absolute;left:50%;top:50%;width:max(100%,var(--pad-hit));height:var(--pad-hit);transform:translate(-50%,-50%)}
 .pad button svg{width:var(--pad-glyph);height:var(--pad-glyph);display:block;overflow:visible}
 /* stroke matches JetBrains Mono 400 at the letter size (stem ~0.09em, letters are 0.68 of the 24-unit box) */
@@ -392,6 +394,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .pad button[data-k="b"] > span,.pad button[data-k="a"] > span,.pad button[data-k="start"] > span{display:block;transform:translateY(var(--ink-dy,0))}
 .pad button[data-k="start"]{width:auto;min-width:var(--pad-glyph)}
 .pad button:hover,.pad button:focus-visible,.pad button:active{--br:1.32}
+.pad button:active{transform:scale(.92)}
 .pad button:focus-visible{outline:1px solid rgba(var(--c-rgb),.7);outline-offset:3px}
 .pad.bad{opacity:1;color:var(--dim-w)}
 .pad.bad button{animation:pad-bad .48s linear both}
@@ -408,6 +411,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 @media (prefers-reduced-motion:reduce){
   .pad,.pad.in,.pad.go{transition:none}
   .pad.go button{animation:none;filter:drop-shadow(0 0 12px rgba(255,215,0,.85));text-shadow:none}
+  .pad button:active{transform:none;filter:brightness(1.55)}
   .pad.bad button{animation:none;color:var(--bad);filter:drop-shadow(0 0 6px var(--bad-glow));text-shadow:none}
 }
 .konami.rk-sky{z-index:40;background:transparent;pointer-events:auto}
@@ -918,6 +922,7 @@ fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver){ const 
    keyboard is the same arrows then b a, and Enter is start. a alone does not launch.
    Enter is ignored while an input has focus. any other key on the start step is a miss.
    idle glyphs stay --dim-w. progress is the launch-hold gold pulse, one eleventh per press.
+   v1.73: a correct press also bumps that glyph (scale ~1.15, bright gold, 250ms). transform only.
    a miss blinks the whole row red and clears the glow. gold hides the row in place (visibility, the box stays).
    liftoff flies the successful-launch gold rocket; the flight itself is unchanged. */
 const CODE = ['up', 'up', 'down', 'down', 'left', 'right', 'left', 'right', 'b', 'a', 'start'];
@@ -979,9 +984,21 @@ function idle(){
   at = 0; const pad = document.querySelector('.pad'); if (!pad) return;
   pad.classList.remove('go', 'bad'); pad.style.setProperty('--pad-k', '0'); pad.dataset.step = '0';
 }
+function clearBump(pad){
+  pad.querySelectorAll('button').forEach(b => { b.getAnimations().forEach(a => { if (a.id === 'pad-hit') a.cancel(); }); });
+}
+function bump(k){
+  const pad = document.querySelector('.pad'); if (!pad) return;
+  const btn = pad.querySelector('button[data-k="' + k + '"]'); if (!btn || !btn.animate) return;
+  clearBump(pad);
+  const rest = 'brightness(1) drop-shadow(0 0 8px rgba(255,215,0,.75))';
+  const flash = 'brightness(1.7) drop-shadow(0 0 22px rgba(255,215,0,1)) drop-shadow(0 0 8px rgba(255,246,194,1))';
+  if (reduced) btn.animate([{filter: 'brightness(1) drop-shadow(0 0 12px rgba(255,215,0,.85))'}, {filter: 'brightness(1.7) drop-shadow(0 0 18px rgba(255,215,0,1))', offset: .35}, {filter: 'brightness(1) drop-shadow(0 0 12px rgba(255,215,0,.85))'}], {duration: 250, easing: 'ease-out', id: 'pad-hit'});
+  else btn.animate([{transform: 'scale(1)', filter: rest}, {transform: 'scale(1.15)', filter: flash, offset: .35}, {transform: 'scale(1)', filter: rest}], {duration: 250, easing: 'ease-out', id: 'pad-hit'});
+}
 function failRow(){
   const pad = document.querySelector('.pad'); if (!pad) return;
-  at = 0; lock = true; pad.classList.remove('go'); pad.style.setProperty('--pad-k', '0'); pad.dataset.step = '0'; pad.classList.add('bad');
+  at = 0; lock = true; clearBump(pad); pad.classList.remove('go'); pad.style.setProperty('--pad-k', '0'); pad.dataset.step = '0'; pad.classList.add('bad');
   haptic.error();
   setTimeout(() => { pad.classList.remove('bad'); lock = false; }, reduced ? 480 : 540);
 }
@@ -1001,13 +1018,13 @@ function press(k, fromKey){
   const pad = document.querySelector('.pad'); if (!pad) return false;
   if (k === 'enter'){
     if (!fromKey || at === 0) return false;
-    if (at === CODE.length - 1){ succeed(); return true; }
+    if (at === CODE.length - 1){ succeed(); bump('start'); return true; }
     failRow(); return true;
   }
   if (k === CODE[at]){
-    if (k === 'start'){ succeed(); return true; }
+    if (k === 'start'){ succeed(); bump('start'); return true; }
     at++; pad.classList.add('go'); pad.style.setProperty('--pad-k', String(at)); pad.dataset.step = String(at);
-    haptic.tick();
+    bump(k); haptic.tick();
     return true;
   }
   if (fromKey && at === 0 && CODE.indexOf(k) < 0) return false;
