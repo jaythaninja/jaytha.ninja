@@ -13,7 +13,8 @@
 <title>song of the day · jay tha ninja</title>
 <!-- jaytha.ninja/song-of-the-day/: song of the day (PREVIEW, jay 2026.09.30). same look, typing engine, rain + layout as /quote-of-the-day/.
      THE DAILY UPDATE TOUCHES ONLY songs.json (next to this file): [{date "YYYY-MM-DD" (america/chicago), lyric (string, or null until jay sends it), track, artist, id (spotify track id), url, slug}, …].
-     the newest entry dated today or earlier is typed at the top: the lyric (like a quote, always lowercase: v1.49), then "artist - song name" as an orange link to the track on spotify.
+     the newest entry dated today or earlier is typed at the top: the lyric (like a quote, always lowercase: v1.49), then "artist - song name" as a link to the track on spotify (the speed colour, --c).
+     under the heading, before that entry, a quiet line "full playlist →" opens the whole playlist (v1.75). it is part of this page, not songs.json, so the nightly drop does not add, move, or remove it.
      no lyric yet = just the credit link (no empty quote). every older entry is the archive below, newest first. future-dated entries stay hidden until their day.
      self-contained: JetBrains Mono (latin, variable) is inlined; the only other load is songs.json (same origin). no spotify embed (dropped for the quotes layout, jay 2026.09.30). -->
 <style>
@@ -40,10 +41,20 @@ a:hover{color:var(--c)}
 .home{display:inline-block;margin:0 0 30px;font-size:14px;line-height:1.5;color:var(--c);letter-spacing:.02em}   /* the way back: brand orange like every link; teal on hover */
 .home:hover,.home:focus-visible{color:var(--c)}
 .kicker{font-size:21px;line-height:1.4;color:var(--c)}
+/* v1.75 (jay 2026.10.06): the heading's box is reserved from first paint. the typed line is always
+   "song of the day, yyyy.mm.dd", the same width as this stand-in (the date is always 10 characters),
+   so the playlist line under it does not move when the ending types in. on a very narrow phone the
+   heading wraps, and the stand-in wraps the same way. gone once the real heading is laid in. */
+.kicker:empty::before{content:"song of the day, 0000.00.00";visibility:hidden}
+/* v1.75: quiet line under the heading, before today's entry. colour is the speed colour (--c),
+   the same as every other link (teal, orange after a speed tap, gold, and the light-theme shades).
+   one fixed line (nowrap, line-height set) so it never grows or shifts. */
+.playlist{display:block;margin-top:10px;font-size:14px;line-height:1.5;font-weight:400;letter-spacing:.02em;color:var(--c);white-space:nowrap}
+.playlist:hover,.playlist:focus-visible{color:var(--c)}
 .today{margin-top:26px}
 .qt{font-size:20px;line-height:1.7;color:var(--white);white-space:pre-line}   /* the lyric: same as a quote on /quote-of-the-day/ */
 .qt,.aq{text-transform:lowercase}   /* v1.49 (jay 2026.10.02): lyrics are always lowercase (jay's style), today's and the archive; songs.json is lowercased when published, this is the safeguard. was (v1.27-v1.48): shown exactly as sent, e.g. "Japan" */
-/* the credit: "artist - song name", an orange link to the track on spotify (where /quote-of-the-day/ has the teal author). lowercase like /quote-of-the-day/' author line */
+/* the credit: "artist - song name", a link to the track on spotify in the speed colour (--c) (where /quote-of-the-day/ has the author). lowercase like /quote-of-the-day/' author line */
 .by{margin-top:22px;font-size:20px;line-height:1.5;color:var(--c);text-transform:lowercase;font-weight:400}
 .by a{color:var(--c)}
 .by a:hover,.by a:focus-visible{color:var(--c)}
@@ -76,6 +87,7 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
   .copy{margin-left:24px;width:calc(100vw - 48px)}
   .home{margin-bottom:22px;font-size:13px}
   .kicker{font-size:17px}
+  .playlist{margin-top:8px;font-size:13px}
   .today{margin-top:14px}
   .qt{font-size:16px;line-height:1.7}
   .by{margin-top:15px;font-size:16px}
@@ -125,6 +137,7 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
   <div class="copy">
     <a class="home" href="/">&larr; jaytha.ninja</a>
     <h1 class="kicker"></h1>
+    <a class="playlist" href="https://open.spotify.com/playlist/4agJs1yW7WQcFx1Lg5VVZq" target="_blank" rel="noopener">full playlist &rarr;</a>
     <figure class="today">
       <blockquote class="qt"></blockquote>
       <figcaption class="by"></figcaption>
@@ -290,7 +303,7 @@ async function main(){
     else { $('.qt').remove(); $('.today').classList.add('nolyric'); }   // no lyric yet: just the credit (no empty quote)
     lines.push(prepare($('.by'), {text: credit(e), href: trackUrl(e)}));
   }
-  else { $('.today').remove(); const p = mk('p', 'none'); p.textContent = data.error ? COPY.error : COPY.empty; $('.kicker').after(p); p.style.marginTop = '14px'; }
+  else { $('.today').remove(); const p = mk('p', 'none'); p.textContent = data.error ? COPY.error : COPY.empty; $('.playlist').after(p); p.style.marginTop = '14px'; }   /* v1.75: the message sits where the entry would, under the playlist line, so that line does not move */
   const ol = $('.archive'); data.rest.forEach(x => ol.appendChild(archiveItem(x)));
   if (!data.rest.length) $('.sr').remove();
   lines.forEach(t => render(t, 0, TIMING.window)); cursor.remove();   // reserve the final layout (nothing visible yet), then size the rain to the full page
