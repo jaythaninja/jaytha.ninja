@@ -145,6 +145,14 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .egg .measure{position:absolute;left:0;top:0;visibility:hidden;white-space:nowrap;pointer-events:none}
 .egg a{color:var(--c)}
 .egg a:hover{color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6)}
+/* v1.78: tear-off calendar for the habits line. the box is fixed (1.05em by 1.15em) before the day number is written, so the line does not move. the band, rings, and outline are the speed colour (--c): teal, orange after a speed tap, the light-theme shade. */
+.egg .cal{display:inline-block;position:relative;width:1.05em;height:1.15em;vertical-align:-.2em;box-sizing:border-box;border:1px solid var(--c);border-radius:2px;color:var(--c)}
+.egg .c.fall .cal,.egg .c.land .cal{color:var(--c);text-shadow:none}
+.egg .cal .band{position:absolute;left:-1px;right:-1px;top:-1px;height:.34em;background:var(--c);border-radius:1px 1px 0 0}
+.egg .cal::before,.egg .cal::after{content:"";position:absolute;top:-.16em;width:1.5px;height:.28em;background:var(--c);border-radius:1px}
+.egg .cal::before{left:24%}
+.egg .cal::after{right:24%}
+.egg .cal .n{position:absolute;left:0;right:0;top:.36em;bottom:0;display:flex;align-items:center;justify-content:center;font-size:.58em;font-weight:500;line-height:1;font-variant-numeric:tabular-nums;color:var(--c)}
 .egg .w{white-space:nowrap}
 .egg .c{display:inline-block;position:relative}
 .egg .c.fall{color:var(--c-hot);text-shadow:0 0 8px rgba(var(--c-rgb),.95),0 0 20px rgba(var(--c-rgb),.7)}
@@ -678,7 +686,14 @@ const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const 
 const eggEl = $('.egg');
 
 const lc = t => String(t || '').replace(/\s+/g, ' ').trim().toLowerCase();
-const EGG = [{icon: '//', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}, {icon: '📝', body: '', href: COPY.recapHref, recap: true}, {icon: '📸', body: '', href: COPY.snapHref, snap: true}];
+const CAL = '\uE000';
+const chiDateNum = () => new Intl.DateTimeFormat('en-US', {timeZone: 'America/Chicago', day: 'numeric'}).format(new Date());
+function calendarIcon(){
+  const el = mk('span', 'cal'); el.setAttribute('aria-hidden', 'true');
+  const band = mk('span', 'band'), n = mk('span', 'n'); n.textContent = chiDateNum();
+  el.append(band, n); return el;
+}
+const EGG = [{icon: '//', body: COPY.dayDate || '', day: true}, {icon: '🎧', body: lc(COPY.lyric), href: COPY.lyricHref, song: true}, {icon: '💭', body: lc(COPY.egg), href: COPY.eggHref, quote: true}, {icon: '📝', body: '', href: COPY.recapHref, recap: true}, {icon: '📸', body: '', href: COPY.snapHref, snap: true}, {icon: CAL, body: "daily habits i'm currently tracking", href: '/habits/', habits: true}];
 const quoteLine = EGG.find(l => l.quote), recapLine = EGG.find(l => l.recap), snapLine = EGG.find(l => l.snap), songLine = EGG.find(l => l.song), dayLine = EGG.find(l => l.day);
 const snapFig = gateTap(mk('a', 'snapfig')), snapImg = mk('img'), snapCv = mk('canvas');
 snapFig.setAttribute('href', COPY.snapHref); snapFig.setAttribute('aria-label', COPY.snapText); snapCv.setAttribute('aria-hidden', 'true');
@@ -738,8 +753,8 @@ function snapDig(){
 }
 const lineText = (l, body) => l.day ? `${l.icon} ${body}` : `${l.icon} ${body} →`;
 eggEl.classList.toggle('has-day', !!COPY.dayDate);
-const lineClass = l => l.day ? 'day' : l.song ? 'song' : l.recap ? 'recap' : l.snap ? 'snap' : 'quote';
-const isDeco = w => w === '→' || w === '//' || /^\p{Extended_Pictographic}/u.test(w);
+const lineClass = l => l.day ? 'day' : l.song ? 'song' : l.recap ? 'recap' : l.snap ? 'snap' : l.habits ? 'habits' : 'quote';
+const isDeco = w => w === '→' || w === '//' || w === CAL || /^\p{Extended_Pictographic}/u.test(w);
 const eggGroups = text => {
   const words = text.split(' ').filter(Boolean), groups = [];
   words.forEach((w, i) => {
@@ -755,7 +770,12 @@ const fillChars = (p, text, into) => eggGroups(text).forEach((g, gi) => {
   const w = mk('span', 'w');
   g.forEach((word, wi) => {
     if (wi) w.appendChild(document.createTextNode(' '));
-    graphemes(word).forEach(ch => { const c = mk('span', 'c'); c.textContent = ch; w.appendChild(c); if (into) into.push({el: c, ch}); });
+    graphemes(word).forEach(ch => {
+      const c = mk('span', 'c');
+      if (ch === CAL){ c.appendChild(calendarIcon()); if (into) into.push({el: c, ch, cal: true}); }
+      else { c.textContent = ch; if (into) into.push({el: c, ch}); }
+      w.appendChild(c);
+    });
   });
   p.appendChild(w);
 });
@@ -764,7 +784,8 @@ const fillPlain = (el, text) => eggGroups(text).forEach((g, gi) => {
   const w = mk('span', 'w');
   g.forEach((word, wi) => {
     if (wi) w.appendChild(document.createTextNode(' '));
-    if (isDeco(word)){ const d = mk('span'); d.setAttribute('aria-hidden', 'true'); d.textContent = word; w.appendChild(d); }
+    if (word === CAL) w.appendChild(calendarIcon());
+    else if (isDeco(word)){ const d = mk('span'); d.setAttribute('aria-hidden', 'true'); d.textContent = word; w.appendChild(d); }
     else w.appendChild(document.createTextNode(word));
   });
   el.appendChild(w);
@@ -845,12 +866,18 @@ function egg(){
     const delay = Math.random()*TIMING.rainJitter/r;
     last = Math.max(last, delay + dur);
     const tr = mk('span', 'tr'); c.trail = Array.from({length: 4 + Math.floor(Math.random()*4)}, rg); tr.textContent = c.trail.join('\n');
-    c.tr = tr; c.el.appendChild(tr); c.el.firstChild.textContent = rg(); c.el.classList.add('fall');
+    c.tr = tr; c.el.appendChild(tr);
+    if (c.cal){ const n = c.el.querySelector('.n'); if (n) n.textContent = String(1 + Math.floor(Math.random()*28)); }
+    else c.el.firstChild.textContent = rg();
+    c.el.classList.add('fall');
     c.end = t0 + delay + dur;
     const an = c.el.animate([{transform: `translateY(${-rows*row}px)`}, {transform: 'translateY(0)'}], {duration: dur, delay, easing: `steps(${rows}, end)`, fill: 'backwards'});
     eggRun.anims.push(an);
     an.finished.then(() => {
-      c.done = true; c.el.firstChild.textContent = c.ch; c.el.classList.remove('fall'); c.el.classList.add('land');
+      c.done = true;
+      if (c.cal){ const n = c.el.querySelector('.n'); if (n) n.textContent = chiDateNum(); }
+      else c.el.firstChild.textContent = c.ch;
+      c.el.classList.remove('fall'); c.el.classList.add('land');
       tr.classList.add('off'); setTimeout(() => tr.remove(), 750);
       if (--left === 0){ clearInterval(eggRun.scr); eggRun.timers.push(setTimeout(settleOnce, 1200/eggRate)); eggNext(); }
     }, () => {});
@@ -863,7 +890,8 @@ function egg(){
     const now = performance.now();
     for (const c of eggChars){
       if (c.done) continue;
-      c.el.firstChild.textContent = c.end - now < 260/eggRate ? c.ch : Math.random() < .7 ? rg() : c.el.firstChild.textContent;
+      if (c.cal){ const n = c.el.querySelector('.n'); if (n) n.textContent = c.end - now < 260/eggRate ? chiDateNum() : String(1 + Math.floor(Math.random()*28)); }
+      else c.el.firstChild.textContent = c.end - now < 260/eggRate ? c.ch : Math.random() < .7 ? rg() : c.el.firstChild.textContent;
       c.trail.pop(); c.trail.unshift(rg()); c.tr.textContent = c.trail.join('\n');
     }
   }, 90);
