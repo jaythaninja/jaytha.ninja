@@ -1,6 +1,6 @@
 /* jaytha.ninja/habits/ (v1.76): two year graphs on one screen. cells use the state colour; a run of 10 or more active days is gold. */
 (() => {
-const VER = 'habits-1.76';
+const VER = 'habits-1.77';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
 const SHORT = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 const LONG = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -92,6 +92,11 @@ function build(section, model){
   weeks.forEach((col, i) => {
     const lab = mk('span');
     lab.textContent = labels[i];
+    /* a label in the last two columns is wider than those cells. pin its right edge to the grid so the month stays on screen. */
+    if (labels[i] && weeks.length - i <= 2){
+      lab.classList.add('edge');
+      lab.style.setProperty('--mc', String(i + 1));
+    }
     months.appendChild(lab);
     col.forEach(iso => {
       const future = iso > model.today;

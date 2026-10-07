@@ -55,9 +55,9 @@ v1.73: each correct press (tap or key) bumps that glyph, about 1.15 scale and a 
 
 v1.74: a konami win recolors the page with the same gold pass as a successful email launch. Each text element and icon turns gold as the rocket's centre passes it, including while the page rides down past the rocket, over the same fade. Nothing snaps gold at once. Reduced motion still goes gold immediately.
 
-## habits (v1.76)
+## habits (v1.77)
 
-`/habits/` is a test bed for a later app. It is not linked from the homepage or the sitemap. The page is one screen: two year graphs stacked, wide like a contribution graph, and the squares update in place. Nothing is pushed down when a new day starts.
+`/habits/` is a test bed for a later app. It is not linked from the homepage or the sitemap. The page is one screen: two year graphs stacked, wide like a contribution graph, and the squares update in place. Nothing is pushed down when a new day starts. On a phone the two sections are one block, centered between the home link and the footer, and all 53 weeks fit the width.
 
 Each graph's title uses the daily-page kicker (21px, teal, the state colour; 17px on a phone). The legend under each graph is less → more, plus a gold cursor rectangle for a run of 10 or more active days. Cell colour is the site's state colour (`--c`: teal, orange after a speed tap, the light-theme shade). Gold is the site's gold (`--au`). A cell opens `/habits/YYYY-MM-DD/`.
 
