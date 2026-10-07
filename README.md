@@ -54,3 +54,22 @@ v1.72: correct presses use that same gold pulse, building by one eleventh, inste
 v1.73: each correct press (tap or key) bumps that glyph, about 1.15 scale and a bright gold flash for 250ms, then it settles back into the row pulse. The bump is transform only. Reduced motion flashes brightness and does not scale. A touch presses in immediately, with no 300ms tap delay. A miss still blinks the row red.
 
 v1.74: a konami win recolors the page with the same gold pass as a successful email launch. Each text element and icon turns gold as the rocket's centre passes it, including while the page rides down past the rocket, over the same fade. Nothing snaps gold at once. Reduced motion still goes gold immediately.
+
+## habits (v1.76)
+
+`/habits/` is a test bed for a later app. It is not linked from the homepage or the sitemap. The page is one screen: two year graphs stacked, wide like a contribution graph, and the squares update in place. Nothing is pushed down when a new day starts.
+
+Each graph's title uses the daily-page kicker (21px, teal, the state colour; 17px on a phone). The legend under each graph is less → more, plus a gold cursor rectangle for a run of 10 or more active days. Cell colour is the site's state colour (`--c`: teal, orange after a speed tap, the light-theme shade). Gold is the site's gold (`--au`). A cell opens `/habits/YYYY-MM-DD/`.
+
+| tracker | data | what counts |
+|---|---|---|
+| cursor | `site/habits/cursor.json` | commits + pull requests opened + pull requests merged + AI line edits |
+| workouts | `site/habits/workouts.json` | Apple Health + Strava. Every type counts, including walks. A record with `exclude: true` is left out. Several workouts on one day add up. The cell colour is that day's active minutes, not the count: under 45, 45–89, 90–149, 150 or more. Oct–Dec 2025 and Apr–May 2026 are empty on purpose. |
+
+The workouts file is the public slice of a merged export: type, time, active minutes, distance, calories, elevation, average and max heart rate, five zone-minute totals, and a Strava link when there is one. Device names, timezones, and the per-minute heart-rate series are not in the file. Rebuild it with `python3 scripts/habits.py workouts <merged.json>` (that file stays off the site). The longest workout streak in this export is 8 days, so the gold cells on `/habits/` are the cursor graph.
+
+`python3 scripts/habits.py all` rebuilds `cursor.json` and the day pages. Commit dates are author dates in America/Chicago. Merge commits are skipped. A pull request counts on the day it was opened and, if it merged, again on the day it merged, so a day's total can be higher than GitHub's own calendar (the calendar counts a pull request once). The day page shows the breakdown. AI line edits are not fetched: put them in `site/habits/cursor-lines.json` (`{"days": {"YYYY-MM-DD": 120}}`) and rerun the script. An empty `days` object means no AI edits.
+
+Repos are listed in `site/habits/trackers.json`. `jaythaninja/mideeyah` is private. The Actions token cannot see it, so those commits stay out until a `HABITS_GITHUB_TOKEN` secret (repo scope) is set. A repo the token cannot see is named in `cursor.json` under `skipped_repos`. The Pages workflow runs `scripts/habits.py all` before upload and still deploys if the fetch fails (the committed json ships).
+
+Adding another tracker later is a block in `trackers.json`, a json file, and a `<section class="tracker">` on `/habits/` with the same graph, legend, and stats. The label is the section title.

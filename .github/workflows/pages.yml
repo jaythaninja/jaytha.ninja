@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: read
   pages: write
   id-token: write
 
@@ -28,6 +29,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Habits (refresh cursor counts, write day routes)
+        # rebuilds site/habits/cursor.json from GitHub and rewrites /habits/YYYY-MM-DD/ before the upload.
+        # HABITS_GITHUB_TOKEN (repo scope) is optional; without it private repos are skipped and the public repo still counts.
+        # a failed fetch keeps the committed cursor.json. this step never blocks the deploy.
+        env:
+          GH_TOKEN: ${{ github.token }}
+          HABITS_GITHUB_TOKEN: ${{ secrets.HABITS_GITHUB_TOKEN }}
+        run: python3 scripts/habits.py all
+        continue-on-error: true
       - name: Share cards (flip at 12:00am CT)
         # copies og-next/ into site/og/ + rewrites ?d= once that date has started in chicago; a no-op otherwise, and never blocks the deploy
         run: python3 scripts/make_cards.py flip
