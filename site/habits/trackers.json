@@ -10,7 +10,7 @@
   "trackers": [
     {
       "id": "cursor",
-      "label": "cursor",
+      "label": "code",
       "enabled": true,
       "unit": "contribution",
       "data": "/habits/cursor.json",
