@@ -1,0 +1,583 @@
+#!/usr/bin/env python3
+"""Rebuild the cursor habit graph and the /habits/YYYY-MM-DD/ pages.
+
+  python3 scripts/habits.py all      # fetch github, merge cursor-lines.json, write day pages
+  python3 scripts/habits.py fetch    # cursor.json only
+  python3 scripts/habits.py pages    # day routes from the json already on disk
+  python3 scripts/habits.py check    # schema only, no network
+
+Dates are America/Chicago. A day total is commits + pull requests opened + pull
+requests merged + ai line edits. GitHub's own calendar counts a pull request
+once and drops some commits; this file keeps the breakdown instead.
+
+Private repos (mideeyah) need HABITS_GITHUB_TOKEN with repo scope. The Actions
+token only sees this public repo. A repo the token cannot see is listed in
+cursor.json under skipped_repos and left out. Counts are never invented.
+
+cursor-lines.json maps a date to a number (or {"ai_lines": N}). Empty means no
+AI edits. workouts.json is a placeholder and this script does not write it.
+"""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import subprocess
+import sys
+import urllib.error
+import urllib.parse
+import urllib.request
+from datetime import date, datetime, timedelta, timezone
+from pathlib import Path
+from zoneinfo import ZoneInfo
+
+ROOT = Path(__file__).resolve().parents[1]
+HABITS = ROOT / "site" / "habits"
+TRACKERS = HABITS / "trackers.json"
+CURSOR = HABITS / "cursor.json"
+WORKOUTS = HABITS / "workouts.json"
+INDEX = HABITS / "index.html"
+DAY_TEMPLATE = Path(__file__).resolve().parent / "habits_day.html"
+TZ = ZoneInfo("America/Chicago")
+DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
+VER = "1.76"
+
+
+def chicago_today() -> date:
+    return datetime.now(TZ).date()
+
+
+def ct_day(iso: str) -> str:
+    dt = datetime.fromisoformat(iso.replace("Z", "+00:00"))
+    return dt.astimezone(TZ).date().isoformat()
+
+
+def window(today: date) -> tuple[date, date, date]:
+    """Return (stats start, grid sunday, grid saturday)."""
+    start = today - timedelta(days=364)
+    back = (start.weekday() + 1) % 7  # days since Sunday
+    grid_start = start - timedelta(days=back)
+    forward = (6 - ((today.weekday() + 1) % 7)) % 7
+    grid_end = today + timedelta(days=forward)
+    return start, grid_start, grid_end
+
+
+def token() -> str:
+    for key in ("HABITS_GITHUB_TOKEN", "GH_TOKEN", "GITHUB_TOKEN"):
+        value = os.environ.get(key, "").strip()
+        if value:
+            return value
+    try:
+        out = subprocess.check_output(["gh", "auth", "token"], text=True, stderr=subprocess.DEVNULL).strip()
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+    return out
+
+
+def api(url: str, tok: str):
+    headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "jaytha-ninja-habits",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+    if tok:
+        headers["Authorization"] = f"Bearer {tok}"
+    req = urllib.request.Request(url, headers=headers)
+    try:
+        with urllib.request.urlopen(req, timeout=45) as res:
+            return json.load(res), None
+    except urllib.error.HTTPError as err:
+        body = err.read().decode("utf-8", "replace")[:300]
+        return None, f"HTTP {err.code} {body}"
+    except urllib.error.URLError as err:
+        return None, str(err.reason)
+
+
+def load_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def dump_json(path: Path, data: dict) -> None:
+    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def load_manual(path: Path) -> dict[str, int]:
+    if not path.exists():
+        return {}
+    raw = load_json(path).get("days") or {}
+    out: dict[str, int] = {}
+    for key, value in raw.items():
+        if not DATE_RE.fullmatch(str(key)):
+            continue
+        if isinstance(value, bool):
+            continue
+        if isinstance(value, (int, float)):
+            count = int(value)
+        elif isinstance(value, dict):
+            count = int(value.get("ai_lines") or 0)
+        else:
+            continue
+        if count > 0:
+            out[str(key)] = count
+    return out
+
+
+def blank_day() -> dict:
+    return {"commits": 0, "prs_opened": 0, "prs_merged": 0, "items": []}
+
+
+def finalize_day(day: dict) -> dict:
+    ai = int(day.pop("_ai", 0) or 0)
+    items = sorted(day["items"], key=lambda item: (item.get("at") or "", item.get("role") or "", item.get("sha") or ""))
+    out = {
+        "total": day["commits"] + day["prs_opened"] + day["prs_merged"] + ai,
+        "commits": day["commits"],
+        "prs_opened": day["prs_opened"],
+        "prs_merged": day["prs_merged"],
+        "items": items,
+    }
+    if ai > 0:
+        out["ai_lines"] = ai
+        # keep the public order: counts, then ai_lines, then items
+        out = {
+            "total": out["total"],
+            "commits": out["commits"],
+            "prs_opened": out["prs_opened"],
+            "prs_merged": out["prs_merged"],
+            "ai_lines": ai,
+            "items": items,
+        }
+    return out
+
+
+def fetch_repo(repo: str, tok: str, since_iso: str, login: str, cutoff: str) -> tuple[list, list, str | None]:
+    commits: list = []
+    page = 1
+    while page <= 30:
+        qs = urllib.parse.urlencode({
+            "author": login,
+            "since": since_iso,
+            "per_page": 100,
+            "page": page,
+        })
+        batch, err = api(f"https://api.github.com/repos/{repo}/commits?{qs}", tok)
+        if err:
+            return [], [], err
+        if not batch:
+            break
+        commits.extend(batch)
+        if len(batch) < 100:
+            break
+        page += 1
+
+    pulls: list = []
+    page = 1
+    while page <= 30:
+        qs = urllib.parse.urlencode({
+            "state": "all",
+            "per_page": 100,
+            "sort": "updated",
+            "direction": "desc",
+            "page": page,
+        })
+        batch, err = api(f"https://api.github.com/repos/{repo}/pulls?{qs}", tok)
+        if err:
+            return [], [], err
+        if not batch:
+            break
+        pulls.extend(batch)
+        if all(ct_day(item["updated_at"]) < cutoff for item in batch):
+            break
+        if len(batch) < 100:
+            break
+        page += 1
+    return commits, pulls, None
+
+
+def write_cursor(cfg: dict, today: date) -> dict:
+    data = build_cursor_once(cfg, today)
+    if not data["days"] and not CURSOR.exists():
+        raise SystemExit("habits: github returned no days and cursor.json does not exist")
+    if not data["days"] and CURSOR.exists():
+        print("habits: fetch produced no days; leaving cursor.json as it is", file=sys.stderr)
+        return load_json(CURSOR)
+    dump_json(CURSOR, data)
+    active = len(data["days"])
+    total = sum(day["total"] for day in data["days"].values())
+    print(f"habits: wrote {CURSOR.relative_to(ROOT)} ({active} active days, total {total})")
+    for skip in data["skipped_repos"]:
+        print(f"habits: note: {skip['repo']} not included")
+    return data
+
+
+def build_cursor_once(cfg: dict, today: date) -> dict:
+    """Same as build_cursor but finalize each day a single time."""
+    login = cfg["login"]
+    _start, grid_start, _grid_end = window(today)
+    since = datetime(grid_start.year, grid_start.month, grid_start.day, tzinfo=TZ).astimezone(timezone.utc)
+    since_iso = since.strftime("%Y-%m-%dT%H:%M:%SZ")
+    tok = token()
+    days: dict[str, dict] = {}
+    skipped = []
+
+    def bucket(day_key: str) -> dict:
+        if day_key not in days:
+            days[day_key] = blank_day()
+        return days[day_key]
+
+    for repo in cfg["repos"]:
+        commits, pulls, err = fetch_repo(repo, tok, since_iso, login, grid_start.isoformat())
+        if err:
+            skipped.append({
+                "repo": repo,
+                "reason": err + " Private repos need a HABITS_GITHUB_TOKEN secret with repo scope.",
+            })
+            print(f"habits: skipped {repo}: {err}", file=sys.stderr)
+            continue
+        for commit in commits:
+            if len(commit.get("parents") or []) > 1:
+                continue
+            author = (commit.get("commit") or {}).get("author") or {}
+            if not author.get("date"):
+                continue
+            day_key = ct_day(author["date"])
+            if day_key < grid_start.isoformat() or day_key > today.isoformat():
+                continue
+            subject = ((commit.get("commit") or {}).get("message") or "").split("\n", 1)[0].strip()
+            row = bucket(day_key)
+            row["commits"] += 1
+            row["items"].append({
+                "kind": "commit",
+                "repo": repo,
+                "sha": commit.get("sha") or "",
+                "title": (subject or "(no message)")[:180],
+                "url": commit.get("html_url") or "",
+                "at": author["date"],
+            })
+        for pull in pulls:
+            if (pull.get("user") or {}).get("login") != login:
+                continue
+            title = (pull.get("title") or "(pull request)")[:180]
+            url = pull.get("html_url") or ""
+            number = pull.get("number")
+            state = "merged" if pull.get("merged_at") else (pull.get("state") or "open")
+            created = pull.get("created_at")
+            if created:
+                day_key = ct_day(created)
+                if grid_start.isoformat() <= day_key <= today.isoformat():
+                    row = bucket(day_key)
+                    row["prs_opened"] += 1
+                    row["items"].append({
+                        "kind": "pr",
+                        "role": "opened",
+                        "repo": repo,
+                        "number": number,
+                        "title": title,
+                        "url": url,
+                        "state": state,
+                        "at": created,
+                    })
+            merged_at = pull.get("merged_at")
+            if merged_at:
+                day_key = ct_day(merged_at)
+                if grid_start.isoformat() <= day_key <= today.isoformat():
+                    row = bucket(day_key)
+                    row["prs_merged"] += 1
+                    row["items"].append({
+                        "kind": "pr",
+                        "role": "merged",
+                        "repo": repo,
+                        "number": number,
+                        "title": title,
+                        "url": url,
+                        "state": "merged",
+                        "at": merged_at,
+                    })
+
+    manual_name = "cursor-lines.json"
+    for tracker in cfg["trackers"]:
+        if tracker["id"] == "cursor" and tracker.get("manual"):
+            manual_name = tracker["manual"]
+    for day_key, count in load_manual(HABITS / manual_name).items():
+        if day_key > today.isoformat():
+            continue
+        bucket(day_key)["_ai"] = count
+
+    cleaned = {}
+    for key in sorted(days):
+        final = finalize_day(days[key])
+        if final["total"] > 0:
+            cleaned[key] = final
+
+    return {
+        "id": "cursor",
+        "label": next((t["label"] for t in cfg["trackers"] if t["id"] == "cursor"), "cursor"),
+        "timezone": "America/Chicago",
+        "generated": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "through": today.isoformat(),
+        "login": login,
+        "repos": list(cfg["repos"]),
+        "skipped_repos": skipped,
+        "manual": manual_name,
+        "counting": (
+            "total = commits + prs opened + prs merged + ai line edits. "
+            "Commit dates are author dates in America/Chicago. Merge commits are skipped. "
+            "A pull request counts on the day it was opened and, if merged, again on the day it merged. "
+            "GitHub's contribution calendar counts a pull request once and omits some commits; this file keeps the breakdown. "
+            "AI line edits come only from cursor-lines.json."
+        ),
+        "days": cleaned,
+    }
+
+
+def check_index(cfg: dict) -> None:
+    html = INDEX.read_text(encoding="utf-8")
+    for tracker in cfg["trackers"]:
+        if tracker.get("enabled", True) and f'data-id="{tracker["id"]}"' not in html:
+            raise SystemExit(f"habits: site/habits/index.html has no section for {tracker['id']}")
+
+
+def write_pages(today: date) -> None:
+    _start, grid_start, _grid_end = window(today)
+    template = DAY_TEMPLATE.read_text(encoding="utf-8")
+    keep: set[str] = set()
+    day = grid_start
+    # pages for every grid day through today, including the leading partial week
+    while day <= today:
+        key = day.isoformat()
+        keep.add(key)
+        folder = HABITS / key
+        folder.mkdir(parents=True, exist_ok=True)
+        html = (
+            template.replace("__DATE__", key)
+            .replace("__DOTS__", key.replace("-", "."))
+            .replace("__VER__", VER)
+        )
+        (folder / "index.html").write_text(html, encoding="utf-8")
+        day += timedelta(days=1)
+    removed = 0
+    for child in HABITS.iterdir():
+        if child.is_dir() and DATE_RE.fullmatch(child.name) and child.name not in keep:
+            for item in child.iterdir():
+                item.unlink()
+            child.rmdir()
+            removed += 1
+    print(f"habits: wrote {len(keep)} day pages ({grid_start.isoformat()} … {today.isoformat()}), removed {removed}")
+
+
+def _num(value):
+    if value is None or value is False or value is True:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
+def _round1(value) -> float:
+    return round(float(value) + 0.0, 1)
+
+
+def slim_workout(raw: dict) -> dict:
+    """Fields the day page draws. Nothing else (no device names, timezones, HR series)."""
+    start = (raw.get("start") or "")[:5]
+    end = (raw.get("end") or "")[:5]
+    item = {
+        "type": raw.get("type") or "workout",
+        "start": start,
+        "end": end,
+        "duration_min": _round1(raw.get("duration_min") or 0),
+    }
+    name = ((raw.get("strava") or {}) if isinstance(raw.get("strava"), dict) else {}).get("name")
+    if name:
+        item["name"] = str(name)
+    dist = _num(raw.get("distance_mi"))
+    if dist and dist > 0:
+        item["distance_mi"] = _round1(dist)
+    kcal = _num(raw.get("active_kcal"))
+    if kcal and kcal > 0:
+        item["kcal"] = int(round(kcal))
+    elev = _num(((raw.get("strava") or {}) if isinstance(raw.get("strava"), dict) else {}).get("elev_gain_ft"))
+    if elev and elev > 0:
+        item["elevation_ft"] = int(round(elev))
+    avg = _num(raw.get("avg_hr"))
+    mx = _num(raw.get("max_hr"))
+    if avg:
+        item["avg_hr"] = int(round(avg))
+    if mx:
+        item["max_hr"] = int(round(mx))
+    zones = ((raw.get("hr") or {}) if isinstance(raw.get("hr"), dict) else {}).get("zones") or []
+    mins = []
+    for zone in zones:
+        mins.append(_round1((zone or {}).get("minutes") or 0))
+    if any(m > 0 for m in mins):
+        while len(mins) < 5:
+            mins.append(0.0)
+        item["zones"] = mins[:5]
+    url = ((raw.get("strava") or {}) if isinstance(raw.get("strava"), dict) else {}).get("url")
+    if url:
+        item["strava"] = url
+    return item
+
+
+def write_workouts(src: Path) -> dict:
+    """Build the public workouts.json from a merged Health + Strava export.
+
+    Intensity is the day's active minutes (duration_min summed), not the workout
+    count. Edges are fixed: under 45, 45–89, 90–149, 150+. Records with
+    exclude:true are dropped. Several workouts on one date add up.
+    """
+    raw = load_json(src)
+    grouped: dict[str, list] = {}
+    skipped = 0
+    for workout in raw.get("workouts") or []:
+        if workout.get("exclude"):
+            skipped += 1
+            continue
+        day_key = workout.get("date") or ""
+        if not DATE_RE.fullmatch(day_key):
+            raise SystemExit(f"habits: workout missing a date: {workout.get('id')}")
+        grouped.setdefault(day_key, []).append(workout)
+    days = {}
+    for day_key in sorted(grouped):
+        rows = sorted(grouped[day_key], key=lambda row: row.get("start") or "")
+        items = [slim_workout(row) for row in rows]
+        minutes = int(round(sum(float(row.get("duration_min") or 0) for row in rows)))
+        days[day_key] = {"total": len(items), "minutes": minutes, "items": items}
+    edges = [45, 90, 150]
+    counts = [0, 0, 0, 0]
+    for day in days.values():
+        mins = day["minutes"]
+        if mins < edges[0]:
+            counts[0] += 1
+        elif mins < edges[1]:
+            counts[1] += 1
+        elif mins < edges[2]:
+            counts[2] += 1
+        else:
+            counts[3] += 1
+    data = {
+        "id": "workouts",
+        "label": "workouts",
+        "timezone": "America/Chicago",
+        "generated": raw.get("generated"),
+        "through": chicago_today().isoformat(),
+        "source": "Apple Health and Strava. exclude:true records are omitted. Empty months are real gaps.",
+        "intensity": {
+            "metric": "minutes",
+            "edges": edges,
+            "legend": "A cell is the day's active minutes (duration_min, summed). 1 is under 45, 2 is 45 to 89, 3 is 90 to 149, 4 is 150 or more.",
+        },
+        "days": days,
+    }
+    dump_json(WORKOUTS, data)
+    longest = run = 0
+    if days:
+        first = date.fromisoformat(min(days))
+        last = date.fromisoformat(max(days))
+        probe = first
+        while probe <= last:
+            if days.get(probe.isoformat(), {}).get("total"):
+                run += 1
+                longest = max(longest, run)
+            else:
+                run = 0
+            probe += timedelta(days=1)
+    print(
+        f"habits: wrote {WORKOUTS.relative_to(ROOT)} "
+        f"({sum(day['total'] for day in days.values())} workouts, {len(days)} days, "
+        f"skipped {skipped}, longest streak {longest})"
+    )
+    print(f"habits: minute buckets under45={counts[0]} 45-89={counts[1]} 90-149={counts[2]} 150+={counts[3]}")
+    return data
+
+
+def check() -> None:
+    cfg = load_json(TRACKERS)
+    check_index(cfg)
+    cursor = load_json(CURSOR)
+    workouts = load_json(WORKOUTS)
+    if not isinstance(workouts.get("days"), dict):
+        raise SystemExit("habits: workouts.json days must be an object")
+    days = cursor.get("days") or {}
+    for key, day in days.items():
+        if not DATE_RE.fullmatch(key):
+            raise SystemExit(f"habits: bad date {key}")
+        ai = int(day.get("ai_lines") or 0)
+        expect = int(day["commits"]) + int(day["prs_opened"]) + int(day["prs_merged"]) + ai
+        if int(day["total"]) != expect:
+            raise SystemExit(f"habits: {key} total {day['total']} != {expect}")
+        if ai == 0 and "ai_lines" in day:
+            raise SystemExit(f"habits: {key} has a zero ai_lines key; omit it")
+    today = date.fromisoformat(cursor.get("through") or chicago_today().isoformat())
+    start, _grid_start, _grid_end = window(today)
+    longest = run = 0
+    current = 0
+    cursor_day = today
+    # current streak ends today if today is active, else yesterday
+    if not days.get(today.isoformat(), {}).get("total"):
+        cursor_day = today - timedelta(days=1)
+    if days.get(cursor_day.isoformat(), {}).get("total"):
+        probe = cursor_day
+        while days.get(probe.isoformat(), {}).get("total"):
+            current += 1
+            probe -= timedelta(days=1)
+    day = start
+    while day <= today:
+        if days.get(day.isoformat(), {}).get("total"):
+            run += 1
+            longest = max(longest, run)
+        else:
+            run = 0
+        day += timedelta(days=1)
+    total = sum(int(day["total"]) for day in days.values())
+    wdays = workouts.get("days") or {}
+    for key, day in wdays.items():
+        if not DATE_RE.fullmatch(key):
+            raise SystemExit(f"habits: bad workout date {key}")
+        items = day.get("items") or []
+        if int(day["total"]) != len(items):
+            raise SystemExit(f"habits: {key} workout total {day['total']} != {len(items)} items")
+        if int(day.get("minutes") or 0) <= 0:
+            raise SystemExit(f"habits: {key} is an active day with no minutes")
+        if key.startswith("2025-") or key[5:7] in {"04", "05"} and key.startswith("2026-"):
+            raise SystemExit(f"habits: {key} falls in a real empty stretch and should not be in the file")
+    print(
+        f"habits: check ok. cursor active {len(days)}, total {total}, longest {longest}, current {current}; "
+        f"workouts {len(wdays)} days"
+    )
+
+
+def main(argv: list[str]) -> None:
+    cmd = argv[1] if len(argv) > 1 else "all"
+    if cmd not in {"all", "fetch", "pages", "check", "workouts"}:
+        raise SystemExit("usage: habits.py [all|fetch|pages|check|workouts <merged.json>]")
+    if cmd == "workouts":
+        if len(argv) < 3:
+            raise SystemExit("usage: habits.py workouts <merged.json>")
+        write_workouts(Path(argv[2]))
+        check()
+        return
+    cfg = load_json(TRACKERS)
+    today = chicago_today()
+    if cmd in {"all", "fetch"}:
+        try:
+            write_cursor(cfg, today)
+        except SystemExit:
+            raise
+        except Exception as err:  # noqa: BLE001 — keep the seed and still publish
+            print(f"habits: fetch failed ({err})", file=sys.stderr)
+            if not CURSOR.exists():
+                raise SystemExit(1) from err
+            if cmd == "fetch":
+                raise SystemExit(1) from err
+    if cmd in {"all", "pages"}:
+        check_index(cfg)
+        write_pages(today)
+    if cmd == "check" or cmd == "all":
+        check()
+
+
+if __name__ == "__main__":
+    main(sys.argv)

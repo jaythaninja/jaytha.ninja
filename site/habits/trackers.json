@@ -1,0 +1,34 @@
+{
+  "version": 1,
+  "timezone": "America/Chicago",
+  "streak": 10,
+  "login": "jaythaninja",
+  "repos": [
+    "jaythaninja/jaytha.ninja",
+    "jaythaninja/mideeyah"
+  ],
+  "trackers": [
+    {
+      "id": "cursor",
+      "label": "cursor",
+      "enabled": true,
+      "unit": "contribution",
+      "data": "/habits/cursor.json",
+      "manual": "cursor-lines.json",
+      "sources": [
+        {"key": "commits", "label": "commits"},
+        {"key": "prs_opened", "label": "prs opened"},
+        {"key": "prs_merged", "label": "prs merged"},
+        {"key": "ai_lines", "label": "ai line edits", "when": "present"}
+      ]
+    },
+    {
+      "id": "workouts",
+      "label": "workouts",
+      "enabled": true,
+      "unit": "workout",
+      "data": "/habits/workouts.json",
+      "sources": []
+    }
+  ]
+}
