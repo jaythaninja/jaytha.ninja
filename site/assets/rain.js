@@ -130,26 +130,27 @@ function Rain(cv, o){
   // (see rain.css): teal now -> orange; orange -> gold while the gold skip is still on (dumpHint: the page has the skip armed, i.e. the ››| glyph shows), else teal; gold
   // locked (a signup) -> gold (taps keep it gold); the gold skip flash (auFx, taps swallowed / it snaps back to teal) -> orange. it is re-read on every mode change, dump(),
   // gold() / goldOff() and rendered(), so it recolours on its own the moment the gold window ends. colour only: the hint's box never changes
-  const WORDS='<span class="tws">tap</span>';
+  // v1.78: one sentence, no chevrons. the colour is --c (rain.css), not the next-tap colour. the 22ch box is in the stylesheet, so writing the words does not grow it.
+  const HINT='tap screen for speed +';
   let rendered=false,auFx=false;
   const nextTap=()=>auLock?'gold':auFx?'orange':modeName()==='fast'?(dumpHint?'gold':'teal'):'orange';
   const hintNext=()=>{if(hint&&hint.dataset.next!==nextTap())hint.dataset.next=nextTap()};
-  const setHintMode=fast=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';speed.innerHTML=`${WORDS}${dumpHint?DUMP_GLYPH:arrows(fast?1:2)}`;}hintNext();};
+  const setHintMode=()=>{if(!hint)return;const speed=hint.querySelector('.speed-label')||hint.querySelector('.speed');if(speed){speed.className='speed-label';if(speed.textContent!==HINT)speed.textContent=HINT;}hintNext();};
   // v1.20: each teal background glow gets an orange twin that fades in at >> speed (both pages via this shared file)
   const glowTwins=()=>document.querySelectorAll('.glow:not(.glow-fast):not([data-twin])').forEach(g=>{g.dataset.twin='1';const t=g.cloneNode(false);t.classList.add('glow-fast');t.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,77,26,'));g.after(t);const u=g.cloneNode(false);u.classList.add('glow-au');u.setAttribute('style',(g.getAttribute('style')||'').replace(/rgba\(26,\s*173,\s*179,/g,'rgba(255,215,0,'));t.after(u);});   // v1.52: + a gold twin (shown while .gld)
   const ensure=()=>{
     glowTwins();
     hint=document.querySelector('.tap-hint');
     if(hint){const legacy=hint.querySelector('.speed-label')||hint.querySelector('.speed')||hint.querySelector(':scope > span');if(legacy)legacy.className='speed-label';hint.querySelectorAll(':scope > svg').forEach(g=>g.remove());}   // v1.57: no glove
-    if(!hint){ hint=document.createElement('div'); hint.className='tap-hint'; hint.setAttribute('aria-hidden','true'); hint.innerHTML='<span class="speed-label"></span>'; (document.querySelector('.scan')||document.body).after(hint); }   // v1.57: was ICON + the label
-    setHintMode(modeName()==='fast'); hint.classList.add('ready'); requestAnimationFrame(()=>hint.classList.add('ready')); place();
+    if(!hint){ hint=document.createElement('div'); hint.className='tap-hint'; hint.setAttribute('aria-hidden','true'); hint.innerHTML='<span class="speed-label">tap screen for speed +</span>'; (document.querySelector('.scan')||document.body).after(hint); }   // v1.78: the sentence is in the box from the moment it exists
+    setHintMode(); hint.classList.add('ready'); requestAnimationFrame(()=>hint.classList.add('ready')); place();
   };
   const place=()=>{if(!hint)return;const copy=document.querySelector('.copy');if(!copy)return;const r=copy.getBoundingClientRect();const mobile=innerWidth<760;const lh=parseFloat(getComputedStyle(copy.querySelector('.hello')||copy).lineHeight)||30;hint.style.top=mobile?`calc(env(safe-area-inset-top,0px) + 11px)`:`${Math.max(11,r.top-2*lh)}px`;if(mobile){hint.style.right=`calc(env(safe-area-inset-right,0px) + 14px)`;return;}let right=0;for(const el of copy.querySelectorAll('.hello,.para,.sig,.prompt')){const range=document.createRange();range.selectNodeContents(el);for(const q of range.getClientRects())right=Math.max(right,q.right);}if(!right)right=r.right;hint.style.right=Math.max(14,innerWidth-right-16)+'px';};
-  const mode=(fast,ms=250)=>{const next=fast?'fast':'normal';document.documentElement.dataset.mode=next;document.documentElement.classList.toggle('fast',fast);if(hint){setHintMode(fast);hint.classList.toggle('settled',fast||hint.classList.contains('settled'));}if(rain){rain.fast=fast;rain.setSpeed(fast?2:1,ms);rain.setTint(fast?RAIN_ORANGE:T,ms);}if(onMode)onMode(fast);};
+  const mode=(fast,ms=250)=>{const next=fast?'fast':'normal';document.documentElement.dataset.mode=next;document.documentElement.classList.toggle('fast',fast);if(hint){setHintMode();hint.classList.toggle('settled',fast||hint.classList.contains('settled'));}if(rain){rain.fast=fast;rain.setSpeed(fast?2:1,ms);rain.setTint(fast?RAIN_ORANGE:T,ms);}if(onMode)onMode(fast);};
   const boot=()=>{if(booted)return;booted=true;ensure();document.addEventListener('pointerdown',e=>{down=e.isPrimary&&e.button===0&&!e.target.closest('a,button,input,label')?{x:e.clientX,y:e.clientY}:null});document.addEventListener('pointercancel',()=>down=null);document.addEventListener('pointerup',e=>{if(!down||!e.isPrimary||Math.hypot(e.clientX-down.x,e.clientY-down.y)>10||String(getSelection()))return;down=null;if(onTap&&onTap())return;mode(!document.documentElement.classList.contains('fast'));});addEventListener('resize',place);if(window.ResizeObserver){const c=document.querySelector('.copy');c&&new ResizeObserver(place).observe(c)}};
   // jay 2026.09.30 v1.25: optional tap hook. if it returns true the page used the tap (the homepage's terminal dump) and the 1x/2x toggle is skipped
   const register=(r,cb,tap)=>{rain=r;onMode=cb||null;onTap=tap||null;boot()};
-  const dump=on=>{dumpHint=!!on;setHintMode(modeName()==='fast')};
+  const dump=on=>{dumpHint=!!on;setHintMode()};
   const markRendered=()=>{rendered=true;hintNext()};   // the page has finished rendering (no gold skip any more). v1.61: the hint re-reads the next colour (was v1.57: .live off, the 3rd word back to --c)
   // jay 2026.09.30 v1.25: back-navigation note. off the homepage (/song-of-the-day/, /quote-of-the-day/), a plain same-tab click on a link home ("← jaytha.ninja") leaves a one-shot sessionStorage note; the homepage reads + clears it and opens fully loaded
   const HOME=/^\/(index\.html)?$/;
