@@ -61,6 +61,8 @@ v1.74: a konami win recolors the page with the same gold pass as a successful em
 
 Each graph's title uses the daily-page kicker (21px, teal, the state colour; 17px on a phone). The legend under each graph is less → more, plus a gold cursor rectangle for a run of 10 or more active days. Cell colour is the site's state colour (`--c`: teal, orange after a speed tap, the light-theme shade). Gold is the site's gold (`--au`). A cell opens `/habits/YYYY-MM-DD/`.
 
+v1.79: the board column is the song and daily-update measure (their `60ch` at 20px, this page's 16px type, so `75ch`) with the same side margin. The graphs scale to that width and the stats stay inside it. Each graph's box is `aspect-ratio: weeks / 7`, so the reserved height is the squares' height at every width and the legend sits under the graph. The two sections are one block, centered between the home link and the footer, on a desktop as well as a phone.
+
 | tracker | data | what counts |
 |---|---|---|
 | cursor | `site/habits/cursor.json` | commits + pull requests opened + pull requests merged + AI line edits |
