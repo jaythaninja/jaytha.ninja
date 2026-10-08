@@ -10,18 +10,18 @@
 <meta name="color-scheme" content="dark light">
 <script>document.documentElement.classList.add('js')</script>
 <title>habits · jay tha ninja</title>
-<link rel="stylesheet" href="/habits/habits.css?v=1.83">
+<link rel="stylesheet" href="/habits/habits.css?v=1.84">
 <link rel="icon" href="/favicon.ico" sizes="any">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16.png">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <link rel="canonical" href="https://jaytha.ninja/habits/">
-<meta name="description" content="a year of habits. code on top, workouts underneath. the page does not scroll. the squares fill in.">
+<meta name="description" content="a year of habits. code, workouts, journal, and zero caffeine. the squares fill in.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="jaytha.ninja">
 <meta property="og:url" content="https://jaytha.ninja/habits/">
 <meta property="og:title" content="habits · jay tha ninja">
-<meta property="og:description" content="a year of habits. code on top, workouts underneath.">
+<meta property="og:description" content="a year of habits. code, workouts, journal, and zero caffeine.">
 <meta property="og:image" content="https://jaytha.ninja/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -30,7 +30,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:site" content="@jaythaninja">
 <meta name="twitter:title" content="habits · jay tha ninja">
-<meta name="twitter:description" content="a year of habits. code on top, workouts underneath.">
+<meta name="twitter:description" content="a year of habits. code, workouts, journal, and zero caffeine.">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image.png">
 <meta name="twitter:image:alt" content="jaytha.ninja: a human building something human, with a little help from his 🤖 team">
 <link rel="stylesheet" href="/assets/rain.css?v=1.83"><script src="/assets/rain.js?v=1.82"></script>
@@ -83,11 +83,45 @@
           <div class="stat"><span class="sl">current streak</span><b class="sv" data-k="current">0d</b></div>
         </div>
       </section>
+      <section class="tracker" data-id="journal" data-kind="journal" data-unit="note" data-buckets="2,5,10" data-src="/habits/journal.json" aria-label="journal">
+        <h2 class="kicker"><span class="kt">journal</span></h2>
+        <div class="fit">
+          <div class="graph">
+            <div class="months"></div>
+            <div class="dow" aria-hidden="true"><span></span><span>mon</span><span></span><span>wed</span><span></span><span>fri</span><span></span></div>
+            <div class="weeks"></div>
+          </div>
+        </div>
+        <p class="legend"><span>less</span><span class="swatches" aria-hidden="true"><i data-lv="0"></i><i data-lv="1"></i><i data-lv="2"></i><i data-lv="3"></i><i data-lv="4"></i></span><span>more</span><span class="streakkey"><i class="goldmark" aria-hidden="true"></i>10-day streak</span></p>
+        <div class="stats">
+          <div class="stat"><span class="sl">year</span><b class="sv" data-k="total">0</b></div>
+          <div class="stat"><span class="sl">most active month</span><b class="sv" data-k="month">—</b></div>
+          <div class="stat"><span class="sl">most active day</span><b class="sv" data-k="day">—</b></div>
+          <div class="stat"><span class="sl">longest streak</span><b class="sv" data-k="longest">0d</b></div>
+          <div class="stat"><span class="sl">current streak</span><b class="sv" data-k="current">0d</b></div>
+        </div>
+      </section>
+      <section class="tracker" data-id="caffeine" data-kind="caffeine" data-unit="day" data-src="/habits/caffeine.json" aria-label="zero caffeine">
+        <h2 class="kicker"><span class="kt">zero caffeine</span></h2>
+        <div class="fit">
+          <div class="graph">
+            <div class="months"></div>
+            <div class="dow" aria-hidden="true"><span></span><span>mon</span><span></span><span>wed</span><span></span><span>fri</span><span></span></div>
+            <div class="weeks"></div>
+          </div>
+        </div>
+        <p class="legend"><span class="key"><i class="missmark" aria-hidden="true"></i>caffeine</span><span class="key"><i class="hitmark" aria-hidden="true"></i>zero caffeine</span><span class="streakkey"><i class="goldmark" aria-hidden="true"></i>10-day streak</span></p>
+        <div class="stats stats-3">
+          <div class="stat"><span class="sl">zero-caffeine days</span><b class="sv" data-k="total">0</b></div>
+          <div class="stat"><span class="sl">current streak</span><b class="sv" data-k="current">0d</b></div>
+          <div class="stat"><span class="sl">longest streak</span><b class="sv" data-k="longest">0d</b></div>
+        </div>
+      </section>
     </div>
   </div>
 </main>
 <footer class="foot" data-ref="habits">
 </footer>
-<script src="/habits/habits.js?v=1.80"></script>
+<script src="/habits/habits.js?v=1.84"></script>
 </body>
 </html>

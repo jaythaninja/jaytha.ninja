@@ -1,6 +1,6 @@
-/* jaytha.ninja/habits/YYYY-MM-DD/ (v1.76): one day, every tracker, from the same json the year graph uses. */
+/* jaytha.ninja/habits/YYYY-MM-DD/ (v1.84): one day, every tracker, from the same json the year graph uses. journal is a count. caffeine is yes or no, and only from its start date. */
 (() => {
-const VER = 'habits-day-1.76';
+const VER = 'habits-day-1.84';
 const TIMING = {kickerSpeed: 55, window: 4};
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
 const RAIN_GLYPHS = '0123456789{}[]<>/\\=+*:;.-_#$%&@abcdefhjknrstuvxyz'.split('');
@@ -94,6 +94,24 @@ function sectionFor(tracker, file, iso){
     const p = mk('p', 'quiet');
     p.textContent = 'could not load this tracker';
     sec.appendChild(p);
+    return sec;
+  }
+  if (tracker.kind === 'journal' || tracker.id === 'journal'){
+    const raw = file[iso];
+    const fromDays = file.days && file.days[iso];
+    const n = typeof raw === 'number' ? raw : (typeof fromDays === 'number' ? fromDays : ((fromDays && fromDays.total) || 0));
+    const total = mk('p', 'total');
+    total.textContent = commas(n) + ' ' + unitWord(n, 'note');
+    sec.appendChild(total);
+    return sec;
+  }
+  if (tracker.kind === 'caffeine' || tracker.id === 'caffeine'){
+    const start = file.start || '';
+    if (!start || iso < start) return null;
+    const raw = (file.days || {})[iso];
+    const total = mk('p', 'total');
+    total.textContent = raw === true ? 'zero caffeine' : 'caffeine';
+    sec.appendChild(total);
     return sec;
   }
   const day = (file.days || {})[iso] || {};
@@ -252,7 +270,10 @@ async function main(){
   }));
   if (held){
     held.replaceChildren();
-    (cfg.trackers || []).filter(t => t.enabled !== false).forEach(t => held.appendChild(sectionFor(t, files[t.id], iso)));
+    (cfg.trackers || []).filter(t => t.enabled !== false).forEach(t => {
+      const sec = sectionFor(t, files[t.id], iso);
+      if (sec) held.appendChild(sec);
+    });
   }
   await document.fonts.ready;
   line = prepare(kick, kick.textContent);

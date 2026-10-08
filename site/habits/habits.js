@@ -1,6 +1,6 @@
-/* jaytha.ninja/habits/ (v1.76): two year graphs on one screen. cells use the state colour; a run of 10 or more active days is gold. */
+/* jaytha.ninja/habits/ (v1.84): four year graphs on one screen. cells use the state colour; a run of 10 or more active days is gold. a caffeine miss is red. */
 (() => {
-const VER = 'habits-1.77';
+const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
 const SHORT = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec'];
 const LONG = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -47,6 +47,12 @@ function sentence(n, iso, unit, minutes){
   const head = n + ' ' + unitWord(n, unit);
   if (minutes == null) return head + ' on ' + when + '.';
   return head + ' · ' + minutes + ' min on ' + when + '.';
+}
+function shortDate(iso){
+  return SHORT[+iso.slice(5, 7) - 1] + ' ' + (+iso.slice(8));
+}
+function noteLine(n, iso){
+  return shortDate(iso) + ': ' + n + ' ' + unitWord(n, 'note');
 }
 const commas = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 function monthLabel(ym){
@@ -182,21 +188,47 @@ function fillStats(section, s){
   set('longest', s.longest + 'd');
   set('current', s.current + 'd');
 }
-function paint(cell, lv, gold){
+function paint(cell, lv, gold, miss){
   cell.dataset.lv = String(lv);
   if (gold) cell.dataset.gold = '1';
   else delete cell.dataset.gold;
+  if (miss) cell.dataset.miss = '1';
+  else delete cell.dataset.miss;
   cell.classList.remove('hot');
 }
 function paintAll(){
-  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold));
+  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold, fin.miss));
+}
+function daysOf(section, data){
+  const kind = section.dataset.kind || '';
+  if (kind === 'journal'){
+    const src = (data && data.days && typeof Object.values(data.days)[0] !== 'object') ? data.days : data;
+    const days = {};
+    Object.keys(src || {}).forEach(iso => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
+      days[iso] = {total: Number(src[iso]) || 0};
+    });
+    return days;
+  }
+  if (kind === 'caffeine'){
+    const days = {};
+    const raw = (data && data.days) || {};
+    Object.keys(raw).forEach(iso => {
+      const success = raw[iso] === true;
+      days[iso] = {total: success ? 1 : 0, success, miss: !success};
+    });
+    return days;
+  }
+  return (data && data.days) || {};
 }
 function apply(section, days, meta){
+  const kind = section.dataset.kind || '';
   const unit = section.dataset.unit || 'contribution';
   const metric = (meta && meta.intensity && meta.intensity.metric) || section.dataset.metric || '';
   const edges = (meta && meta.intensity && meta.intensity.edges) || (section.dataset.buckets || '').split(',').map(Number).filter(Boolean);
   const today = section.dataset.today;
   const start = section.dataset.start;
+  const habitStart = (meta && meta.start) || '';
   const cells = [...section.querySelectorAll('.cell')];
   const dates = cells.map(c => c.dataset.date);
   const counted = [];
@@ -210,10 +242,22 @@ function apply(section, days, meta){
     if (iso > today) return;
     const day = days[iso];
     const n = (day && day.total) || 0;
+    if (kind === 'caffeine'){
+      const inRange = !!habitStart && iso >= habitStart && iso <= today;
+      const success = !!(day && day.success);
+      const miss = inRange && !success;
+      const on = success && gold.has(iso);
+      final.set(cell, {lv: success ? 4 : 0, gold: on, miss, n});
+      if (inRange) cell.setAttribute('aria-label', shortDate(iso) + ': ' + (success ? 'zero caffeine' : 'caffeine'));
+      else cell.removeAttribute('aria-label');
+      return;
+    }
     const minutes = metric === 'minutes' ? Math.round((day && day.minutes) || 0) : null;
-    const lv = metric === 'minutes' ? minutesLevel(minutes || 0, edges) : level(n, scale);
-    final.set(cell, {lv, gold: gold.has(iso), n, minutes});
-    cell.setAttribute('aria-label', sentence(n, iso, unit, minutes));
+    const lv = metric === 'minutes' || (kind === 'journal' && edges.length)
+      ? minutesLevel(minutes != null ? minutes : n, edges)
+      : level(n, scale);
+    final.set(cell, {lv, gold: gold.has(iso), miss: false, n, minutes});
+    cell.setAttribute('aria-label', kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
   });
   fillStats(section, computeStats(days, start, today, metric));
 }
@@ -230,7 +274,9 @@ function hideTip(){ tip.hidden = true; }
 function showTip(cell){
   const fin = final.get(cell);
   const unit = cell.closest('.tracker').dataset.unit || 'contribution';
-  tip.textContent = cell.getAttribute('aria-label') || sentence(fin ? fin.n : 0, cell.dataset.date, unit);
+  const label = cell.getAttribute('aria-label');
+  if (!label){ hideTip(); return; }
+  tip.textContent = label || sentence(fin ? fin.n : 0, cell.dataset.date, unit);
   tip.hidden = false;
   const r = cell.getBoundingClientRect();
   const w = tip.offsetWidth, h = tip.offsetHeight;
@@ -313,11 +359,11 @@ async function sweep(){
   const columns = model.weeks.length;
   for (let i = 0; i < columns; i++){
     if (skipped) return;
-    const live = columnCells(i).filter(c => { const f = final.get(c); return f && (f.lv > 0 || f.gold); });
+    const live = columnCells(i).filter(c => { const f = final.get(c); return f && (f.lv > 0 || f.gold || f.miss); });
     live.forEach(c => c.classList.add('hot'));
     await wait(18);
     if (skipped) return;
-    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold); });
+    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold, f.miss); });
     await wait(26);
   }
 }
@@ -366,7 +412,7 @@ async function loadAll(){
       const res = await fetch(section.dataset.src, {cache: 'no-cache'});
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
-      apply(section, data.days || {}, data);
+      apply(section, daysOf(section, data), data);
     } catch (err) {
       section.dataset.error = '1';
       const el = section.querySelector('[data-k="total"]');
