@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v1.84): four year graphs on one screen. cells use the state colour; a run of 10 or more active days is gold. a caffeine miss is a thin red × on the empty cell. */
+/* jaytha.ninja/habits/ (v1.84): four year graphs on one screen. cells use the state colour; a run of 10 or more active days is gold. a caffeine day without a zero-caffeine record stays the empty gray cell. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -191,16 +191,14 @@ function fillStats(section, s){
   set('longest', s.longest + 'd');
   set('current', s.current + 'd');
 }
-function paint(cell, lv, gold, miss){
+function paint(cell, lv, gold){
   cell.dataset.lv = String(lv);
   if (gold) cell.dataset.gold = '1';
   else delete cell.dataset.gold;
-  if (miss) cell.dataset.miss = '1';
-  else delete cell.dataset.miss;
   cell.classList.remove('hot');
 }
 function paintAll(){
-  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold, fin.miss));
+  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold));
 }
 function daysOf(section, data){
   const kind = section.dataset.kind || '';
@@ -218,7 +216,7 @@ function daysOf(section, data){
     const raw = (data && data.days) || {};
     Object.keys(raw).forEach(iso => {
       const success = raw[iso] === true;
-      days[iso] = {total: success ? 1 : 0, success, miss: !success};
+      days[iso] = {total: success ? 1 : 0, success};
     });
     return days;
   }
@@ -248,9 +246,8 @@ function apply(section, days, meta){
     if (kind === 'caffeine'){
       const inRange = !!habitStart && iso >= habitStart && iso <= today;
       const success = !!(day && day.success);
-      const miss = inRange && !success;
       const on = success && gold.has(iso);
-      final.set(cell, {lv: success ? 4 : 0, gold: on, miss, n});
+      final.set(cell, {lv: success ? 4 : 0, gold: on, n});
       if (inRange) cell.setAttribute('aria-label', shortDate(iso) + ': ' + (success ? 'zero caffeine' : 'caffeine'));
       else cell.removeAttribute('aria-label');
       return;
@@ -259,7 +256,7 @@ function apply(section, days, meta){
     const lv = metric === 'minutes' || (kind === 'journal' && edges.length)
       ? minutesLevel(minutes != null ? minutes : n, edges)
       : level(n, scale);
-    final.set(cell, {lv, gold: gold.has(iso), miss: false, n, minutes});
+    final.set(cell, {lv, gold: gold.has(iso), n, minutes});
     cell.setAttribute('aria-label', kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
   });
   fillStats(section, computeStats(days, start, today, metric));
@@ -362,11 +359,11 @@ async function sweep(){
   const columns = model.weeks.length;
   for (let i = 0; i < columns; i++){
     if (skipped) return;
-    const live = columnCells(i).filter(c => { const f = final.get(c); return f && (f.lv > 0 || f.gold || f.miss); });
+    const live = columnCells(i).filter(c => { const f = final.get(c); return f && (f.lv > 0 || f.gold); });
     live.forEach(c => c.classList.add('hot'));
     await wait(18);
     if (skipped) return;
-    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold, f.miss); });
+    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold); });
     await wait(26);
   }
 }
