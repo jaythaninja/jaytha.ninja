@@ -19,7 +19,8 @@
         {"key": "commits", "label": "commits"},
         {"key": "prs_opened", "label": "prs opened"},
         {"key": "prs_merged", "label": "prs merged"},
-        {"key": "ai_lines", "label": "ai line edits", "when": "present"}
+        {"key": "ai_lines", "label": "ai line edits", "when": "present"},
+        {"key": "rides", "label": "🚵 ride (thinking time)", "when": "present"}
       ]
     },
     {

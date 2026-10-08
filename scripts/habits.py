@@ -7,8 +7,9 @@
   python3 scripts/habits.py check    # schema only, no network
 
 Dates are America/Chicago. A day total is commits + pull requests opened + pull
-requests merged + ai line edits. GitHub's own calendar counts a pull request
-once and drops some commits; this file keeps the breakdown instead.
+requests merged + ai line edits + bike rides. GitHub's own calendar counts a pull request
+once and drops some commits; this file keeps the breakdown instead. A cycling
+workout on or after 2026-01-01 counts as one coding session, kept in `rides`.
 
 Private repos (mideeyah) need HABITS_GITHUB_TOKEN with repo scope. The Actions
 token only sees this public repo. A repo the token cannot see is listed in
@@ -41,7 +42,15 @@ INDEX = HABITS / "index.html"
 DAY_TEMPLATE = Path(__file__).resolve().parent / "habits_day.html"
 TZ = ZoneInfo("America/Chicago")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-VER = "1.88"
+VER = "1.90"
+RIDE_FROM = "2026-01-01"
+# public workouts.json says "cycling". A raw Health/Strava row may still say the source type.
+RIDE_TYPES = {
+    "cycling",
+    "ride",
+    "hkworkoutactivitytypecycling",
+    "strava:ride",
+}
 
 
 def chicago_today() -> date:
@@ -127,28 +136,100 @@ def blank_day() -> dict:
     return {"commits": 0, "prs_opened": 0, "prs_merged": 0, "items": []}
 
 
-def finalize_day(day: dict) -> dict:
-    ai = int(day.pop("_ai", 0) or 0)
-    items = sorted(day["items"], key=lambda item: (item.get("at") or "", item.get("role") or "", item.get("sha") or ""))
+def is_cycling(item: dict) -> bool:
+    raw = str(item.get("type") or "").strip().lower()
+    compact = raw.replace("_", "").replace(" ", "")
+    return raw in RIDE_TYPES or compact in RIDE_TYPES or compact.endswith("cycling")
+
+
+def ride_counts(workouts: dict | None = None) -> dict[str, int]:
+    """One coding session per cycling workout on or after 2026-01-01. Two rides on a day count as two."""
+    if workouts is None:
+        if not WORKOUTS.exists():
+            return {}
+        workouts = load_json(WORKOUTS)
+    counts: dict[str, int] = {}
+    for day_key, day in (workouts.get("days") or {}).items():
+        if not DATE_RE.fullmatch(str(day_key)) or day_key < RIDE_FROM:
+            continue
+        n = sum(1 for item in (day.get("items") or []) if isinstance(item, dict) and is_cycling(item))
+        if n:
+            counts[str(day_key)] = n
+    return counts
+
+
+def compose_day(day: dict, rides: int) -> dict:
+    commits = int(day.get("commits") or 0)
+    opened = int(day.get("prs_opened") or 0)
+    merged = int(day.get("prs_merged") or 0)
+    ai = int(day.get("ai_lines") or 0)
     out = {
-        "total": day["commits"] + day["prs_opened"] + day["prs_merged"] + ai,
-        "commits": day["commits"],
-        "prs_opened": day["prs_opened"],
-        "prs_merged": day["prs_merged"],
-        "items": items,
+        "total": commits + opened + merged + ai + rides,
+        "commits": commits,
+        "prs_opened": opened,
+        "prs_merged": merged,
     }
     if ai > 0:
         out["ai_lines"] = ai
-        # keep the public order: counts, then ai_lines, then items
-        out = {
-            "total": out["total"],
-            "commits": out["commits"],
-            "prs_opened": out["prs_opened"],
-            "prs_merged": out["prs_merged"],
+    if rides > 0:
+        out["rides"] = rides
+    out["items"] = day.get("items") or []
+    return out
+
+
+def counting_text() -> str:
+    return (
+        "total = commits + prs opened + prs merged + ai line edits + bike rides. "
+        "Commit dates are author dates in America/Chicago. Merge commits are skipped. "
+        "A pull request counts on the day it was opened and, if merged, again on the day it merged. "
+        "GitHub's contribution calendar counts a pull request once and omits some commits; this file keeps the breakdown. "
+        "AI line edits come only from cursor-lines.json. "
+        "A cycling workout on or after 2026-01-01 counts as one ride, a coding session. "
+        "Two rides on one day count as two. The ride still counts on the workouts graph."
+    )
+
+
+def apply_rides(cursor: dict, workouts: dict | None = None) -> dict:
+    """Fold ride sessions into code days. The rides field stays separate so it can be switched off."""
+    rides = ride_counts(workouts)
+    days = cursor.get("days") or {}
+    merged = {}
+    for key in sorted(set(days) | set(rides)):
+        if not DATE_RE.fullmatch(key):
+            continue
+        final = compose_day(days.get(key) or {}, rides.get(key, 0))
+        if final["total"] > 0:
+            merged[key] = final
+    cursor["days"] = merged
+    cursor["counting"] = counting_text()
+    return cursor
+
+
+def refresh_rides() -> None:
+    if not CURSOR.exists():
+        print("habits: no cursor.json yet; rides wait for the next fetch", file=sys.stderr)
+        return
+    cursor = apply_rides(load_json(CURSOR))
+    dump_json(CURSOR, cursor)
+    ride_n = sum(int(day.get("rides") or 0) for day in cursor["days"].values())
+    ride_days = sum(1 for day in cursor["days"].values() if day.get("rides"))
+    print(f"habits: rides folded into cursor.json ({ride_n} rides on {ride_days} days)")
+
+
+def finalize_day(day: dict) -> dict:
+    ai = int(day.pop("_ai", 0) or 0)
+    items = sorted(day["items"], key=lambda item: (item.get("at") or "", item.get("role") or "", item.get("sha") or ""))
+    return compose_day(
+        {
+            "commits": day["commits"],
+            "prs_opened": day["prs_opened"],
+            "prs_merged": day["prs_merged"],
+            "_ai": ai,
             "ai_lines": ai,
             "items": items,
-        }
-    return out
+        },
+        0,
+    )
 
 
 def fetch_repo(repo: str, tok: str, since_iso: str, login: str, cutoff: str) -> tuple[list, list, str | None]:
@@ -310,7 +391,7 @@ def build_cursor_once(cfg: dict, today: date) -> dict:
         if final["total"] > 0:
             cleaned[key] = final
 
-    return {
+    data = {
         "id": "cursor",
         "label": next((t["label"] for t in cfg["trackers"] if t["id"] == "cursor"), "cursor"),
         "timezone": "America/Chicago",
@@ -320,15 +401,10 @@ def build_cursor_once(cfg: dict, today: date) -> dict:
         "repos": list(cfg["repos"]),
         "skipped_repos": skipped,
         "manual": manual_name,
-        "counting": (
-            "total = commits + prs opened + prs merged + ai line edits. "
-            "Commit dates are author dates in America/Chicago. Merge commits are skipped. "
-            "A pull request counts on the day it was opened and, if merged, again on the day it merged. "
-            "GitHub's contribution calendar counts a pull request once and omits some commits; this file keeps the breakdown. "
-            "AI line edits come only from cursor-lines.json."
-        ),
+        "counting": counting_text(),
         "days": cleaned,
     }
+    return apply_rides(data)
 
 
 def check_index(cfg: dict) -> None:
@@ -564,6 +640,7 @@ def write_workouts(src: Path) -> dict:
         "days": days,
     }
     dump_json(WORKOUTS, data)
+    refresh_rides()
     longest = run = 0
     if days:
         first = date.fromisoformat(min(days))
@@ -597,11 +674,23 @@ def check() -> None:
         if not DATE_RE.fullmatch(key):
             raise SystemExit(f"habits: bad date {key}")
         ai = int(day.get("ai_lines") or 0)
-        expect = int(day["commits"]) + int(day["prs_opened"]) + int(day["prs_merged"]) + ai
+        rides = int(day.get("rides") or 0)
+        expect = int(day["commits"]) + int(day["prs_opened"]) + int(day["prs_merged"]) + ai + rides
         if int(day["total"]) != expect:
             raise SystemExit(f"habits: {key} total {day['total']} != {expect}")
         if ai == 0 and "ai_lines" in day:
             raise SystemExit(f"habits: {key} has a zero ai_lines key; omit it")
+        if rides == 0 and "rides" in day:
+            raise SystemExit(f"habits: {key} has a zero rides key; omit it")
+    expected_rides = ride_counts(workouts)
+    for key, n in expected_rides.items():
+        got = int((days.get(key) or {}).get("rides") or 0)
+        if got != n:
+            raise SystemExit(f"habits: {key} rides {got} != {n} cycling workouts")
+    for key, day in days.items():
+        got = int(day.get("rides") or 0)
+        if got and expected_rides.get(key, 0) != got:
+            raise SystemExit(f"habits: {key} rides {got} has no matching cycling workout")
     today = date.fromisoformat(cursor.get("through") or chicago_today().isoformat())
     start, _grid_start, _grid_end = window(today)
     longest = run = 0
@@ -668,6 +757,7 @@ def main(argv: list[str]) -> None:
                 raise SystemExit(1) from err
     if cmd in {"all", "pages"}:
         check_index(cfg)
+        refresh_rides()
         write_pages(today)
     if cmd == "check" or cmd == "all":
         check()
