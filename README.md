@@ -65,7 +65,7 @@ v1.79: the board column is the song and daily-update measure (their `60ch` at 20
 
 | tracker | data | what counts |
 |---|---|---|
-| code | `site/habits/cursor.json` | commits + pull requests opened + pull requests merged + AI line edits |
+| code | `site/habits/cursor.json` | commits + pull requests opened + pull requests merged + AI line edits + bike rides. A cycling workout on or after 2026-01-01 is one coding session (`rides`). Two rides on a day count as two. The ride still counts on the workouts graph. |
 | workouts | `site/habits/workouts.json` | Apple Health + Strava. Every type counts, including walks. A record with `exclude: true` is left out. Several workouts on one day add up. The cell colour is that day's active minutes, not the count: under 45, 45–89, 90–149, 150 or more. Oct–Dec 2025 and Apr–May 2026 are empty on purpose. |
 | journal | `site/habits/journal.json` | Notes created that day, including bot-written notes. The file is a date-to-count map and omits zero days. Colour steps are 1, 2–4, 5–9, and 10 or more. |
 | zero caffeine | `site/habits/caffeine.json` | Starts 2025-10-05, the first day the grid shows. `true` is a caffeine-free day (one solid speed colour). `false` is a miss (coral red). Every displayed day through 2026-10-08 is a miss. Days after today stay empty. |
@@ -89,3 +89,5 @@ v1.82: on a phone the corner hint is 11px and sits 6px under the safe area (it w
 v1.87: the phone speed hint paints above the scan-line fade. That fade stays on the rain, the glows, and the scan lines, and on a phone the hint is solid, without the text shadow. The email signup stays on the homepage. Every other page's footer is the icon row only. A 10-day streak cell is solid `#FFD700` in both themes, and the legend keeps the single gold cursor. `/habits/` stacks four graphs (code, workouts, journal, zero caffeine) at the two-graph size and scrolls on every screen. `--habit-gap` (16px) is the only vertical step, so a fifth habit needs no layout change. `rain.css`, `rain.js`, `foot.css`, `foot.js`, `habits.css`, `habits.js`, and `day.js` are `?v=1.87`.
 
 v1.88: caffeine misses are a lighter coral red (`#F0625A` dark, `#E8574E` light), and every displayed day from 2025-10-05 through 2026-10-08 is a miss. Day pages cover that same span, including `/habits/2026-10-08/`. `habits.css`, `habits.js`, and `day.js` are `?v=1.88`.
+
+v1.89: a cycling workout on or after 2026-01-01 counts as one coding session on the code grid (`rides` on the day, shown as `🚵 ride (thinking time)`). `habits.css`, `habits.js`, and `day.js` are `?v=1.89`.
