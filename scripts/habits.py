@@ -42,7 +42,7 @@ INDEX = HABITS / "index.html"
 DAY_TEMPLATE = Path(__file__).resolve().parent / "habits_day.html"
 TZ = ZoneInfo("America/Chicago")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-VER = "1.89"
+VER = "1.90"
 RIDE_FROM = "2026-01-01"
 # public workouts.json says "cycling". A raw Health/Strava row may still say the source type.
 RIDE_TYPES = {

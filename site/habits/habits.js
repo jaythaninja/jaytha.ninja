@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v1.84): four year graphs on one screen. cells use the state colour; a run of 10 or more active days is gold. a caffeine miss is red. */
+/* jaytha.ninja/habits/ (v1.84): four year graphs on one screen. cells use the state colour; a run of 10 or more active days is gold. a caffeine miss is a thin red × on the empty cell. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
