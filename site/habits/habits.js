@@ -79,6 +79,8 @@ function build(section, model){
   graph.style.setProperty('--weeks', String(weeks.length));
   section.dataset.start = model.start;
   section.dataset.today = model.today;
+  /* pages run through this day. a cell past it is drawn, and it is not a link. */
+  const covered = document.body.dataset.pagesThrough || model.today;
   const labels = weeks.map(col => {
     const hit = col.find(d => d.slice(8) === '01' && d <= model.today);
     return hit ? SHORT[+hit.slice(5, 7) - 1] : '';
@@ -106,10 +108,11 @@ function build(section, model){
     months.appendChild(lab);
     col.forEach(iso => {
       const future = iso > model.today;
-      const el = mk(future ? 'span' : 'a', 'cell' + (future ? ' future' : ''));
+      const linkable = !future && iso <= covered;
+      const el = mk(linkable ? 'a' : 'span', 'cell' + (future ? ' future' : ''));
       el.dataset.date = iso;
       el.dataset.lv = '0';
-      if (!future){
+      if (linkable){
         el.href = '/habits/' + iso + '/';
         el.setAttribute('aria-label', sentence(0, iso, unit, section.dataset.metric === 'minutes' ? 0 : null));
       }
