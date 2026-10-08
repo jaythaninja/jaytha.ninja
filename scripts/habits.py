@@ -41,7 +41,7 @@ INDEX = HABITS / "index.html"
 DAY_TEMPLATE = Path(__file__).resolve().parent / "habits_day.html"
 TZ = ZoneInfo("America/Chicago")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-VER = "1.86"
+VER = "1.87"
 
 
 def chicago_today() -> date:
