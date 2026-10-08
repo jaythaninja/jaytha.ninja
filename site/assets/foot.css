@@ -1,25 +1,13 @@
-/* v1.67 (jay 2026.10.03): the shared footer (every subpage, built by assets/foot.js): the homepage's whole signup + icon row at the end of the page.
-   everything below the footer box rules is the homepage's own css, copied by tools/build_foot.py (the classes are the same: .cta / .prompt / .signup / .notify / .social
-   and the liftoff's .rk-sky), so the field, the one-colour charging line, the rocket, the liftoff + the failed liftoff look and move exactly as on the homepage and
-   follow the page states (--c / --f: teal, orange after a speed tap, gold). the sizes are the homepage's (18px, 14px on phones) and the spacing too (field 29px under
-   the prompt, 13px on phones; the row 29.5px / 18px under the field). the footer sits at the end of the content, under everything (the page's min-height keeps it below
-   the first screen, so building it never moves anything you can see). was (v1.61-v1.66): "drop us your email if you want to help" + a plain → */
-.foot{--fs:18px;--pgap:32px;--su:29px;--sec-a:29.5px;--k:.9167;--kx:.8;--ich:48px;--igap:12px;
-  position:relative;z-index:2;margin-left:var(--left);width:min(72ch,calc(100vw - var(--left) - 24px));padding:12px 0 clamp(56px,9vh,100px);min-height:calc(186px + clamp(56px,9vh,100px));font-size:var(--fs);line-height:1.5;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
-.foot .cta{margin-top:0}
+/* v1.67 (jay 2026.10.03): the shared footer. v1.83: the email signup stays on the homepage. every other page's footer is the icon row only.
+   the empty footer already has the row's height (padding + the 48px row, 40px on a phone), so building it moves nothing.
+   everything below the footer box rules is the homepage's own css, copied by tools/build_foot.py. the homepage still uses those rules for its own signup. */
+.foot{--fs:18px;--pgap:32px;--su:29px;--sec-a:0px;--k:.9167;--kx:.8;--ich:48px;--igap:12px;
+  position:relative;z-index:2;margin-left:var(--left);width:min(72ch,calc(100vw - var(--left) - 24px));padding:12px 0 clamp(56px,9vh,100px);min-height:calc(60px + clamp(56px,9vh,100px));font-size:var(--fs);line-height:1.5;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
 .foot .social li{opacity:1}
-.foot .status{white-space:nowrap}
+.foot .elsewhere{margin-top:0}
 @media (max-width:760px){
-  .foot{--fs:14px;--pgap:20px;--su:13px;--sec-a:18px;--k:.8333;--kx:.7143;--ich:40px;margin-left:24px;width:calc(100vw - 48px);padding-bottom:22px;min-height:163px}
-  .foot .notify{gap:14px}
-  .foot .notify button{font-size:16px}
-  .foot .notify .rkb{width:48px;height:48px;margin:-7px -6px -7px -4px;border-radius:11px}
-  .foot .notify input{font-size:16px;flex:0 0 auto;width:calc((100% - 52px)/.875);margin-right:calc((100% - 52px)*(1 - 1/.875));transform:scale(.875);transform-origin:0 100%}
-  .foot .signup{--hint-r:14px;--chev-in:2.4px;margin-right:calc(var(--hint-r) + var(--chev-in) - 24px)}
+  .foot{--fs:14px;--pgap:20px;--k:.8333;--kx:.7143;--ich:40px;margin-left:24px;width:calc(100vw - 48px);padding-bottom:22px;min-height:74px}
 }
-@media (min-width:761px){.foot .notify input{flex:1 1 0}.foot .signup{margin-right:6px}}
-@media (max-width:329px){.foot{min-height:187px}}   /* the prompt wraps to two lines this narrow */
-/* the empty footer already has the built one's height (min-height = padding + prompt + field + row), so the page is as tall from the first frame and building it moves nothing (not even a scrollbar appearing) */
 /* ---- the homepage's css (generated, don't edit here: edit the homepage + re-run tools/build_foot.py) ---- */
 .prompt .teal{color:var(--c);white-space:nowrap}
 .spamcan{--spam-body:#1AADB3;--spam-body-edge:#0B5B5E;--spam-rim:#F2B632;--spam-rim-edge:#6E4A06;--spam-ink:#021213}
