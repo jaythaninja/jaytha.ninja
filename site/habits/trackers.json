@@ -42,7 +42,7 @@
     },
     {
       "id": "caffeine",
-      "label": "zero caffeine",
+      "label": "caffeine",
       "enabled": true,
       "unit": "day",
       "kind": "caffeine",
