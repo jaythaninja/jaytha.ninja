@@ -42,11 +42,12 @@ html.au-snap,html.au-snap *,html.au-snap *::before,html.au-snap *::after{transit
   .rk-sky .smk,.rk-sky .plm,.rk-sky .puff.smoke{filter:brightness(.62)}   /* the white liftoff / crash smoke would vanish on white: grey it */
 }
 /* v1.78: "tap screen for speed +". no chevrons. the colour is the current speed colour (--c), so a speed tap and the light theme recolour it with everything else. 22ch is the sentence, reserved before the words are written, so the corner does not grow. readable, still small.
-   v1.82: phones only. 11px, and 6px under the safe area (was 13px and 11px), so the hint clears the date. the 22ch box stays. desktop is unchanged. */
-.tap-hint{position:fixed;z-index:4;top:11px;right:14px;display:flex;align-items:center;color:var(--c);font-size:13px;font-weight:500;line-height:1;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px var(--bg);transition:color .25s ease,opacity .7s ease,transform .7s ease}
+   v1.82: phones only. 11px, and 6px under the safe area (was 13px and 11px), so the hint clears the date. the 22ch box stays. desktop is unchanged.
+   v1.83: the hint sits above the scan overlay (z-index 30), which fades over the top and bottom 20% of the page. that fade stays on the rain, the glows, and the scan lines. on a phone the hint is solid (was opacity .92 with an 8px text-shadow), so the glyphs are not washed by that shadow. position and size stay at the v1.82 values. */
+.tap-hint{position:fixed;z-index:31;top:11px;right:14px;display:flex;align-items:center;color:var(--c);font-size:13px;font-weight:500;line-height:1;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px var(--bg);transition:color .25s ease,opacity .7s ease,transform .7s ease}
 .tap-hint.ready,.tap-hint.settled{opacity:.92;transform:none}
 .speed-label{display:block;min-width:22ch}
-@media (max-width:760px){.tap-hint{top:calc(env(safe-area-inset-top, 0px) + 6px);font-size:11px}}
 @media(prefers-reduced-motion:reduce){.tap-hint{transition:none;transform:none}.tap-hint.ready,.tap-hint.settled{opacity:.92}}
+@media (max-width:760px){.tap-hint{top:calc(env(safe-area-inset-top, 0px) + 6px);font-size:11px;text-shadow:none}.tap-hint.ready,.tap-hint.settled{opacity:1}}
 
 .glow{transition:opacity .5s ease}.glow-fast{opacity:0}[data-mode="fast"] .glow{opacity:0}[data-mode="fast"] .glow-fast{opacity:.85}@media(prefers-reduced-motion:reduce){.glow{transition:none}}
