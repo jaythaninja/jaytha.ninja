@@ -29,6 +29,24 @@
       "unit": "workout",
       "data": "/habits/workouts.json",
       "sources": []
+    },
+    {
+      "id": "journal",
+      "label": "journal",
+      "enabled": true,
+      "unit": "note",
+      "kind": "journal",
+      "data": "/habits/journal.json",
+      "sources": []
+    },
+    {
+      "id": "caffeine",
+      "label": "zero caffeine",
+      "enabled": true,
+      "unit": "day",
+      "kind": "caffeine",
+      "data": "/habits/caffeine.json",
+      "sources": []
     }
   ]
 }
