@@ -88,7 +88,16 @@ function workoutCard(item){
 function sectionFor(tracker, file, iso){
   const sec = mk('section', 'daysec');
   const h = mk('h2', 'kicker');
-  h.textContent = tracker.label || tracker.id;
+  if (tracker.kind === 'caffeine' || tracker.id === 'caffeine'){
+    const sr = mk('span', 'sr');
+    sr.textContent = 'zero caffeine';
+    const vis = mk('span', 'strike');
+    vis.textContent = 'caffeine';
+    vis.setAttribute('aria-hidden', 'true');
+    h.append(sr, vis);
+  } else {
+    h.textContent = tracker.label || tracker.id;
+  }
   sec.appendChild(h);
   if (!file || file.error){
     const p = mk('p', 'quiet');
