@@ -3,7 +3,7 @@
 
   python3 scripts/habits.py all      # fetch github, merge cursor-lines.json, write day pages
   python3 scripts/habits.py fetch    # cursor.json only
-  python3 scripts/habits.py pages    # day routes from the json already on disk
+  python3 scripts/habits.py pages    # day routes from the json already on disk, through today and the latest habit date
   python3 scripts/habits.py check    # schema only, no network
 
 Dates are America/Chicago. A day total is commits + pull requests opened + pull
@@ -41,7 +41,7 @@ INDEX = HABITS / "index.html"
 DAY_TEMPLATE = Path(__file__).resolve().parent / "habits_day.html"
 TZ = ZoneInfo("America/Chicago")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-VER = "1.87"
+VER = "1.88"
 
 
 def chicago_today() -> date:
@@ -338,13 +338,101 @@ def check_index(cfg: dict) -> None:
             raise SystemExit(f"habits: site/habits/index.html has no section for {tracker['id']}")
 
 
+def date_keys(data: dict) -> list[date]:
+    """YYYY-MM-DD keys on a tracker file. Journal is a flat map; the others use days."""
+    if not isinstance(data, dict):
+        return []
+    found: list[date] = []
+    seen: set[str] = set()
+
+    def take(bucket) -> None:
+        if not isinstance(bucket, dict):
+            return
+        for key in bucket:
+            text = str(key)
+            if text in seen or not DATE_RE.fullmatch(text):
+                continue
+            seen.add(text)
+            found.append(date.fromisoformat(text))
+
+    take(data.get("days"))
+    take(data)
+    return found
+
+
+def habit_files() -> list[Path]:
+    cfg = load_json(TRACKERS)
+    paths: list[Path] = []
+    for tracker in cfg.get("trackers") or []:
+        rel = str(tracker.get("data") or "")
+        if rel.startswith("/"):
+            paths.append(ROOT / "site" / rel.lstrip("/"))
+        elif rel:
+            paths.append(HABITS / rel)
+        manual = tracker.get("manual")
+        if manual:
+            paths.append(HABITS / str(manual))
+    return paths
+
+
+def habit_dates() -> list[date]:
+    found: list[date] = []
+    for path in habit_files():
+        if path.exists():
+            found.extend(date_keys(load_json(path)))
+    return found
+
+
+def coverage_end(today: date) -> date:
+    """Last day a cell can name. Today, or a later day already stored in a habit file."""
+    dates = habit_dates()
+    latest = max(dates) if dates else today
+    return max(today, latest)
+
+
+def stamp_coverage(end: date) -> None:
+    """The grid reads this and will not link a day past the last page written."""
+    html = INDEX.read_text(encoding="utf-8")
+    marker = f'data-pages-through="{end.isoformat()}"'
+    if 'data-pages-through="' in html:
+        html = re.sub(r'data-pages-through="\d{4}-\d{2}-\d{2}"', marker, html, count=1)
+    else:
+        html = html.replace('<body class="board">', f'<body class="board" {marker}>', 1)
+    INDEX.write_text(html, encoding="utf-8")
+
+
+def assert_pages(today: date) -> tuple[date, date]:
+    _start, grid_start, _grid_end = window(today)
+    end = coverage_end(today)
+    if end < grid_start:
+        end = grid_start
+    missing = []
+    day = grid_start
+    while day <= end:
+        if not (HABITS / day.isoformat() / "index.html").is_file():
+            missing.append(day.isoformat())
+        day += timedelta(days=1)
+    if missing:
+        raise SystemExit(
+            "habits: grid can link a day with no page: " + ", ".join(missing[:12])
+        )
+    html = INDEX.read_text(encoding="utf-8")
+    marker = f'data-pages-through="{end.isoformat()}"'
+    if marker not in html:
+        raise SystemExit(f"habits: site/habits/index.html is missing {marker}")
+    return grid_start, end
+
+
 def write_pages(today: date) -> None:
     _start, grid_start, _grid_end = window(today)
+    end = coverage_end(today)
+    if end < grid_start:
+        end = grid_start
     template = DAY_TEMPLATE.read_text(encoding="utf-8")
     keep: set[str] = set()
     day = grid_start
-    # pages for every grid day through today, including the leading partial week
-    while day <= today:
+    # every grid day through today, plus any later day a habit file already stores
+    while day <= end:
         key = day.isoformat()
         keep.add(key)
         folder = HABITS / key
@@ -363,7 +451,11 @@ def write_pages(today: date) -> None:
                 item.unlink()
             child.rmdir()
             removed += 1
-    print(f"habits: wrote {len(keep)} day pages ({grid_start.isoformat()} … {today.isoformat()}), removed {removed}")
+    stamp_coverage(end)
+    assert_pages(today)
+    print(
+        f"habits: wrote {len(keep)} day pages ({grid_start.isoformat()} … {end.isoformat()}), removed {removed}"
+    )
 
 
 def _num(value):
@@ -543,9 +635,11 @@ def check() -> None:
             raise SystemExit(f"habits: {key} is an active day with no minutes")
         if key.startswith("2025-") or key[5:7] in {"04", "05"} and key.startswith("2026-"):
             raise SystemExit(f"habits: {key} falls in a real empty stretch and should not be in the file")
+    page_today = chicago_today()
+    grid_start, page_end = assert_pages(page_today)
     print(
         f"habits: check ok. cursor active {len(days)}, total {total}, longest {longest}, current {current}; "
-        f"workouts {len(wdays)} days"
+        f"workouts {len(wdays)} days; day pages {grid_start.isoformat()} … {page_end.isoformat()}"
     )
 
 
