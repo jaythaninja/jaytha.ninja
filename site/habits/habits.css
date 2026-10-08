@@ -189,7 +189,7 @@ body.day .home{margin:0 0 22px}
   body.board{height:100vh;height:100svh;overflow:hidden}
   body.board .copy{width:min(calc(75ch * 2 + 16px),calc(100vw - var(--left) - 24px));max-width:min(calc(75ch * 2 + 16px),calc(100vw - var(--left) - 24px))}
   .trackers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));column-gap:16px;row-gap:16px;align-content:center;justify-content:start}
-  .tracker{min-width:0}
+  .tracker{min-width:0;container-type:inline-size}
   .tracker .kicker{font-size:21px;line-height:1.4;margin:0 0 2px}
   body.board .graph{width:100%;--gap:3px;--lab:28px;--mh:14px}
   .legend{gap:4px 10px;margin:4px 0 0;min-height:1.5em;font-size:12px;line-height:1.2}
@@ -197,6 +197,14 @@ body.day .home{margin:0 0 22px}
   .stats{gap:8px;margin-top:4px;min-height:3.2em}
   .stat .sl{min-height:2.3em;font-size:11px;line-height:1.15;white-space:normal}
   .stat .sv{min-height:1.25em;font-size:14px;line-height:1.25}
+}
+/* a half column is narrower than the old 75ch board, so the stat type steps down until "september 2026" fits on one line. */
+@container (max-width:660px){
+  .stat .sl{font-size:10px}
+  .stat .sv{font-size:12px}
+}
+@container (max-width:520px){
+  .stat .sv{font-size:10px}
 }
 @media (max-height:560px){
   body.board{height:auto;min-height:100svh;overflow:auto}
