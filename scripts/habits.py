@@ -7,9 +7,13 @@
   python3 scripts/habits.py check    # schema only, no network
 
 Dates are America/Chicago. A day total is commits + pull requests opened + pull
-requests merged + ai line edits + bike rides. GitHub's own calendar counts a pull request
-once and drops some commits; this file keeps the breakdown instead. A cycling
-workout on or after 2026-01-01 counts as one coding session, kept in `rides`.
+requests merged + ai line edits + bike rides + journal thinking + non-cycling
+workouts. GitHub's own calendar counts a pull request once and drops some commits;
+this file keeps the breakdown instead. A cycling workout on or after 2026-01-01
+counts as one coding session, kept in `rides`. A day from 2026-03-01 through
+2026-06-30 with at least one journal note counts as one, kept in `thinking`.
+A non-cycling workout on or after 2026-06-01 counts as one, kept in `workouts`.
+Cycling is not counted again.
 
 Private repos (mideeyah) need HABITS_GITHUB_TOKEN with repo scope. The Actions
 token only sees this public repo. A repo the token cannot see is listed in
@@ -38,11 +42,15 @@ HABITS = ROOT / "site" / "habits"
 TRACKERS = HABITS / "trackers.json"
 CURSOR = HABITS / "cursor.json"
 WORKOUTS = HABITS / "workouts.json"
+JOURNAL = HABITS / "journal.json"
 SLEEP = HABITS / "sleep.json"
 INDEX = HABITS / "index.html"
 TZ = ZoneInfo("America/Chicago")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 RIDE_FROM = "2026-01-01"
+THINKING_FROM = "2026-03-01"
+THINKING_THROUGH = "2026-06-30"
+WORKOUT_CODE_FROM = "2026-06-01"
 # public workouts.json says "cycling". A raw Health/Strava row may still say the source type.
 RIDE_TYPES = {
     "cycling",
@@ -166,13 +174,53 @@ def ride_counts(workouts: dict | None = None) -> dict[str, int]:
     return counts
 
 
-def compose_day(day: dict, rides: int) -> dict:
+def thinking_counts(journal: dict | None = None) -> dict[str, int]:
+    """One coding session on a day from 2026-03-01 through 2026-06-30 with at least one journal note."""
+    if journal is None:
+        if not JOURNAL.exists():
+            return {}
+        journal = load_json(JOURNAL)
+    src = journal.get("days") if isinstance(journal.get("days"), dict) else journal
+    if not isinstance(src, dict):
+        return {}
+    counts: dict[str, int] = {}
+    for key, value in src.items():
+        text = str(key)
+        if not DATE_RE.fullmatch(text) or text < THINKING_FROM or text > THINKING_THROUGH:
+            continue
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            continue
+        if int(value) >= 1:
+            counts[text] = 1
+    return counts
+
+
+def workout_code_counts(workouts: dict | None = None) -> dict[str, int]:
+    """One coding session per non-cycling workout on or after 2026-06-01. Cycling stays in rides."""
+    if workouts is None:
+        if not WORKOUTS.exists():
+            return {}
+        workouts = load_json(WORKOUTS)
+    counts: dict[str, int] = {}
+    for day_key, day in (workouts.get("days") or {}).items():
+        if not DATE_RE.fullmatch(str(day_key)) or str(day_key) < WORKOUT_CODE_FROM or not isinstance(day, dict):
+            continue
+        if "items" in day:
+            n = sum(1 for item in (day.get("items") or []) if isinstance(item, dict) and not is_cycling(item))
+        else:
+            n = int(day.get("total") or 0) - int(day.get("rides") or 0)
+        if n > 0:
+            counts[str(day_key)] = n
+    return counts
+
+
+def compose_day(day: dict, rides: int, thinking: int = 0, workout_sessions: int = 0) -> dict:
     commits = int(day.get("commits") or 0)
     opened = int(day.get("prs_opened") or 0)
     merged = int(day.get("prs_merged") or 0)
     ai = int(day.get("ai_lines") or 0)
     out = {
-        "total": commits + opened + merged + ai + rides,
+        "total": commits + opened + merged + ai + rides + thinking + workout_sessions,
         "commits": commits,
         "prs_opened": opened,
         "prs_merged": merged,
@@ -181,6 +229,10 @@ def compose_day(day: dict, rides: int) -> dict:
         out["ai_lines"] = ai
     if rides > 0:
         out["rides"] = rides
+    if thinking > 0:
+        out["thinking"] = thinking
+    if workout_sessions > 0:
+        out["workouts"] = workout_sessions
     if day_pages_enabled():
         out["items"] = day.get("items") or []
     return out
@@ -188,25 +240,35 @@ def compose_day(day: dict, rides: int) -> dict:
 
 def counting_text() -> str:
     return (
-        "total = commits + prs opened + prs merged + ai line edits + bike rides. "
+        "total = commits + prs opened + prs merged + ai line edits + bike rides + journal thinking + non-cycling workouts. "
         "Commit dates are author dates in America/Chicago. Merge commits are skipped. "
         "A pull request counts on the day it was opened and, if merged, again on the day it merged. "
         "GitHub's contribution calendar counts a pull request once and omits some commits; this file keeps the breakdown. "
         "AI line edits come only from cursor-lines.json. "
         "A cycling workout on or after 2026-01-01 counts as one ride, a coding session. "
-        "Two rides on one day count as two. The ride still counts on the workouts graph."
+        "Two rides on one day count as two. The ride still counts on the workouts graph. "
+        "A day from 2026-03-01 through 2026-06-30 with at least one journal note counts as one thinking session. "
+        "A non-cycling workout on or after 2026-06-01 counts as one coding session, kept in workouts. "
+        "Cycling is not counted again. The site shows the day's total only."
     )
 
 
-def apply_rides(cursor: dict, workouts: dict | None = None) -> dict:
-    """Fold ride sessions into code days. The rides field stays separate so it can be switched off."""
+def apply_rides(cursor: dict, workouts: dict | None = None, journal: dict | None = None) -> dict:
+    """Fold ride, journal, and non-cycling workout sessions into code days. Each field stays separate."""
     rides = ride_counts(workouts)
+    thinking = thinking_counts(journal)
+    sessions = workout_code_counts(workouts)
     days = cursor.get("days") or {}
     merged = {}
-    for key in sorted(set(days) | set(rides)):
+    for key in sorted(set(days) | set(rides) | set(thinking) | set(sessions)):
         if not DATE_RE.fullmatch(key):
             continue
-        final = compose_day(days.get(key) or {}, rides.get(key, 0))
+        final = compose_day(
+            days.get(key) or {},
+            rides.get(key, 0),
+            thinking.get(key, 0),
+            sessions.get(key, 0),
+        )
         if final["total"] > 0:
             merged[key] = final
     cursor["days"] = merged
@@ -220,9 +282,15 @@ def refresh_rides() -> None:
         return
     cursor = apply_rides(load_json(CURSOR))
     dump_json(CURSOR, cursor)
-    ride_n = sum(int(day.get("rides") or 0) for day in cursor["days"].values())
-    ride_days = sum(1 for day in cursor["days"].values() if day.get("rides"))
-    print(f"habits: rides folded into cursor.json ({ride_n} rides on {ride_days} days)")
+    days = cursor["days"].values()
+    ride_n = sum(int(day.get("rides") or 0) for day in days)
+    ride_days = sum(1 for day in days if day.get("rides"))
+    think_n = sum(int(day.get("thinking") or 0) for day in days)
+    work_n = sum(int(day.get("workouts") or 0) for day in days)
+    print(
+        f"habits: sessions folded into cursor.json "
+        f"({ride_n} rides on {ride_days} days, {think_n} thinking, {work_n} non-cycling workouts)"
+    )
 
 
 def finalize_day(day: dict) -> dict:
@@ -754,14 +822,30 @@ def check() -> None:
             raise SystemExit(f"habits: bad date {key}")
         ai = int(day.get("ai_lines") or 0)
         rides = int(day.get("rides") or 0)
-        expect = int(day["commits"]) + int(day["prs_opened"]) + int(day["prs_merged"]) + ai + rides
+        thinking = int(day.get("thinking") or 0)
+        workout_sessions = int(day.get("workouts") or 0)
+        expect = (
+            int(day["commits"]) + int(day["prs_opened"]) + int(day["prs_merged"])
+            + ai + rides + thinking + workout_sessions
+        )
         if int(day["total"]) != expect:
             raise SystemExit(f"habits: {key} total {day['total']} != {expect}")
         if ai == 0 and "ai_lines" in day:
             raise SystemExit(f"habits: {key} has a zero ai_lines key; omit it")
         if rides == 0 and "rides" in day:
             raise SystemExit(f"habits: {key} has a zero rides key; omit it")
+        if thinking == 0 and "thinking" in day:
+            raise SystemExit(f"habits: {key} has a zero thinking key; omit it")
+        if thinking not in (0, 1):
+            raise SystemExit(f"habits: {key} thinking {thinking} is not 0 or 1")
+        if workout_sessions == 0 and "workouts" in day:
+            raise SystemExit(f"habits: {key} has a zero workouts key; omit it")
+        if workout_sessions < 0:
+            raise SystemExit(f"habits: {key} workouts {workout_sessions} is negative")
+    journal = load_json(JOURNAL) if JOURNAL.exists() else {}
     expected_rides = ride_counts(workouts)
+    expected_thinking = thinking_counts(journal)
+    expected_workouts = workout_code_counts(workouts)
     for key, n in expected_rides.items():
         got = int((days.get(key) or {}).get("rides") or 0)
         if got != n:
@@ -770,10 +854,26 @@ def check() -> None:
         got = int(day.get("rides") or 0)
         if got and expected_rides.get(key, 0) != got:
             raise SystemExit(f"habits: {key} rides {got} has no matching cycling workout")
+        got_t = int(day.get("thinking") or 0)
+        if got_t != expected_thinking.get(key, 0):
+            raise SystemExit(f"habits: {key} thinking {got_t} != {expected_thinking.get(key, 0)}")
+        got_w = int(day.get("workouts") or 0)
+        if got_w != expected_workouts.get(key, 0):
+            raise SystemExit(f"habits: {key} workouts {got_w} != {expected_workouts.get(key, 0)}")
+    for key, n in expected_thinking.items():
+        if int((days.get(key) or {}).get("thinking") or 0) != n:
+            raise SystemExit(f"habits: {key} is missing thinking {n}")
+    for key, n in expected_workouts.items():
+        if int((days.get(key) or {}).get("workouts") or 0) != n:
+            raise SystemExit(f"habits: {key} is missing workouts {n}")
     today = date.fromisoformat(cursor.get("through") or chicago_today().isoformat())
     start, _grid_start, _grid_end = window(today)
     longest = run = 0
     current = 0
+    year_total = 0
+    best_n = 0
+    best_day = ""
+    by_month: dict[str, int] = {}
     cursor_day = today
     # current streak ends today if today is active, else yesterday
     if not days.get(today.isoformat(), {}).get("total"):
@@ -785,12 +885,25 @@ def check() -> None:
             probe -= timedelta(days=1)
     day = start
     while day <= today:
-        if days.get(day.isoformat(), {}).get("total"):
+        n = int((days.get(day.isoformat()) or {}).get("total") or 0)
+        year_total += n
+        if n > 0:
             run += 1
             longest = max(longest, run)
+            mo = day.isoformat()[:7]
+            by_month[mo] = by_month.get(mo, 0) + n
+            if n > best_n or (n == best_n and day.isoformat() > best_day):
+                best_n = n
+                best_day = day.isoformat()
         else:
             run = 0
         day += timedelta(days=1)
+    best_mo = ""
+    best_mo_n = 0
+    for mo, n in by_month.items():
+        if n > best_mo_n or (n == best_mo_n and mo > best_mo):
+            best_mo = mo
+            best_mo_n = n
     total = sum(int(day["total"]) for day in days.values())
     wdays = workouts.get("days") or {}
     for key, day in wdays.items():
@@ -810,7 +923,8 @@ def check() -> None:
     n = assert_redirects()
     pages = f"{n} day urls redirect to /habits/"
     print(
-        f"habits: check ok. cursor active {len(days)}, total {total}, longest {longest}, current {current}; "
+        f"habits: check ok. cursor active {len(days)}, total {total}, year {year_total}, "
+        f"longest {longest}, current {current}, best month {best_mo} ({best_mo_n}), best day {best_day} ({best_n}); "
         f"workouts {len(wdays)} days; {pages}"
     )
 
