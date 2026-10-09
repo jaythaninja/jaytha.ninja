@@ -150,10 +150,11 @@ function minutesLevel(mins, edges){
   }
   return lv;
 }
+const SLEEP_STREAK = 70;
 function scoreLevel(score){
   if (score < 50) return 1;
-  if (score < 65) return 2;
-  if (score < 80) return 3;
+  if (score < 70) return 2;
+  if (score < 85) return 3;
   return 4;
 }
 function markGold(dates, days, today, min){
@@ -202,7 +203,7 @@ function computeSleepStats(days, start, today){
   for (let iso = start; iso <= today; iso = addDays(iso, 1)){
     const day = days[iso];
     const recorded = !!(day && Number.isFinite(day.score));
-    if (recorded && day.score >= 60){
+    if (recorded && day.score >= SLEEP_STREAK){
       run++;
       if (run > longest) longest = run;
     } else run = 0;
@@ -226,8 +227,8 @@ function computeSleepStats(days, start, today){
   });
   let current = 0;
   let cursorDay = days[today] ? today : addDays(today, -1);
-  if (days[cursorDay] && days[cursorDay].score >= 60){
-    while (days[cursorDay] && days[cursorDay].score >= 60){ current++; cursorDay = addDays(cursorDay, -1); }
+  if (days[cursorDay] && days[cursorDay].score >= SLEEP_STREAK){
+    while (days[cursorDay] && days[cursorDay].score >= SLEEP_STREAK){ current++; cursorDay = addDays(cursorDay, -1); }
   }
   const avg = n ? Math.round((sum / n) * 10) / 10 : 0;
   return {avg, longest, current, bestDay, bestScore, bestMo};
@@ -285,7 +286,7 @@ function daysOf(section, data){
       const row = raw[iso] || {};
       const score = Number(row.score);
       if (!Number.isFinite(score)) return;
-      days[iso] = {total: score >= 60 ? 1 : 0, score, asleep: Number(row.asleep_min) || 0};
+      days[iso] = {total: score >= SLEEP_STREAK ? 1 : 0, score, asleep: Number(row.asleep_min) || 0};
     });
     return days;
   }
