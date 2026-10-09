@@ -460,7 +460,7 @@ const fastNow = () => document.documentElement.dataset.mode === 'fast';
 let lines = [], wantNow = false;
 function finish(){
   if (state.done) return;
-  cursor.remove();
+  JayRain.introDone();
   state.done = true;
   JayRain.dump && JayRain.dump(false);
   JayRain.rendered && JayRain.rendered();

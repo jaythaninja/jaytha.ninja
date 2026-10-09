@@ -47,7 +47,7 @@ a:hover{color:var(--c)}
 .by a{color:var(--c)}
 .by a:hover,.by a:focus-visible{color:var(--c)}
 .today.nolyric .by{margin-top:0}   /* no lyric yet: the credit sits where the lyric goes */
-.by .cursor{margin-left:.35em}   /* the cursor stays for good, blinking after the credit */
+.by .cursor{margin-left:.35em}   /* while the credit is still typing */
 /* archive: static, quieter (smaller, dimmer), newest first (same as /quote-of-the-day/) */
 .archive{list-style:none;margin-top:96px}
 .archive li + li{margin-top:35.5px}   /* v1.55 (jay 2026.10.02): a little more room between posts, the same on all three daily pages: ~38px text to text on desktop, ~30px on phones (was ~28.5 / ~22.5px; margin 35.5 / 27.5px, was 26 / 20px) */
@@ -108,8 +108,8 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 <meta name="twitter:description" content="a song a day, straight from jay's playlist">
 <meta name="twitter:image" content="https://jaytha.ninja/og/song.png?d=2026-10-08">
 <meta name="twitter:image:alt" content="today's song of the day on jaytha.ninja: the album art, a lyric and the artist">
-<link rel="stylesheet" href="/assets/rain.css?v=1.97"><script src="/assets/rain.js?v=1.87"></script>
-<link rel="stylesheet" href="/assets/foot.css?v=1.97"><script src="/assets/foot.js?v=1.97" defer></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.99"><script src="/assets/rain.js?v=1.99"></script>
+<link rel="stylesheet" href="/assets/foot.css?v=1.97"><script src="/assets/foot.js?v=1.99" defer></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -259,7 +259,7 @@ window.__pageRain = rain; JayRain.register(rain, fast => { pace = fast ? 4 : 2; 
   () => { if (!ready || state.done || reduced || !fastNow()) return false; skipToEnd(); return true; });
 function finishUp(){
   if (state.done) return;
-  lines[lines.length - 1].el.appendChild(cursor);   // the cursor stays, blinking at the end (teal; orange at the faster pace)
+  JayRain.introDone();   // v1.99: the caret does not stay. the footer ninja pulses instead
   state.done = true; JayRain.dump(false); JayRain.rendered && JayRain.rendered(); JayRain.seen();
 }
 function complete(){   // the whole page at once (back navigation, bfcache, reduced motion)
