@@ -54,6 +54,20 @@ function shortDate(iso){
 function noteLine(n, iso){
   return shortDate(iso) + ': ' + n + ' ' + unitWord(n, 'note');
 }
+function sleepLine(iso, score, mins){
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return shortDate(iso) + ': score ' + score + ' · ' + h + 'h ' + String(m).padStart(2, '0') + 'm';
+}
+function labelCell(cell, text){
+  if (!text){
+    cell.removeAttribute('aria-label');
+    cell.removeAttribute('role');
+    return;
+  }
+  cell.setAttribute('role', 'img');
+  cell.setAttribute('aria-label', text);
+}
 const commas = n => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 function monthLabel(ym){
   if (!ym) return '—';
@@ -136,6 +150,12 @@ function minutesLevel(mins, edges){
   }
   return lv;
 }
+function scoreLevel(score){
+  if (score < 50) return 1;
+  if (score < 65) return 2;
+  if (score < 80) return 3;
+  return 4;
+}
 function markGold(dates, days, today, min){
   const gold = new Set();
   let run = [];
@@ -175,11 +195,56 @@ function computeStats(days, start, today, metric){
   }
   return {total, longest, current, bestDay, bestMo};
 }
+function computeSleepStats(days, start, today){
+  let sum = 0, n = 0, longest = 0, run = 0;
+  let bestScore = -1, bestDay = '';
+  const byMonth = {};
+  for (let iso = start; iso <= today; iso = addDays(iso, 1)){
+    const day = days[iso];
+    const recorded = !!(day && Number.isFinite(day.score));
+    if (recorded && day.score >= 60){
+      run++;
+      if (run > longest) longest = run;
+    } else run = 0;
+    if (!recorded) continue;
+    sum += day.score;
+    n++;
+    const mo = iso.slice(0, 7);
+    if (!byMonth[mo]) byMonth[mo] = {sum: 0, n: 0};
+    byMonth[mo].sum += day.score;
+    byMonth[mo].n++;
+    if (day.score > bestScore || (day.score === bestScore && iso > bestDay)){
+      bestScore = day.score; bestDay = iso;
+    }
+  }
+  let bestMo = '', bestAvg = -1;
+  Object.keys(byMonth).forEach(mo => {
+    const row = byMonth[mo];
+    if (row.n < 7) return;
+    const avg = row.sum / row.n;
+    if (avg > bestAvg || (avg === bestAvg && mo > bestMo)){ bestMo = mo; bestAvg = avg; }
+  });
+  let current = 0;
+  let cursorDay = days[today] ? today : addDays(today, -1);
+  if (days[cursorDay] && days[cursorDay].score >= 60){
+    while (days[cursorDay] && days[cursorDay].score >= 60){ current++; cursorDay = addDays(cursorDay, -1); }
+  }
+  const avg = n ? Math.round((sum / n) * 10) / 10 : 0;
+  return {avg, longest, current, bestDay, bestScore, bestMo};
+}
 function fillStats(section, s){
   const set = (k, v) => { const el = section.querySelector('[data-k="' + k + '"]'); if (el) el.textContent = v; };
   set('total', commas(s.total));
   set('month', s.bestMo ? monthLabel(s.bestMo) : '—');
   set('day', s.bestDay ? s.bestDay.replace(/-/g, '.') : '—');
+  set('longest', s.longest + 'd');
+  set('current', s.current + 'd');
+}
+function fillSleepStats(section, s){
+  const set = (k, v) => { const el = section.querySelector('[data-k="' + k + '"]'); if (el) el.textContent = v; };
+  set('total', String(s.avg));
+  set('month', s.bestMo ? monthLabel(s.bestMo) : '—');
+  set('day', s.bestDay ? s.bestScore + ' · ' + shortDate(s.bestDay) : '—');
   set('longest', s.longest + 'd');
   set('current', s.current + 'd');
 }
@@ -212,6 +277,18 @@ function daysOf(section, data){
     });
     return days;
   }
+  if (kind === 'sleep'){
+    const days = {};
+    const raw = (data && data.days) || {};
+    Object.keys(raw).forEach(iso => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
+      const row = raw[iso] || {};
+      const score = Number(row.score);
+      if (!Number.isFinite(score)) return;
+      days[iso] = {total: score >= 60 ? 1 : 0, score, asleep: Number(row.asleep_min) || 0};
+    });
+    return days;
+  }
   return (data && data.days) || {};
 }
 function apply(section, days, meta){
@@ -240,8 +317,15 @@ function apply(section, days, meta){
       const success = !!(day && day.success);
       const on = success && gold.has(iso);
       final.set(cell, {lv: success ? 4 : 0, gold: on, n});
-      if (inRange) cell.setAttribute('aria-label', shortDate(iso) + ': ' + (success ? 'zero caffeine' : 'caffeine'));
-      else cell.removeAttribute('aria-label');
+      if (inRange) labelCell(cell, shortDate(iso) + ': ' + (success ? 'zero caffeine' : 'caffeine'));
+      else labelCell(cell, '');
+      return;
+    }
+    if (kind === 'sleep'){
+      const recorded = !!(day && Number.isFinite(day.score));
+      const score = recorded ? day.score : 0;
+      final.set(cell, {lv: recorded ? scoreLevel(score) : 0, gold: recorded && gold.has(iso), n: score});
+      labelCell(cell, recorded ? sleepLine(iso, score, day.asleep) : '');
       return;
     }
     const minutes = metric === 'minutes' ? Math.round((day && day.minutes) || 0) : null;
@@ -249,9 +333,10 @@ function apply(section, days, meta){
       ? minutesLevel(minutes != null ? minutes : n, edges)
       : level(n, scale);
     final.set(cell, {lv, gold: gold.has(iso), n, minutes});
-    cell.setAttribute('aria-label', kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
+    labelCell(cell, kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
   });
-  fillStats(section, computeStats(days, start, today, metric));
+  if (kind === 'sleep') fillSleepStats(section, computeSleepStats(days, start, today));
+  else fillStats(section, computeStats(days, start, today, metric));
 }
 
 const today = chicagoToday();

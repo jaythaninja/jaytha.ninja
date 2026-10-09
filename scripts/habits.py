@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Rebuild the cursor habit graph. Day pages stay off unless HABITS_DAY_PAGES=1.
+"""Rebuild the cursor habit graph. Day pages stay redirects to /habits/.
 
-  python3 scripts/habits.py all      # fetch github, merge cursor-lines.json. day pages stay redirects
+  python3 scripts/habits.py all      # fetch github, merge cursor-lines.json. day urls stay redirects
   python3 scripts/habits.py fetch    # cursor.json only
-  python3 scripts/habits.py pages    # refresh ride counts. with HABITS_DAY_PAGES=1, write day routes
+  python3 scripts/habits.py pages    # refresh ride counts and keep the redirects
   python3 scripts/habits.py check    # schema only, no network
 
 Dates are America/Chicago. A day total is commits + pull requests opened + pull
@@ -38,11 +38,10 @@ HABITS = ROOT / "site" / "habits"
 TRACKERS = HABITS / "trackers.json"
 CURSOR = HABITS / "cursor.json"
 WORKOUTS = HABITS / "workouts.json"
+SLEEP = HABITS / "sleep.json"
 INDEX = HABITS / "index.html"
-DAY_TEMPLATE = Path(__file__).resolve().parent / "habits_day.html"
 TZ = ZoneInfo("America/Chicago")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-VER = "1.92"
 RIDE_FROM = "2026-01-01"
 # public workouts.json says "cycling". A raw Health/Strava row may still say the source type.
 RIDE_TYPES = {
@@ -537,41 +536,6 @@ def assert_pages(today: date) -> tuple[date, date]:
     return grid_start, end
 
 
-def write_pages(today: date) -> None:
-    _start, grid_start, _grid_end = window(today)
-    end = coverage_end(today)
-    if end < grid_start:
-        end = grid_start
-    template = DAY_TEMPLATE.read_text(encoding="utf-8")
-    keep: set[str] = set()
-    day = grid_start
-    # every grid day through today, plus any later day a habit file already stores
-    while day <= end:
-        key = day.isoformat()
-        keep.add(key)
-        folder = HABITS / key
-        folder.mkdir(parents=True, exist_ok=True)
-        html = (
-            template.replace("__DATE__", key)
-            .replace("__DOTS__", key.replace("-", "."))
-            .replace("__VER__", VER)
-        )
-        (folder / "index.html").write_text(html, encoding="utf-8")
-        day += timedelta(days=1)
-    removed = 0
-    for child in HABITS.iterdir():
-        if child.is_dir() and DATE_RE.fullmatch(child.name) and child.name not in keep:
-            for item in child.iterdir():
-                item.unlink()
-            child.rmdir()
-            removed += 1
-    stamp_coverage(end)
-    assert_pages(today)
-    print(
-        f"habits: wrote {len(keep)} day pages ({grid_start.isoformat()} … {end.isoformat()}), removed {removed}"
-    )
-
-
 def write_redirects() -> int:
     """Replace each published day page with a forward to /habits/. New dates are not added."""
     n = 0
@@ -759,6 +723,24 @@ def write_workouts(src: Path) -> dict:
     return data
 
 
+def check_sleep() -> None:
+    data = load_json(SLEEP)
+    days = data.get("days") or {}
+    if not isinstance(days, dict):
+        raise SystemExit("habits: sleep.json days must be an object")
+    for key, day in days.items():
+        if not DATE_RE.fullmatch(key):
+            raise SystemExit(f"habits: bad sleep date {key}")
+        if not isinstance(day, dict) or set(day) != {"score", "asleep_min"}:
+            raise SystemExit(f"habits: {key} sleep day must be score and asleep_min only")
+        score = day["score"]
+        mins = day["asleep_min"]
+        if isinstance(score, bool) or not isinstance(score, int) or not 0 <= score <= 100:
+            raise SystemExit(f"habits: {key} sleep score {score} is outside 0-100")
+        if isinstance(mins, bool) or not isinstance(mins, int) or mins < 0:
+            raise SystemExit(f"habits: {key} asleep_min {mins} is not a minute count")
+
+
 def check() -> None:
     cfg = load_json(TRACKERS)
     check_index(cfg)
@@ -824,13 +806,9 @@ def check() -> None:
             raise SystemExit(f"habits: {key} is an active day with no minutes")
         if key.startswith("2025-") or key[5:7] in {"04", "05"} and key.startswith("2026-"):
             raise SystemExit(f"habits: {key} falls in a real empty stretch and should not be in the file")
-    if day_pages_enabled():
-        page_today = chicago_today()
-        grid_start, page_end = assert_pages(page_today)
-        pages = f"day pages {grid_start.isoformat()} … {page_end.isoformat()}"
-    else:
-        n = assert_redirects()
-        pages = f"{n} day urls redirect to /habits/"
+    check_sleep()
+    n = assert_redirects()
+    pages = f"{n} day urls redirect to /habits/"
     print(
         f"habits: check ok. cursor active {len(days)}, total {total}, longest {longest}, current {current}; "
         f"workouts {len(wdays)} days; {pages}"
@@ -864,10 +842,7 @@ def main(argv: list[str]) -> None:
         check_index(cfg)
         publish_counts()
         refresh_rides()
-        if day_pages_enabled():
-            write_pages(today)
-        else:
-            write_redirects()
+        write_redirects()
     if cmd == "check" or cmd == "all":
         check()
 
