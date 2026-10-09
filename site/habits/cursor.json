@@ -2,8 +2,8 @@
   "id": "cursor",
   "label": "code",
   "timezone": "America/Chicago",
-  "generated": "2026-10-07T15:17:08Z",
-  "through": "2026-10-07",
+  "generated": "2026-10-09T14:14:29Z",
+  "through": "2026-10-09",
   "login": "jaythaninja",
   "repos": [
     "jaythaninja/jaytha.ninja",
@@ -325,10 +325,23 @@
       "prs_merged": 1
     },
     "2026-10-07": {
-      "total": 3,
-      "commits": 1,
-      "prs_opened": 1,
-      "prs_merged": 1
+      "total": 25,
+      "commits": 8,
+      "prs_opened": 9,
+      "prs_merged": 8
+    },
+    "2026-10-08": {
+      "total": 25,
+      "commits": 8,
+      "prs_opened": 8,
+      "prs_merged": 8,
+      "rides": 1
+    },
+    "2026-10-09": {
+      "total": 6,
+      "commits": 2,
+      "prs_opened": 2,
+      "prs_merged": 2
     }
   }
 }
