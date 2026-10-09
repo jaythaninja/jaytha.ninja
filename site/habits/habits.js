@@ -233,21 +233,35 @@ function computeSleepStats(days, start, today){
   const avg = n ? Math.round((sum / n) * 10) / 10 : 0;
   return {avg, longest, current, bestDay, bestScore, bestMo};
 }
+/* stats stay at the reserved placeholders until that tracker's cells colour in. */
+const pendingStats = new Map();
+function stashStats(section, payload){ pendingStats.set(section, payload); }
+function revealStats(section){
+  const payload = pendingStats.get(section);
+  if (!payload) return;
+  Object.keys(payload).forEach(k => {
+    const el = section.querySelector('[data-k="' + k + '"]');
+    if (el) el.textContent = payload[k];
+  });
+}
+function revealAllStats(){ $$('.tracker').forEach(revealStats); }
 function fillStats(section, s){
-  const set = (k, v) => { const el = section.querySelector('[data-k="' + k + '"]'); if (el) el.textContent = v; };
-  set('total', commas(s.total));
-  set('month', s.bestMo ? monthLabel(s.bestMo) : '—');
-  set('day', s.bestDay ? s.bestDay.replace(/-/g, '.') : '—');
-  set('longest', s.longest + 'd');
-  set('current', s.current + 'd');
+  stashStats(section, {
+    total: commas(s.total),
+    month: s.bestMo ? monthLabel(s.bestMo) : '—',
+    day: s.bestDay ? s.bestDay.replace(/-/g, '.') : '—',
+    longest: s.longest + 'd',
+    current: s.current + 'd'
+  });
 }
 function fillSleepStats(section, s){
-  const set = (k, v) => { const el = section.querySelector('[data-k="' + k + '"]'); if (el) el.textContent = v; };
-  set('total', String(s.avg));
-  set('month', s.bestMo ? monthLabel(s.bestMo) : '—');
-  set('day', s.bestDay ? s.bestScore + ' · ' + shortDate(s.bestDay) : '—');
-  set('longest', s.longest + 'd');
-  set('current', s.current + 'd');
+  stashStats(section, {
+    total: String(s.avg),
+    month: s.bestMo ? monthLabel(s.bestMo) : '—',
+    day: s.bestDay ? s.bestScore + ' · ' + shortDate(s.bestDay) : '—',
+    longest: s.longest + 'd',
+    current: s.current + 'd'
+  });
 }
 function paint(cell, lv, gold){
   cell.dataset.lv = String(lv);
@@ -425,19 +439,19 @@ function type(t, opt){
 }
 const wait = ms => new Promise(r => setTimeout(r, reduced ? 0 : ms / pace));
 
-function columnCells(i){
-  const out = [];
-  $$('.tracker').forEach(sec => {
-    const cells = sec.querySelectorAll('.cell');
-    for (let r = 0; r < 7; r++){ const cell = cells[i * 7 + r]; if (cell) out.push(cell); }
-  });
-  return out;
-}
-async function sweep(){
+/* one graph, left to right, same step as before: a hot flash, then the colour. */
+async function sweepSection(section){
   const columns = model.weeks.length;
+  const cells = section.querySelectorAll('.cell');
   for (let i = 0; i < columns; i++){
     if (skipped) return;
-    const live = columnCells(i).filter(c => { const f = final.get(c); return f && (f.lv > 0 || f.gold); });
+    const live = [];
+    for (let r = 0; r < 7; r++){
+      const cell = cells[i * 7 + r];
+      if (!cell) continue;
+      const f = final.get(cell);
+      if (f && (f.lv > 0 || f.gold)) live.push(cell);
+    }
     live.forEach(c => c.classList.add('hot'));
     await wait(18);
     if (skipped) return;
@@ -471,6 +485,7 @@ function complete(){
   current && current.stop();
   lines.forEach(t => render(t, t.n + TIMING.window, TIMING.window));
   paintAll();
+  revealAllStats();
   finish();
 }
 window.__pageRain = rain;
@@ -499,11 +514,41 @@ async function loadAll(){
   }));
 }
 const dataReady = loadAll();
+/* v2.00: the intro walks trackers.json, not a fixed list. a section with no matching id still plays, after those. */
+const orderReady = (async () => {
+  const have = $$('.tracker');
+  const byId = new Map(have.map(s => [s.dataset.id, s]));
+  let ids = [];
+  try {
+    const res = await fetch('/habits/trackers.json', {cache: 'no-cache'});
+    if (res.ok){
+      const data = await res.json();
+      ids = (data.trackers || []).map(t => t && t.id).filter(Boolean);
+    }
+  } catch (e) {}
+  const ordered = [], seen = new Set();
+  ids.forEach(id => {
+    const section = byId.get(id);
+    if (!section || seen.has(section)) return;
+    ordered.push(section);
+    seen.add(section);
+  });
+  have.forEach(section => { if (!seen.has(section)) ordered.push(section); });
+  return ordered;
+})();
 
 async function main(){
   await document.fonts.ready;
   await dataReady;
-  lines = $$('.tracker .kt').map(el => prepare(el, el.textContent));
+  const sections = await orderReady;
+  const steps = [];
+  sections.forEach(section => {
+    const el = section.querySelector('.kt');
+    if (!el) return;
+    const line = prepare(el, el.textContent);
+    lines.push(line);
+    steps.push({section, line});
+  });
   lines.forEach(t => render(t, 0, TIMING.window));
   cursor.remove();
   rain.build(); requestAnimationFrame(rain.frame);
@@ -512,15 +557,19 @@ async function main(){
   if (fastNow()) JayRain.dump(true);
   await wait(300);
   if (skipped) return;
-  for (let i = 0; i < lines.length; i++){
+  for (let i = 0; i < steps.length; i++){
+    const step = steps[i];
     state.head = 0;
-    current = type(lines[i], {speed: TIMING.kickerSpeed, window: TIMING.window});
+    current = type(step.line, {speed: TIMING.kickerSpeed, window: TIMING.window});
     await current;
     if (skipped) return;
-    if (i < lines.length - 1){ await wait(TIMING.afterKicker); if (skipped) return; }
+    /* same breath that used to sit between titles, now between a title and its own cells. */
+    await wait(TIMING.afterKicker);
+    if (skipped) return;
+    revealStats(step.section);
+    await sweepSection(step.section);
+    if (skipped) return;
   }
-  await sweep();
-  if (skipped) return;
   finish();
 }
 main();
