@@ -1,8 +1,9 @@
-/* v1.97 (jay 2026.10.09): the shared footer is the icon row only. the email signup stays on the homepage.
-   every other page has <footer class="foot"></footer> plus this script. it builds the cartoon ninja (a quiet link to /now/;
-   plain on /now/ itself) and the 8 icons. the row is the shared content column (foot.css): the ninja is flush
-   with the left edge and mail is flush with the right, spread evenly between. the footer's height is reserved,
-   so building the row moves nothing. colours follow the page states (--c / --f). */
+/* v1.99 (jay 2026.10.09): the shared footer is the icon row only. the email signup stays on the homepage.
+   every other page has <footer class="foot"></footer> plus this script. it builds the 8 icons and then the cartoon ninja
+   (a quiet link to /now/; plain on /now/ itself). the row is the shared content column (foot.css): X is flush
+   with the left edge and the ninja is flush with the right, spread evenly between. the footer's height is reserved,
+   so building the row moves nothing. colours follow the page states (--c / --f). when the intro finishes, rain.js
+   marks the page and the ninja pulses (rain.css). */
 (() => {
 const foot = document.querySelector('footer.foot');
 if (!foot || foot.dataset.built) return; foot.dataset.built = '1';
@@ -13,5 +14,5 @@ const esc = t => String(t).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', 
 const onNow = /^\/now\/?$/.test(location.pathname);
 const njItem = onNow ? `<li class="who"><span class="who-t">${NJ}</span></li>` : `<li class="who"><a class="who-t" href="/now/" aria-label="now">${NJ}</a></li>`;
 const icon = s => `<li><a href="${esc(s.href)}" aria-label="${esc(s.label)}" title="${esc(s.label)}"${/^https?:/.test(s.href) ? ' target="_blank" rel="noopener"' : ''}>${ICONS[s.icon] || ''}</a></li>`;
-foot.innerHTML = `<nav class="elsewhere" aria-label="elsewhere"><ul class="social">${njItem}${SOCIALS.map(icon).join('')}</ul></nav>`;
+foot.innerHTML = `<nav class="elsewhere" aria-label="elsewhere"><ul class="social">${SOCIALS.map(icon).join('')}${njItem}</ul></nav>`;
 })();
