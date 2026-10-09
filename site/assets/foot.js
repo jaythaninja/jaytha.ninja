@@ -1,6 +1,7 @@
-/* v1.83 (jay 2026.10.08): the shared footer is the icon row only. the email signup stays on the homepage.
+/* v1.97 (jay 2026.10.09): the shared footer is the icon row only. the email signup stays on the homepage.
    every other page has <footer class="foot"></footer> plus this script. it builds the cartoon ninja (a quiet link to /now/;
-   plain on /now/ itself) and the 8 icons, evenly spaced like the homepage's row. the footer's height is reserved in foot.css,
+   plain on /now/ itself) and the 8 icons. the row is the shared content column (foot.css): the ninja is flush
+   with the left edge and mail is flush with the right, spread evenly between. the footer's height is reserved,
    so building the row moves nothing. colours follow the page states (--c / --f). */
 (() => {
 const foot = document.querySelector('footer.foot');
@@ -13,15 +14,4 @@ const onNow = /^\/now\/?$/.test(location.pathname);
 const njItem = onNow ? `<li class="who"><span class="who-t">${NJ}</span></li>` : `<li class="who"><a class="who-t" href="/now/" aria-label="now">${NJ}</a></li>`;
 const icon = s => `<li><a href="${esc(s.href)}" aria-label="${esc(s.label)}" title="${esc(s.label)}"${/^https?:/.test(s.href) ? ' target="_blank" rel="noopener"' : ''}>${ICONS[s.icon] || ''}</a></li>`;
 foot.innerHTML = `<nav class="elsewhere" aria-label="elsewhere"><ul class="social">${njItem}${SOCIALS.map(icon).join('')}</ul></nav>`;
-const ul = foot.querySelector('.social');
-/* phones: the row spans the screen, equal gaps at both ends. wider: the row spans the footer column. */
-const fitRow = () => {
-  const items = [...ul.children], n = items.length; if (!n) return;
-  const gw = items.reduce((t, li) => { const e = li.querySelector('svg.ic') || li.querySelector('svg.nj'); return t + (e ? parseFloat(getComputedStyle(e).width) || 0 : 0); }, 0);
-  if (matchMedia('(max-width:760px)').matches){ const V = document.documentElement.clientWidth, s = Math.max(2, (V - gw)/(n + 1)); ul.style.marginLeft = '0px'; const x0 = ul.getBoundingClientRect().left;
-    ul.style.setProperty('--igap', s.toFixed(2) + 'px'); ul.style.marginLeft = (s - x0).toFixed(2) + 'px'; return; }
-  const W = foot.clientWidth; if (!W) return;
-  ul.style.marginLeft = ''; ul.style.setProperty('--igap', Math.max(2, (W - gw)/Math.max(1, n - 1)).toFixed(2) + 'px');
-};
-fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver) new ResizeObserver(fitRow).observe(foot); if (document.fonts) document.fonts.ready.then(fitRow);
 })();

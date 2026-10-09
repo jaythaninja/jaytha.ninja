@@ -21,7 +21,6 @@
   --bg:#000; --ink:#f6efe9; --ink-2:rgba(246,239,233,.72); --ink-3:rgba(246,239,233,.5);
   --orange:#FF4D1A; --teal:#1AADB3; --white:#fff;
   --mono:"JetBrains Mono","IBM Plex Mono",ui-monospace,monospace;
-  --left:max(64px,calc((100vw - 1312px)/2));
 }
 *{box-sizing:border-box;margin:0;padding:0;font-style:normal}
 html{background:var(--bg);touch-action:manipulation}   /* taps toggle typing speed (like the homepage), so no double-tap zoom */
@@ -35,7 +34,7 @@ a:hover{color:var(--c)}
 .scan{position:fixed;inset:0;z-index:30;pointer-events:none;background:repeating-linear-gradient(to bottom,rgba(235,250,250,.026) 0 1px,rgba(0,0,0,0) 1px 3px);mix-blend-mode:screen;-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 20%,#000 80%,transparent 100%)}
 
 .stage{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:clamp(48px,8vh,96px) 0 clamp(56px,9vh,100px)}   /* centered while short; once the archive is long the page just scrolls */
-.copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:20px;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
+.copy{margin-left:var(--left);width:var(--col);font-size:20px;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
 .home{display:inline-block;margin:0 0 30px;font-size:14px;line-height:1.5;color:var(--c);letter-spacing:.02em}   /* the way back: brand orange like every link (round 22); teal on hover */
 .home:hover,.home:focus-visible{color:var(--c)}
 .kicker{font-size:21px;line-height:1.4;color:var(--c)}
@@ -62,7 +61,6 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 @media (max-width:760px){
   /* same mobile rhythm as the homepage (fits one iphone 17 screen in ios 26 safari, 402x718 visible) */
   .stage{padding:24px 0 22px}
-  .copy{margin-left:24px;width:calc(100vw - 48px)}
   .home{margin-bottom:22px;font-size:13px}
   .kicker{font-size:17px}
   .today{margin-top:14px}
@@ -97,8 +95,8 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 <meta name="twitter:description" content="jay's day, in his own words">
 <meta name="twitter:image" content="https://jaytha.ninja/og-image.png">
 <meta name="twitter:image:alt" content="jaytha.ninja: a human building something human, with a little help from his 🤖 team">
-<link rel="stylesheet" href="/assets/rain.css?v=1.87"><script src="/assets/rain.js?v=1.87"></script>
-<link rel="stylesheet" href="/assets/foot.css?v=1.87"><script src="/assets/foot.js?v=1.87" defer></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.97"><script src="/assets/rain.js?v=1.87"></script>
+<link rel="stylesheet" href="/assets/foot.css?v=1.97"><script src="/assets/foot.js?v=1.97" defer></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
