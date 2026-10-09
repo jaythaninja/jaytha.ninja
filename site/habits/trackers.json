@@ -41,6 +41,15 @@
       "sources": []
     },
     {
+      "id": "sleep",
+      "label": "sleep",
+      "enabled": true,
+      "unit": "night",
+      "kind": "sleep",
+      "data": "/habits/sleep.json",
+      "sources": []
+    },
+    {
       "id": "caffeine",
       "label": "caffeine",
       "enabled": true,
