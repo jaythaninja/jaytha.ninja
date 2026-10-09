@@ -104,3 +104,5 @@ v1.93: sleep is the fifth graph, under caffeine. The cell is the 0–100 score i
 v1.94: sleep sits above caffeine. The column is code, workouts, journal, sleep, caffeine, with the same `--habit-gap` between them. A past night with no sleep record keeps the empty gray cell and is named `oct 3: no record`. `habits.css` and `habits.js` are `?v=1.94`.
 
 v1.95: workouts include 2026-10-07 (one 32-minute row) and 2026-10-08 (one 64-minute ride). The ride is one code session on that day. The public files stay per-day counts. `habits.css` and `habits.js` are `?v=1.95`.
+
+v1.96: on a desktop the homepage social row and the konami row span the content column. The ninja and the up glyph sit on the text's left edge. The mail icon and `start` sit on the rocket's right edge. The items spread evenly between those edges. The prompt caret stays out of that flex line. A phone keeps the viewport fit it already had. The rules are in `site/index.html`.
