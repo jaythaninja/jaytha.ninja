@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-intro="on">
 <head>
 <meta charset="utf-8">
 <!-- v1.65 (jay 2026.10.03): google analytics 4 (G-G8DYYL3KYM). async, never blocks the page or the intro. page_location is read here, before rain.js takes ?ref= out of the address bar; any email-looking query value is dropped (no PII) -->
@@ -105,8 +105,8 @@ a:focus-visible{outline:2px solid var(--c);outline-offset:2px}
 <meta name="twitter:description" content="one photo a day, from jay">
 <meta name="twitter:image" content="https://jaytha.ninja/og/snap.png?d=2026-10-08">
 <meta name="twitter:image:alt" content="today's snap of the day on jaytha.ninja: one photo from jay">
-<link rel="stylesheet" href="/assets/rain.css?v=1.97"><script src="/assets/rain.js?v=1.87"></script>
-<link rel="stylesheet" href="/assets/foot.css?v=1.97"><script src="/assets/foot.js?v=1.97" defer></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.99"><script src="/assets/rain.js?v=1.99"></script>
+<link rel="stylesheet" href="/assets/foot.css?v=1.97"><script src="/assets/foot.js?v=1.99" defer></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -249,7 +249,7 @@ const showShot = now => { if (!shot) return; const im = shot.querySelector('img'
 function finishUp(){
   if (state.done) return;
   showShot(false);
-  lines[lines.length - 1].el.appendChild(cursor);   // the cursor stays, blinking at the end (teal; orange at the faster pace)
+  JayRain.introDone();   // v1.99: the caret does not stay. the footer ninja pulses instead
   state.done = true; JayRain.dump(false); JayRain.rendered && JayRain.rendered(); JayRain.seen();
 }
 function complete(){   // the whole page at once (back navigation, bfcache, reduced motion)

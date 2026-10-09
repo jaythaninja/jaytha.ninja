@@ -256,6 +256,8 @@ function Rain(cv, o){
   const dayLoop=()=>{dayCheck();clearTimeout(dayT);dayT=setTimeout(dayLoop,Math.max(200,Math.min(toMidnight()+150,60000)))};
   dayLoop();document.addEventListener('visibilitychange',()=>{if(!document.hidden)dayCheck()});addEventListener('pageshow',e=>{if(e.persisted)dayCheck()});
   const newDay=cb=>{dayCb=cb||null};
-  window.JayRain={Rain,register,mode,dump,rendered:markRendered,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock,day:ctDay,newDay,ref};
+  // v1.99 (jay 2026.10.09): the intro's resting caret goes away. the ninja (last in the social row) takes that pulse. pages call this from the same place they used to park the caret.
+  const introDone=()=>{document.querySelectorAll('.cursor').forEach(el=>el.remove());document.documentElement.classList.add('intro-done')};
+  window.JayRain={Rain,register,mode,dump,rendered:markRendered,smooth:sm,returning,seen,burst,gold,goldOff,golden:()=>auLock,day:ctDay,newDay,ref,introDone};
   if(document.readyState!=='loading')boot();else addEventListener('DOMContentLoaded',boot,{once:true});
 })();
