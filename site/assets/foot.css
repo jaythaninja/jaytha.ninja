@@ -1,12 +1,13 @@
 /* v1.67 (jay 2026.10.03): the shared footer. v1.83: the email signup stays on the homepage. every other page's footer is the icon row only.
    the empty footer already has the row's height (padding + the 48px row, 40px on a phone), so building it moves nothing.
    everything below the footer box rules is the homepage's own css, copied by tools/build_foot.py. the homepage still uses those rules for its own signup. */
-.foot{--fs:18px;--pgap:32px;--su:29px;--sec-a:0px;--k:.9167;--kx:.8;--ich:48px;--igap:12px;
-  position:relative;z-index:2;margin-left:var(--left);width:min(72ch,calc(100vw - var(--left) - 24px));padding:12px 0 clamp(56px,9vh,100px);min-height:calc(60px + clamp(56px,9vh,100px));font-size:var(--fs);line-height:1.5;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
+.foot{--fs:18px;--pgap:32px;--su:29px;--sec-a:0px;--k:.9167;--kx:.8;--ich:48px;--igap:0px;
+  position:relative;z-index:2;margin-left:var(--left);width:var(--col);padding:12px 0 clamp(56px,9vh,100px);min-height:calc(60px + clamp(56px,9vh,100px));font-size:var(--fs);line-height:1.5;text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
+.foot .social{width:100%;justify-content:space-between;gap:0}
 .foot .social li{opacity:1}
 .foot .elsewhere{margin-top:0}
 @media (max-width:760px){
-  .foot{--fs:14px;--pgap:20px;--k:.8333;--kx:.7143;--ich:40px;margin-left:24px;width:calc(100vw - 48px);padding-bottom:22px;min-height:74px}
+  .foot{--fs:14px;--pgap:20px;--k:.8333;--kx:.7143;--ich:40px;padding-bottom:22px;min-height:74px}
 }
 /* ---- the homepage's css (generated, don't edit here: edit the homepage + re-run tools/build_foot.py) ---- */
 .prompt .teal{color:var(--c);white-space:nowrap}

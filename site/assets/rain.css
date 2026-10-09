@@ -44,6 +44,12 @@ html.au-snap,html.au-snap *,html.au-snap *::before,html.au-snap *::after{transit
 /* v1.78: "tap screen for speed +". no chevrons. the colour is the current speed colour (--c), so a speed tap and the light theme recolour it with everything else. 22ch is the sentence, reserved before the words are written, so the corner does not grow. readable, still small.
    v1.82: phones only. 11px, and 6px under the safe area (was 13px and 11px), so the hint clears the date. the 22ch box stays. desktop is unchanged.
    v1.83: the hint sits above the scan overlay (z-index 30), which fades over the top and bottom 20% of the page. that fade stays on the rain, the glows, and the scan lines. on a phone the hint is solid (was opacity .92 with an 8px text-shadow), so the glyphs are not washed by that shadow. position and size stay at the v1.82 values. */
+/* v1.97 (jay 2026.10.09): one content column on every page. --left is the left inset, --edge the right inset, --col the width.
+   desktop is the homepage measure (72ch at 18px = 777.6px) and stays inside the viewport. a phone is 24px on each side.
+   a page's main column, the habits grids, the footer, and the homepage icon rows all use margin-left:var(--left) and width:var(--col). */
+:root{--left:max(64px,calc((100vw - 1312px)/2));--edge:24px;--col:min(777.6px,calc(100vw - var(--left) - var(--edge)))}
+@media (max-width:760px){:root{--left:24px;--edge:24px;--col:calc(100vw - var(--left) - var(--edge))}}
+
 .tap-hint{position:fixed;z-index:31;top:11px;right:14px;display:flex;align-items:center;color:var(--c);font-size:13px;font-weight:500;line-height:1;white-space:nowrap;opacity:0;transform:translateY(-4px);pointer-events:none;text-shadow:0 0 8px var(--bg);transition:color .25s ease,opacity .7s ease,transform .7s ease}
 .tap-hint.ready,.tap-hint.settled{opacity:.92;transform:none}
 .speed-label{display:block;min-width:22ch}

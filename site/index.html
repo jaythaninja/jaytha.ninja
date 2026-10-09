@@ -18,7 +18,6 @@
   --bg:#000; --ink:#f6efe9; --ink-2:rgba(246,239,233,.72); --ink-3:rgba(246,239,233,.5);
   --orange:#FF4D1A; --teal:#1AADB3; --white:#fff;
   --mono:"JetBrains Mono","IBM Plex Mono",ui-monospace,monospace;
-  --left:max(64px,calc((100vw - 1312px)/2));
 }
 *{box-sizing:border-box;margin:0;padding:0;font-style:normal}
 html{background:var(--bg);touch-action:manipulation}
@@ -34,7 +33,7 @@ a:hover{color:var(--c)}
 .stage{position:relative;z-index:2;min-height:100vh;min-height:100svh;display:flex;align-items:center;padding:clamp(48px,8vh,96px) 0 clamp(56px,9vh,100px)}
 :root{--fs:18px}
 @media (max-width:760px){:root{--fs:14px}}
-.copy{margin-left:var(--left);width:min(60ch,calc(100vw - 48px));font-size:var(--fs);text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
+.copy{margin-left:var(--left);width:var(--col);font-size:var(--fs);text-shadow:0 0 8px rgba(var(--bg-rgb),.8)}
 .hello{font-size:21px;line-height:1.4;color:var(--c)}
 :root{--pgap:32px;--sec-a:31.5px;--sec-b:119.5px}
 @media (max-width:760px){:root{--pgap:20px;--sec-a:18px;--sec-b:72.5px}}
@@ -44,7 +43,6 @@ a:hover{color:var(--c)}
 .ns-links{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:var(--fs);line-height:1.5}.ns-links a{color:var(--f)}
 .para{font-size:var(--fs);line-height:1.7;color:var(--white);white-space:pre-line}
 .para + .para{margin-top:var(--pgap)}
-@media (min-width:761px){.copy{width:min(72ch,calc(100vw - var(--left) - 24px))}}
 .para a{white-space:nowrap}
 .para .bold{font-weight:700;color:var(--white)}
 .para .teal,.prompt .teal{color:var(--c);white-space:nowrap}
@@ -104,7 +102,7 @@ a:hover{color:var(--c)}
 .cursor{display:inline-block;width:.58em;height:1.08em;vertical-align:-.2em;margin-left:.08em;margin-right:-.66em;background:var(--c);box-shadow:0 0 14px rgba(var(--c-rgb),.75);animation:blink 1.05s infinite}
 @keyframes blink{0%,49%{opacity:1}50%,100%{opacity:0}}
 
-:root{--k:.9167;--kx:.8;--ich:48px;--igap:12px}
+:root{--k:.9167;--kx:.8;--ich:48px;--igap:0px}
 @media (max-width:760px){:root{--k:.8333;--kx:.7143;--ich:40px}}
 .social{display:flex;flex-wrap:nowrap;align-items:center;gap:0 var(--igap);list-style:none;min-height:var(--ich)}
 .social li:not(.cur){flex:none;display:flex;align-items:center;height:var(--ich)}
@@ -136,13 +134,11 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .social.fade{animation:egg-fade 1.4s ease-out both}
 .social li.cur{display:flex;align-items:center;height:var(--ich);pointer-events:none;flex:none;width:0;min-width:0;margin-left:calc(-1*var(--igap));white-space:nowrap}
 .social li.cur .cursor{margin:0 0 0 var(--igap);vertical-align:0;flex:none}
-/* v1.96 (jay 2026.10.09): desktop rows share the content column. ninja and up sit on the text's
-   left edge; mail and start sit on the rocket's right edge; the items spread evenly between.
-   the prompt caret is out of the flex line so it does not pull mail in. a phone keeps its viewport fit. */
-@media (min-width:761px){
-  .social{position:relative;justify-content:space-between}
-  .social li.cur{position:absolute;top:0;height:100%;width:auto;margin-left:0}
-}
+/* v1.97 (jay 2026.10.09): the social row and the konami row are the shared content column on every width.
+   ninja and up sit on the left edge; mail and start sit on the right edge; the items spread evenly between.
+   the prompt caret is out of the flex line so it does not pull mail in. */
+.social{position:relative;justify-content:space-between;gap:0}
+.social li.cur{position:absolute;top:0;height:100%;width:auto;margin-left:0}
 .egg{margin-top:52px;font-size:var(--fs);line-height:1.5;font-weight:400;color:var(--c);text-shadow:0 0 12px rgba(var(--c-rgb),.6);visibility:hidden}
 .egg.on{visibility:visible}
 .egg p{margin:0}.egg p + p{margin-top:4px}
@@ -178,7 +174,6 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 
 @media (max-width:760px){
   .stage{padding:22px 0 18px}
-  .copy{margin-left:24px;width:calc(100vw - 48px)}
   .hello{font-size:17px}
   .paras{margin-top:0}
   .para{font-size:var(--fs);line-height:1.7}
@@ -463,7 +458,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 <meta name="twitter:image" content="https://jaytha.ninja/og/home.png?d=2026-10-08">
 <meta name="twitter:image:alt" content="the intro on jaytha.ninja: the internet was a place to make genuine connections with other humans, somewhere along the way, we messed up, my team and i hope to run it back">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "jay", "url": "https://jaytha.ninja/", "sameAs": ["https://x.com/jaythaninja", "https://www.instagram.com/jaythaninja", "https://www.threads.com/jaythaninja", "https://github.com/jaythaninja", "https://www.strava.com/athletes/64153021", "https://www.linkedin.com/in/jaythaninja"]}</script>
-<link rel="stylesheet" href="/assets/rain.css?v=1.87"><script src="/assets/rain.js?v=1.87"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=1.97"><script src="/assets/rain.js?v=1.87"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -925,11 +920,10 @@ const placeCable = () => {
   const len = flowP.getTotalLength && flowP.getTotalLength(); if (len) form.style.setProperty('--cbl-s', (100*(xs - x0)/len).toFixed(2));
   window.__cable = {x0: Math.round(x0), a: Math.round(a), b: Math.round(b), xs: Math.round(xs), port: [Math.round(xp), Math.round(yp)]};
 };
-/* v1.96: desktop spread is space-between across the column (the rocket's right edge). --igap stays 0
-   there so the flex gap does not stack on top of that. the phone branch is the viewport fit, unchanged. */
+/* v1.97: the row is the content column (space-between in the stylesheet). this only parks the
+   prompt caret beside the mail icon, out of the flex line, and keeps the konami row on those edges. */
 const anchorCursor = () => {
-  const desk = matchMedia('(min-width:761px)').matches, caret = curLi.querySelector('.cursor');
-  if (!desk){ ['position','left','right','top','height','marginLeft','width'].forEach(p => { curLi.style[p] = ''; }); if (caret) caret.style.margin = ''; return; }
+  const caret = curLi.querySelector('.cursor');
   curLi.style.position = 'absolute'; curLi.style.top = '0'; curLi.style.height = '100%'; curLi.style.marginLeft = '0'; curLi.style.width = 'auto'; curLi.style.right = 'auto';
   if (caret) caret.style.margin = '0 0 0 .08em';
   const prev = curLi.previousElementSibling, ulBox = ul.getBoundingClientRect();
@@ -937,13 +931,8 @@ const anchorCursor = () => {
   const left = prev ? prev.getBoundingClientRect().right - ulBox.left + fs*.08 : 0;
   curLi.style.left = left.toFixed(2) + 'px';
 };
-const fitRow = () => { const W = emailIn.getBoundingClientRect().width; if (!W) return;
-  const items = [...ul.children].filter(li => li !== curLi), n = items.length;
-  const gw = items.reduce((t, li) => { const e = li.querySelector('svg.ic') || li.querySelector('svg.nj'); return t + (e ? (e.matches('svg') ? parseFloat(getComputedStyle(e).width) || 0 : e.offsetWidth) : 0); }, 0);
-  const cw = .58*parseFloat(getComputedStyle(curLi).fontSize);
-  if (matchMedia('(max-width:760px)').matches){ const V = document.documentElement.clientWidth, s = Math.max(2, (V - gw - cw)/(n + 2)); ul.style.marginLeft = '0px'; const x0 = ul.getBoundingClientRect().left;
-    ul.style.setProperty('--igap', s.toFixed(2) + 'px'); ul.style.marginLeft = (s - x0).toFixed(2) + 'px'; }
-  else { ul.style.marginLeft = ''; ul.style.setProperty('--igap', '0px'); }
+const fitRow = () => {
+  ul.style.marginLeft = ''; ul.style.setProperty('--igap', '0px');
   anchorCursor(); syncPad(); };
 fitRow(); addEventListener('resize', fitRow); if (window.ResizeObserver){ const ro = new ResizeObserver(fitRow); ro.observe(form); const wt = ul.querySelector('svg.nj'); if (wt) ro.observe(wt); } if (document.fonts) document.fonts.ready.then(fitRow);
 /* v1.72 (jay 2026.10.05): konami. buttons need up up down down left right left right b a start.
@@ -981,27 +970,9 @@ const haptic = (() => {
   };
 })();
 function syncPad(){
-  const pad = document.querySelector('.pad'); if (!pad || !ul.offsetWidth) return;
-  /* v1.96: on a desktop the row is already the content column, whose right edge is the rocket. */
-  if (matchMedia('(min-width:761px)').matches){ pad.style.width = ''; pad.style.marginLeft = ''; pad.style.marginRight = ''; return; }
-  const ninja = ul.querySelector('svg.nj'), caret = curLi.querySelector('.cursor');
-  if (!ninja || !caret) return;
-  const parent = pad.parentElement;
-  const unscaled = el => {
-    const a = el.getBoundingClientRect();
-    let s = 1, n = el.parentElement;
-    while (n && n !== parent){
-      const t = getComputedStyle(n).transform;
-      if (t && t !== 'none'){ const m = new DOMMatrix(t); if (m.a) s *= m.a; }
-      n = n.parentElement;
-    }
-    const mid = (a.left + a.right) / 2, half = (a.width / 2) / (s || 1);
-    return {left: mid - half, right: mid + half};
-  };
-  const nl = unscaled(ninja), cr = unscaled(caret), pr = parent.getBoundingClientRect();
-  pad.style.width = (cr.right - nl.left) + 'px';
-  pad.style.marginLeft = (nl.left - pr.left) + 'px';
-  pad.style.marginRight = '0px';
+  const pad = document.querySelector('.pad'); if (!pad) return;
+  /* v1.97: the row is the content column in the stylesheet. clear any leftover inline size. */
+  pad.style.width = ''; pad.style.marginLeft = ''; pad.style.marginRight = '';
 }
 function goldNow(){
   const pad = document.querySelector('.pad');
