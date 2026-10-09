@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
-"""Rebuild the cursor habit graph and the /habits/YYYY-MM-DD/ pages.
+"""Rebuild the cursor habit graph. Day pages stay off unless HABITS_DAY_PAGES=1.
 
-  python3 scripts/habits.py all      # fetch github, merge cursor-lines.json, write day pages
+  python3 scripts/habits.py all      # fetch github, merge cursor-lines.json. day pages stay redirects
   python3 scripts/habits.py fetch    # cursor.json only
-  python3 scripts/habits.py pages    # day routes from the json already on disk, through today and the latest habit date
+  python3 scripts/habits.py pages    # refresh ride counts. with HABITS_DAY_PAGES=1, write day routes
   python3 scripts/habits.py check    # schema only, no network
 
 Dates are America/Chicago. A day total is commits + pull requests opened + pull
@@ -42,7 +42,7 @@ INDEX = HABITS / "index.html"
 DAY_TEMPLATE = Path(__file__).resolve().parent / "habits_day.html"
 TZ = ZoneInfo("America/Chicago")
 DATE_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
-VER = "1.91"
+VER = "1.92"
 RIDE_FROM = "2026-01-01"
 # public workouts.json says "cycling". A raw Health/Strava row may still say the source type.
 RIDE_TYPES = {
@@ -51,6 +51,11 @@ RIDE_TYPES = {
     "hkworkoutactivitytypecycling",
     "strava:ride",
 }
+
+
+def day_pages_enabled() -> bool:
+    """Public day pages. Off unless HABITS_DAY_PAGES is 1, true, or yes."""
+    return os.environ.get("HABITS_DAY_PAGES", "").strip().lower() in {"1", "true", "yes"}
 
 
 def chicago_today() -> date:
@@ -152,7 +157,11 @@ def ride_counts(workouts: dict | None = None) -> dict[str, int]:
     for day_key, day in (workouts.get("days") or {}).items():
         if not DATE_RE.fullmatch(str(day_key)) or day_key < RIDE_FROM:
             continue
-        n = sum(1 for item in (day.get("items") or []) if isinstance(item, dict) and is_cycling(item))
+        # items are the day-page list. once those are unpublished, the day's rides count is enough.
+        if "items" in day:
+            n = sum(1 for item in (day.get("items") or []) if isinstance(item, dict) and is_cycling(item))
+        else:
+            n = int(day.get("rides") or 0)
         if n:
             counts[str(day_key)] = n
     return counts
@@ -173,7 +182,8 @@ def compose_day(day: dict, rides: int) -> dict:
         out["ai_lines"] = ai
     if rides > 0:
         out["rides"] = rides
-    out["items"] = day.get("items") or []
+    if day_pages_enabled():
+        out["items"] = day.get("items") or []
     return out
 
 
@@ -477,6 +487,34 @@ def stamp_coverage(end: date) -> None:
     INDEX.write_text(html, encoding="utf-8")
 
 
+def clear_coverage() -> None:
+    html = INDEX.read_text(encoding="utf-8")
+    html = re.sub(r'\s*data-pages-through="\d{4}-\d{2}-\d{2}"', "", html, count=1)
+    INDEX.write_text(html, encoding="utf-8")
+
+
+REDIRECT_STUB = """<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>habits · jay tha ninja</title>
+<!-- v1.92 (jay 2026.10.09): /habits/YYYY-MM-DD/ forwards to /habits/. location.replace keeps ?query and #hash, and the stub never sits in the back history. -->
+<script>location.replace("/habits/" + location.search + location.hash)</script>
+<meta http-equiv="refresh" content="0; url=/habits/">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#000000">
+<meta name="color-scheme" content="dark">
+<link rel="canonical" href="https://jaytha.ninja/habits/">
+<style>html,body{margin:0;background:#000;color:#f6efe9}body{font:16px/1.5 "JetBrains Mono",ui-monospace,monospace;padding:24px}a{color:#FF4D1A;text-decoration:none}</style>
+</head>
+<body>
+<p><a href="/habits/">habits → jaytha.ninja/habits/</a></p>
+</body>
+</html>
+"""
+
+
 def assert_pages(today: date) -> tuple[date, date]:
     _start, grid_start, _grid_end = window(today)
     end = coverage_end(today)
@@ -532,6 +570,59 @@ def write_pages(today: date) -> None:
     print(
         f"habits: wrote {len(keep)} day pages ({grid_start.isoformat()} … {end.isoformat()}), removed {removed}"
     )
+
+
+def write_redirects() -> int:
+    """Replace each published day page with a forward to /habits/. New dates are not added."""
+    n = 0
+    for child in sorted(HABITS.iterdir()):
+        if not child.is_dir() or not DATE_RE.fullmatch(child.name):
+            continue
+        (child / "index.html").write_text(REDIRECT_STUB, encoding="utf-8")
+        n += 1
+    clear_coverage()
+    print(f"habits: day pages off; {n} old dates redirect to /habits/")
+    return n
+
+
+def assert_redirects() -> int:
+    html = INDEX.read_text(encoding="utf-8")
+    if 'data-pages-through="' in html:
+        raise SystemExit("habits: data-pages-through is set while day pages are off")
+    n = 0
+    for child in HABITS.iterdir():
+        if not child.is_dir() or not DATE_RE.fullmatch(child.name):
+            continue
+        page = child / "index.html"
+        if not page.is_file():
+            raise SystemExit(f"habits: {child.name} has no redirect")
+        text = page.read_text(encoding="utf-8")
+        if 'location.replace("/habits/"' not in text or "day.js" in text:
+            raise SystemExit(f"habits: {child.name} is not a redirect to /habits/")
+        n += 1
+    if n == 0:
+        raise SystemExit("habits: no day-page redirects under site/habits")
+    return n
+
+
+def publish_counts() -> None:
+    """Drop day-page detail from the public files. Grids keep the day's counts."""
+    if day_pages_enabled() or not WORKOUTS.exists():
+        return
+    workouts = load_json(WORKOUTS)
+    for day in (workouts.get("days") or {}).values():
+        if not isinstance(day, dict):
+            continue
+        if "items" in day:
+            rides = sum(1 for item in (day.get("items") or []) if isinstance(item, dict) and is_cycling(item))
+            day.pop("items", None)
+        else:
+            rides = int(day.get("rides") or 0)
+        if rides:
+            day["rides"] = rides
+        else:
+            day.pop("rides", None)
+    dump_json(WORKOUTS, workouts)
 
 
 def _num(value):
@@ -612,7 +703,13 @@ def write_workouts(src: Path) -> dict:
         rows = sorted(grouped[day_key], key=lambda row: row.get("start") or "")
         items = [slim_workout(row) for row in rows]
         minutes = int(round(sum(float(row.get("duration_min") or 0) for row in rows)))
-        days[day_key] = {"total": len(items), "minutes": minutes, "items": items}
+        rides = sum(1 for item in items if is_cycling(item))
+        entry = {"total": len(items), "minutes": minutes}
+        if rides:
+            entry["rides"] = rides
+        if day_pages_enabled():
+            entry["items"] = items
+        days[day_key] = entry
     edges = [45, 90, 150]
     counts = [0, 0, 0, 0]
     for day in days.values():
@@ -717,18 +814,26 @@ def check() -> None:
     for key, day in wdays.items():
         if not DATE_RE.fullmatch(key):
             raise SystemExit(f"habits: bad workout date {key}")
-        items = day.get("items") or []
-        if int(day["total"]) != len(items):
+        items = day.get("items")
+        if items is None:
+            if day_pages_enabled():
+                raise SystemExit(f"habits: {key} is missing workout items")
+        elif int(day["total"]) != len(items):
             raise SystemExit(f"habits: {key} workout total {day['total']} != {len(items)} items")
         if int(day.get("minutes") or 0) <= 0:
             raise SystemExit(f"habits: {key} is an active day with no minutes")
         if key.startswith("2025-") or key[5:7] in {"04", "05"} and key.startswith("2026-"):
             raise SystemExit(f"habits: {key} falls in a real empty stretch and should not be in the file")
-    page_today = chicago_today()
-    grid_start, page_end = assert_pages(page_today)
+    if day_pages_enabled():
+        page_today = chicago_today()
+        grid_start, page_end = assert_pages(page_today)
+        pages = f"day pages {grid_start.isoformat()} … {page_end.isoformat()}"
+    else:
+        n = assert_redirects()
+        pages = f"{n} day urls redirect to /habits/"
     print(
         f"habits: check ok. cursor active {len(days)}, total {total}, longest {longest}, current {current}; "
-        f"workouts {len(wdays)} days; day pages {grid_start.isoformat()} … {page_end.isoformat()}"
+        f"workouts {len(wdays)} days; {pages}"
     )
 
 
@@ -757,8 +862,12 @@ def main(argv: list[str]) -> None:
                 raise SystemExit(1) from err
     if cmd in {"all", "pages"}:
         check_index(cfg)
+        publish_counts()
         refresh_rides()
-        write_pages(today)
+        if day_pages_enabled():
+            write_pages(today)
+        else:
+            write_redirects()
     if cmd == "check" or cmd == "all":
         check()
 
