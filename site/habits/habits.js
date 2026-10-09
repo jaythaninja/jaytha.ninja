@@ -326,7 +326,7 @@ function apply(section, days, meta){
       const recorded = !!(day && Number.isFinite(day.score));
       const score = recorded ? day.score : 0;
       final.set(cell, {lv: recorded ? scoreLevel(score) : 0, gold: recorded && gold.has(iso), n: score});
-      labelCell(cell, recorded ? sleepLine(iso, score, day.asleep) : '');
+      labelCell(cell, recorded ? sleepLine(iso, score, day.asleep) : shortDate(iso) + ': no record');
       return;
     }
     const minutes = metric === 'minutes' ? Math.round((day && day.minutes) || 0) : null;
