@@ -102,3 +102,5 @@ v1.92: grid cells are not links. Hover or tap still shows the date and the quant
 v1.93: sleep is the fifth graph, under caffeine. The cell is the 0–100 score in the speed colour (under 50, 50–69, 70–84, 85+). A night with no record is the empty gray cell. Hover is the date, the score, and the time asleep (`oct 8: score 99 · 5h 09m`). The stats are the year average, the best month (highest average among months with at least 7 nights), the best night (score and date), and streaks of nights scoring 70 or more. Ten in a row is gold. Past cells carry `role="img"` and an accessible name. `habits.css` and `habits.js` are `?v=1.93`.
 
 v1.94: sleep sits above caffeine. The column is code, workouts, journal, sleep, caffeine, with the same `--habit-gap` between them. A past night with no sleep record keeps the empty gray cell and is named `oct 3: no record`. `habits.css` and `habits.js` are `?v=1.94`.
+
+v1.95: workouts include 2026-10-07 (one 32-minute row) and 2026-10-08 (one 64-minute ride). The ride is one code session on that day. The public files stay per-day counts. `habits.css` and `habits.js` are `?v=1.95`.
