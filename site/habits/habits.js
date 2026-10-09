@@ -79,8 +79,6 @@ function build(section, model){
   graph.style.setProperty('--weeks', String(weeks.length));
   section.dataset.start = model.start;
   section.dataset.today = model.today;
-  /* pages run through this day. a cell past it is drawn, and it is not a link. */
-  const covered = document.body.dataset.pagesThrough || model.today;
   const labels = weeks.map(col => {
     const hit = col.find(d => d.slice(8) === '01' && d <= model.today);
     return hit ? SHORT[+hit.slice(5, 7) - 1] : '';
@@ -96,7 +94,6 @@ function build(section, model){
   const box = section.querySelector('.weeks');
   months.replaceChildren();
   box.replaceChildren();
-  const unit = section.dataset.unit || 'contribution';
   weeks.forEach((col, i) => {
     const lab = mk('span');
     lab.textContent = labels[i];
@@ -108,14 +105,9 @@ function build(section, model){
     months.appendChild(lab);
     col.forEach(iso => {
       const future = iso > model.today;
-      const linkable = !future && iso <= covered;
-      const el = mk(linkable ? 'a' : 'span', 'cell' + (future ? ' future' : ''));
+      const el = mk('span', 'cell' + (future ? ' future' : ''));
       el.dataset.date = iso;
       el.dataset.lv = '0';
-      if (linkable){
-        el.href = '/habits/' + iso + '/';
-        el.setAttribute('aria-label', sentence(0, iso, unit, section.dataset.metric === 'minutes' ? 0 : null));
-      }
       box.appendChild(el);
     });
   });
@@ -289,25 +281,25 @@ function showTip(cell){
 }
 let armed = null;
 document.addEventListener('pointerover', e => {
-  const cell = e.target.closest && e.target.closest('a.cell');
+  const cell = e.target.closest && e.target.closest('.cell');
   if (!cell || e.pointerType === 'touch') return;
   showTip(cell);
 });
 document.addEventListener('pointerout', e => {
-  const cell = e.target.closest && e.target.closest('a.cell');
+  const cell = e.target.closest && e.target.closest('.cell');
   if (!cell || e.pointerType === 'touch') return;
   hideTip();
 });
 document.addEventListener('focusin', e => {
-  const cell = e.target.closest && e.target.closest('a.cell');
+  const cell = e.target.closest && e.target.closest('.cell');
   if (cell) showTip(cell);
 });
 document.addEventListener('focusout', () => hideTip());
 document.addEventListener('pointerdown', e => {
-  if (!e.target.closest || !e.target.closest('a.cell')){ armed = null; hideTip(); }
+  if (!e.target.closest || !e.target.closest('.cell')){ armed = null; hideTip(); }
 });
 document.addEventListener('click', e => {
-  const cell = e.target.closest && e.target.closest('a.cell');
+  const cell = e.target.closest && e.target.closest('.cell');
   if (!cell) return;
   if (!matchMedia('(hover: none)').matches) return;
   if (armed !== cell){ e.preventDefault(); armed = cell; showTip(cell); }

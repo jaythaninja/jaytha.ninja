@@ -17,2673 +17,351 @@
   "days": {
     "2026-01-26": {
       "total": 1,
-      "minutes": 19,
-      "items": [
-        {
-          "type": "strength",
-          "start": "16:57",
-          "end": "17:24",
-          "duration_min": 18.7,
-          "kcal": 168,
-          "avg_hr": 144,
-          "max_hr": 172,
-          "zones": [
-            2.3,
-            8.1,
-            5.0,
-            2.7,
-            0.5
-          ]
-        }
-      ]
+      "minutes": 19
     },
     "2026-01-27": {
       "total": 2,
-      "minutes": 64,
-      "items": [
-        {
-          "type": "strength",
-          "start": "09:31",
-          "end": "10:05",
-          "duration_min": 33.9,
-          "kcal": 297,
-          "avg_hr": 143,
-          "max_hr": 173,
-          "zones": [
-            8.6,
-            11.7,
-            7.4,
-            5.0,
-            0.7
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "10:05",
-          "end": "10:36",
-          "duration_min": 30.5,
-          "distance_mi": 0.6,
-          "kcal": 272,
-          "avg_hr": 153,
-          "max_hr": 159,
-          "zones": [
-            0.0,
-            0.4,
-            28.9,
-            1.2,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 64
     },
     "2026-01-29": {
       "total": 2,
-      "minutes": 74,
-      "items": [
-        {
-          "type": "strength",
-          "start": "12:29",
-          "end": "13:13",
-          "duration_min": 44.0,
-          "kcal": 369,
-          "avg_hr": 141,
-          "max_hr": 168,
-          "zones": [
-            11.6,
-            14.9,
-            13.2,
-            4.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "13:14",
-          "end": "13:44",
-          "duration_min": 30.1,
-          "distance_mi": 0.8,
-          "kcal": 298,
-          "avg_hr": 159,
-          "max_hr": 171,
-          "zones": [
-            0.0,
-            0.9,
-            11.1,
-            17.1,
-            1.0
-          ]
-        }
-      ]
+      "minutes": 74
     },
     "2026-01-30": {
       "total": 2,
-      "minutes": 33,
-      "items": [
-        {
-          "type": "strength",
-          "start": "12:00",
-          "end": "12:03",
-          "duration_min": 2.9,
-          "kcal": 15,
-          "avg_hr": 109,
-          "max_hr": 148,
-          "zones": [
-            2.1,
-            0.3,
-            0.2,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "12:04",
-          "end": "12:34",
-          "duration_min": 30.2,
-          "distance_mi": 0.8,
-          "kcal": 231,
-          "avg_hr": 134,
-          "max_hr": 165,
-          "zones": [
-            13.9,
-            10.9,
-            2.4,
-            2.9,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 33
     },
     "2026-01-31": {
       "total": 2,
-      "minutes": 86,
-      "items": [
-        {
-          "type": "strength",
-          "start": "10:36",
-          "end": "11:32",
-          "duration_min": 56.3,
-          "kcal": 464,
-          "avg_hr": 142,
-          "max_hr": 170,
-          "zones": [
-            15.8,
-            13.6,
-            18.7,
-            7.4,
-            0.2
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "11:33",
-          "end": "12:03",
-          "duration_min": 30.1,
-          "distance_mi": 0.8,
-          "kcal": 288,
-          "avg_hr": 157,
-          "max_hr": 164,
-          "zones": [
-            0.0,
-            0.9,
-            10.4,
-            18.7,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 86
     },
     "2026-02-02": {
       "total": 2,
-      "minutes": 66,
-      "items": [
-        {
-          "type": "strength",
-          "start": "07:43",
-          "end": "08:18",
-          "duration_min": 35.1,
-          "kcal": 230,
-          "avg_hr": 129,
-          "max_hr": 156,
-          "zones": [
-            21.2,
-            9.7,
-            3.8,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "08:19",
-          "end": "08:50",
-          "duration_min": 30.4,
-          "distance_mi": 0.8,
-          "kcal": 259,
-          "avg_hr": 146,
-          "max_hr": 156,
-          "zones": [
-            1.9,
-            3.8,
-            24.7,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 66
     },
     "2026-02-03": {
       "total": 3,
-      "minutes": 86,
-      "items": [
-        {
-          "type": "strength",
-          "start": "12:11",
-          "end": "12:52",
-          "duration_min": 41.5,
-          "kcal": 286,
-          "avg_hr": 131,
-          "max_hr": 157,
-          "zones": [
-            22.2,
-            11.1,
-            6.7,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "12:53",
-          "end": "13:32",
-          "duration_min": 39.5,
-          "distance_mi": 1.1,
-          "kcal": 326,
-          "avg_hr": 146,
-          "max_hr": 156,
-          "zones": [
-            2.0,
-            15.4,
-            22.1,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "functional_strength",
-          "start": "14:58",
-          "end": "15:02",
-          "duration_min": 4.8,
-          "kcal": 20,
-          "avg_hr": 117,
-          "max_hr": 128,
-          "zones": [
-            4.7,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 86
     },
     "2026-02-04": {
       "total": 3,
-      "minutes": 112,
-      "items": [
-        {
-          "type": "strength",
-          "start": "11:56",
-          "end": "12:40",
-          "duration_min": 43.5,
-          "kcal": 256,
-          "avg_hr": 131,
-          "max_hr": 160,
-          "zones": [
-            22.9,
-            12.5,
-            7.1,
-            0.6,
-            0.0
-          ]
-        },
-        {
-          "type": "stair_climbing",
-          "start": "12:46",
-          "end": "12:52",
-          "duration_min": 6.0,
-          "kcal": 46,
-          "avg_hr": 150,
-          "max_hr": 158,
-          "zones": [
-            0.0,
-            0.5,
-            5.0,
-            0.6,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "12:52",
-          "end": "13:55",
-          "duration_min": 62.2,
-          "distance_mi": 1.5,
-          "kcal": 370,
-          "avg_hr": 132,
-          "max_hr": 144,
-          "zones": [
-            37.5,
-            24.7,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 112
     },
     "2026-02-06": {
       "total": 2,
-      "minutes": 108,
-      "items": [
-        {
-          "type": "strength",
-          "start": "07:47",
-          "end": "08:33",
-          "duration_min": 45.6,
-          "kcal": 254,
-          "avg_hr": 129,
-          "max_hr": 154,
-          "zones": [
-            27.5,
-            11.3,
-            4.6,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "08:34",
-          "end": "09:37",
-          "duration_min": 62.4,
-          "distance_mi": 1.6,
-          "kcal": 381,
-          "avg_hr": 132,
-          "max_hr": 144,
-          "zones": [
-            29.4,
-            33.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 108
     },
     "2026-02-07": {
       "total": 2,
-      "minutes": 118,
-      "items": [
-        {
-          "type": "strength",
-          "start": "11:22",
-          "end": "12:15",
-          "duration_min": 52.1,
-          "kcal": 284,
-          "avg_hr": 119,
-          "max_hr": 158,
-          "zones": [
-            42.4,
-            8.2,
-            1.2,
-            0.1,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "12:15",
-          "end": "13:21",
-          "duration_min": 66.3,
-          "distance_mi": 2.3,
-          "kcal": 467,
-          "avg_hr": 127,
-          "max_hr": 159,
-          "zones": [
-            33.0,
-            6.2,
-            24.1,
-            0.5,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 118
     },
     "2026-02-08": {
       "total": 2,
-      "minutes": 111,
-      "items": [
-        {
-          "type": "strength",
-          "start": "11:00",
-          "end": "11:50",
-          "duration_min": 49.8,
-          "kcal": 289,
-          "avg_hr": 118,
-          "max_hr": 152,
-          "zones": [
-            40.3,
-            6.2,
-            1.9,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "11:54",
-          "end": "12:55",
-          "duration_min": 61.1,
-          "distance_mi": 2.5,
-          "kcal": 369,
-          "avg_hr": 130,
-          "max_hr": 162,
-          "zones": [
-            31.5,
-            8.2,
-            18.9,
-            2.5,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 111
     },
     "2026-02-09": {
       "total": 3,
-      "minutes": 119,
-      "items": [
-        {
-          "type": "strength",
-          "start": "07:52",
-          "end": "08:43",
-          "duration_min": 51.0,
-          "kcal": 273,
-          "avg_hr": 116,
-          "max_hr": 151,
-          "zones": [
-            43.7,
-            6.3,
-            0.8,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "08:44",
-          "end": "09:44",
-          "duration_min": 60.3,
-          "distance_mi": 2.7,
-          "kcal": 405,
-          "avg_hr": 134,
-          "max_hr": 163,
-          "zones": [
-            31.1,
-            5.3,
-            20.6,
-            3.3,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "09:45",
-          "end": "09:52",
-          "duration_min": 7.3,
-          "distance_mi": 0.3,
-          "kcal": 25,
-          "avg_hr": 103,
-          "max_hr": 112,
-          "zones": [
-            7.2,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 119
     },
     "2026-02-10": {
       "total": 1,
-      "minutes": 19,
-      "items": [
-        {
-          "type": "functional_strength",
-          "start": "10:35",
-          "end": "10:55",
-          "duration_min": 19.2,
-          "kcal": 104,
-          "avg_hr": 112,
-          "max_hr": 147,
-          "zones": [
-            16.7,
-            1.7,
-            0.5,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 19
     },
     "2026-02-11": {
       "total": 5,
-      "minutes": 178,
-      "items": [
-        {
-          "type": "strength",
-          "start": "07:45",
-          "end": "07:53",
-          "duration_min": 8.1,
-          "kcal": 34,
-          "avg_hr": 108,
-          "max_hr": 130,
-          "zones": [
-            6.8,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "07:57",
-          "end": "09:02",
-          "duration_min": 65.0,
-          "distance_mi": 4.0,
-          "kcal": 503,
-          "avg_hr": 133,
-          "max_hr": 148,
-          "zones": [
-            14.0,
-            49.6,
-            1.5,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "11:55",
-          "end": "12:27",
-          "duration_min": 31.8,
-          "distance_mi": 0.9,
-          "kcal": 216,
-          "avg_hr": 122,
-          "max_hr": 135,
-          "zones": [
-            31.7,
-            0.1,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "strength",
-          "start": "12:34",
-          "end": "13:37",
-          "duration_min": 63.6,
-          "kcal": 373,
-          "avg_hr": 121,
-          "max_hr": 158,
-          "zones": [
-            53.0,
-            8.3,
-            2.0,
-            0.1,
-            0.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "13:38",
-          "end": "13:48",
-          "duration_min": 9.9,
-          "distance_mi": 0.5,
-          "kcal": 71,
-          "avg_hr": 154,
-          "max_hr": 177,
-          "zones": [
-            1.0,
-            2.1,
-            2.0,
-            3.6,
-            1.1
-          ]
-        }
-      ]
+      "minutes": 178
     },
     "2026-02-12": {
       "total": 2,
-      "minutes": 56,
-      "items": [
-        {
-          "type": "walking",
-          "start": "15:12",
-          "end": "15:58",
-          "duration_min": 45.1,
-          "distance_mi": 1.7,
-          "kcal": 320,
-          "avg_hr": 127,
-          "max_hr": 160,
-          "zones": [
-            27.6,
-            7.6,
-            5.6,
-            4.2,
-            0.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "16:00",
-          "end": "16:11",
-          "duration_min": 10.9,
-          "distance_mi": 0.6,
-          "kcal": 98,
-          "avg_hr": 157,
-          "max_hr": 180,
-          "zones": [
-            0.7,
-            2.2,
-            2.9,
-            2.5,
-            2.6
-          ]
-        }
-      ]
+      "minutes": 56
     },
     "2026-02-14": {
       "total": 3,
-      "minutes": 146,
-      "items": [
-        {
-          "type": "strength",
-          "start": "09:55",
-          "end": "11:16",
-          "duration_min": 81.5,
-          "kcal": 403,
-          "avg_hr": 113,
-          "max_hr": 152,
-          "zones": [
-            70.4,
-            9.2,
-            1.1,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "11:19",
-          "end": "12:08",
-          "duration_min": 48.9,
-          "distance_mi": 1.6,
-          "kcal": 282,
-          "avg_hr": 125,
-          "max_hr": 147,
-          "zones": [
-            20.5,
-            28.2,
-            0.2,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "12:08",
-          "end": "12:24",
-          "duration_min": 15.2,
-          "distance_mi": 0.8,
-          "kcal": 131,
-          "avg_hr": 152,
-          "max_hr": 177,
-          "zones": [
-            0.8,
-            4.8,
-            4.0,
-            3.8,
-            1.9
-          ]
-        }
-      ]
+      "minutes": 146
     },
     "2026-02-15": {
       "total": 1,
-      "minutes": 65,
-      "items": [
-        {
-          "type": "walking",
-          "start": "09:11",
-          "end": "10:16",
-          "duration_min": 65.1,
-          "distance_mi": 2.3,
-          "kcal": 441,
-          "avg_hr": 124,
-          "max_hr": 156,
-          "zones": [
-            37.7,
-            22.4,
-            5.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 65
     },
     "2026-02-16": {
       "total": 3,
-      "minutes": 134,
-      "items": [
-        {
-          "type": "strength",
-          "start": "10:31",
-          "end": "11:08",
-          "duration_min": 37.6,
-          "kcal": 214,
-          "avg_hr": 117,
-          "max_hr": 150,
-          "zones": [
-            31.0,
-            4.7,
-            0.5,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "11:12",
-          "end": "12:29",
-          "duration_min": 76.7,
-          "distance_mi": 2.6,
-          "kcal": 415,
-          "avg_hr": 122,
-          "max_hr": 145,
-          "zones": [
-            35.0,
-            41.8,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "12:33",
-          "end": "12:53",
-          "duration_min": 19.9,
-          "distance_mi": 1.1,
-          "kcal": 170,
-          "avg_hr": 144,
-          "max_hr": 170,
-          "zones": [
-            4.7,
-            7.2,
-            3.9,
-            4.0,
-            0.1
-          ]
-        }
-      ]
+      "minutes": 134
     },
     "2026-02-17": {
       "total": 2,
-      "minutes": 88,
-      "items": [
-        {
-          "type": "strength",
-          "start": "07:21",
-          "end": "08:09",
-          "duration_min": 48.6,
-          "kcal": 174,
-          "avg_hr": 99,
-          "max_hr": 127,
-          "zones": [
-            48.6,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "08:10",
-          "end": "08:50",
-          "duration_min": 39.6,
-          "distance_mi": 1.3,
-          "kcal": 266,
-          "avg_hr": 127,
-          "max_hr": 135,
-          "zones": [
-            38.6,
-            1.1,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 88
     },
     "2026-02-18": {
       "total": 1,
-      "minutes": 130,
-      "items": [
-        {
-          "type": "walking",
-          "start": "10:14",
-          "end": "12:24",
-          "duration_min": 130.0,
-          "distance_mi": 5.6,
-          "kcal": 901,
-          "avg_hr": 126,
-          "max_hr": 164,
-          "zones": [
-            73.1,
-            7.5,
-            38.1,
-            11.3,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 130
     },
     "2026-02-19": {
       "total": 1,
-      "minutes": 46,
-      "items": [
-        {
-          "type": "strength",
-          "start": "07:48",
-          "end": "08:34",
-          "duration_min": 46.5,
-          "kcal": 180,
-          "avg_hr": 102,
-          "max_hr": 137,
-          "zones": [
-            45.2,
-            0.5,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 46
     },
     "2026-02-20": {
       "total": 3,
-      "minutes": 137,
-      "items": [
-        {
-          "type": "functional_strength",
-          "start": "07:44",
-          "end": "08:05",
-          "duration_min": 21.1,
-          "kcal": 80,
-          "avg_hr": 101,
-          "max_hr": 141,
-          "zones": [
-            20.4,
-            0.3,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "08:07",
-          "end": "09:11",
-          "duration_min": 63.7,
-          "distance_mi": 2.6,
-          "kcal": 546,
-          "avg_hr": 144,
-          "max_hr": 157,
-          "zones": [
-            4.8,
-            26.9,
-            32.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "09:12",
-          "end": "10:04",
-          "duration_min": 52.3,
-          "distance_mi": 2.2,
-          "kcal": 143,
-          "avg_hr": 99,
-          "max_hr": 117,
-          "zones": [
-            52.3,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 137
     },
     "2026-02-21": {
       "total": 3,
-      "minutes": 125,
-      "items": [
-        {
-          "type": "strength",
-          "start": "06:27",
-          "end": "07:25",
-          "duration_min": 57.7,
-          "kcal": 249,
-          "avg_hr": 108,
-          "max_hr": 152,
-          "zones": [
-            55.2,
-            2.1,
-            0.2,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "07:26",
-          "end": "08:00",
-          "duration_min": 34.3,
-          "distance_mi": 1.4,
-          "kcal": 274,
-          "avg_hr": 142,
-          "max_hr": 155,
-          "zones": [
-            5.4,
-            11.6,
-            17.4,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "08:00",
-          "end": "08:33",
-          "duration_min": 32.9,
-          "distance_mi": 2.1,
-          "kcal": 260,
-          "avg_hr": 130,
-          "max_hr": 151,
-          "zones": [
-            12.5,
-            11.9,
-            8.5,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 125
     },
     "2026-02-25": {
       "total": 1,
-      "minutes": 70,
-      "items": [
-        {
-          "type": "walking",
-          "start": "11:05",
-          "end": "12:15",
-          "duration_min": 70.2,
-          "distance_mi": 2.9,
-          "kcal": 252,
-          "avg_hr": 88,
-          "max_hr": 103,
-          "zones": [
-            70.2,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 70
     },
     "2026-02-26": {
       "total": 1,
-      "minutes": 60,
-      "items": [
-        {
-          "type": "walking",
-          "start": "07:46",
-          "end": "08:46",
-          "duration_min": 60.2,
-          "distance_mi": 2.5,
-          "kcal": 196,
-          "avg_hr": 89,
-          "max_hr": 101,
-          "zones": [
-            60.2,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 60
     },
     "2026-03-01": {
       "total": 1,
-      "minutes": 61,
-      "items": [
-        {
-          "type": "walking",
-          "start": "10:09",
-          "end": "11:10",
-          "duration_min": 61.1,
-          "distance_mi": 2.4,
-          "kcal": 398,
-          "avg_hr": 136,
-          "max_hr": 166,
-          "zones": [
-            18.6,
-            15.8,
-            23.2,
-            3.4,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 61
     },
     "2026-03-06": {
       "total": 2,
-      "minutes": 99,
-      "items": [
-        {
-          "type": "strength",
-          "start": "11:59",
-          "end": "12:56",
-          "duration_min": 56.9,
-          "kcal": 254,
-          "avg_hr": 112,
-          "max_hr": 156,
-          "zones": [
-            51.4,
-            2.6,
-            2.4,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "12:56",
-          "end": "13:38",
-          "duration_min": 41.8,
-          "distance_mi": 1.7,
-          "kcal": 304,
-          "avg_hr": 137,
-          "max_hr": 158,
-          "zones": [
-            14.6,
-            4.2,
-            22.9,
-            0.2,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 99
     },
     "2026-03-12": {
       "total": 2,
-      "minutes": 62,
-      "items": [
-        {
-          "type": "strength",
-          "start": "05:11",
-          "end": "06:00",
-          "duration_min": 48.5,
-          "kcal": 250,
-          "avg_hr": 118,
-          "max_hr": 156,
-          "zones": [
-            40.9,
-            4.7,
-            2.7,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "06:00",
-          "end": "06:14",
-          "duration_min": 13.9,
-          "distance_mi": 1.0,
-          "kcal": 117,
-          "avg_hr": 158,
-          "max_hr": 165,
-          "zones": [
-            0.1,
-            0.5,
-            4.5,
-            8.8,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 62
     },
     "2026-03-21": {
       "total": 2,
-      "minutes": 75,
-      "items": [
-        {
-          "type": "strength",
-          "start": "07:56",
-          "end": "09:01",
-          "duration_min": 64.4,
-          "kcal": 270,
-          "avg_hr": 113,
-          "max_hr": 160,
-          "zones": [
-            59.5,
-            3.2,
-            1.6,
-            0.1,
-            0.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "09:03",
-          "end": "09:14",
-          "duration_min": 10.7,
-          "distance_mi": 0.9,
-          "kcal": 83,
-          "avg_hr": 156,
-          "max_hr": 164,
-          "zones": [
-            0.3,
-            0.1,
-            3.1,
-            7.2,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 75
     },
     "2026-03-29": {
       "total": 2,
-      "minutes": 94,
-      "items": [
-        {
-          "type": "strength",
-          "start": "09:42",
-          "end": "10:52",
-          "duration_min": 70.1,
-          "kcal": 304,
-          "avg_hr": 112,
-          "max_hr": 160,
-          "zones": [
-            60.9,
-            5.7,
-            2.0,
-            0.2,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "10:53",
-          "end": "11:16",
-          "duration_min": 23.4,
-          "distance_mi": 1.2,
-          "kcal": 172,
-          "avg_hr": 147,
-          "max_hr": 178,
-          "zones": [
-            3.7,
-            4.0,
-            12.1,
-            2.1,
-            1.4
-          ]
-        }
-      ]
+      "minutes": 94
     },
     "2026-06-14": {
       "total": 1,
-      "minutes": 43,
-      "items": [
-        {
-          "type": "walking",
-          "start": "22:39",
-          "end": "23:21",
-          "duration_min": 42.6,
-          "distance_mi": 1.6,
-          "kcal": 108,
-          "avg_hr": 122,
-          "max_hr": 147,
-          "zones": [
-            28.5,
-            2.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 43
     },
     "2026-06-25": {
       "total": 2,
-      "minutes": 78,
-      "items": [
-        {
-          "type": "walking",
-          "start": "16:03",
-          "end": "16:43",
-          "duration_min": 39.5,
-          "distance_mi": 1.4,
-          "kcal": 133,
-          "avg_hr": 123,
-          "max_hr": 138,
-          "zones": [
-            29.8,
-            0.1,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "20:01",
-          "end": "20:40",
-          "duration_min": 38.9,
-          "distance_mi": 1.5,
-          "kcal": 123,
-          "avg_hr": 134,
-          "max_hr": 146,
-          "zones": [
-            19.5,
-            9.3,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 78
     },
     "2026-07-03": {
       "total": 1,
-      "minutes": 171,
-      "items": [
-        {
-          "type": "pickleball",
-          "start": "17:52",
-          "end": "21:59",
-          "duration_min": 171.3,
-          "kcal": 1436,
-          "avg_hr": 148,
-          "max_hr": 188,
-          "zones": [
-            54.1,
-            31.5,
-            33.5,
-            29.5,
-            22.6
-          ]
-        }
-      ]
+      "minutes": 171
     },
     "2026-07-05": {
       "total": 1,
-      "minutes": 37,
-      "items": [
-        {
-          "type": "walking",
-          "start": "08:32",
-          "end": "09:11",
-          "duration_min": 36.6,
-          "distance_mi": 1.4,
-          "kcal": 236,
-          "avg_hr": 131,
-          "max_hr": 146,
-          "zones": [
-            20.6,
-            16.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 37
     },
     "2026-07-06": {
       "total": 2,
-      "minutes": 53,
-      "items": [
-        {
-          "type": "rowing",
-          "start": "07:31",
-          "end": "07:46",
-          "duration_min": 15.6,
-          "kcal": 116,
-          "avg_hr": 135,
-          "max_hr": 147,
-          "zones": [
-            9.0,
-            5.7,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "07:48",
-          "end": "08:25",
-          "duration_min": 37.8,
-          "distance_mi": 1.3,
-          "kcal": 281,
-          "avg_hr": 132,
-          "max_hr": 147,
-          "zones": [
-            24.5,
-            13.4,
-            0.0,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 53
     },
     "2026-07-09": {
       "total": 1,
-      "minutes": 66,
-      "items": [
-        {
-          "type": "walking",
-          "start": "21:05",
-          "end": "22:11",
-          "duration_min": 66.1,
-          "distance_mi": 2.1,
-          "kcal": 566,
-          "avg_hr": 144,
-          "max_hr": 157,
-          "zones": [
-            18.2,
-            17.9,
-            30.1,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 66
     },
     "2026-07-10": {
       "total": 3,
-      "minutes": 54,
-      "items": [
-        {
-          "type": "strength",
-          "start": "10:01",
-          "end": "10:13",
-          "duration_min": 12.3,
-          "kcal": 46,
-          "avg_hr": 100,
-          "max_hr": 120,
-          "zones": [
-            12.2,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "rowing",
-          "start": "10:14",
-          "end": "10:39",
-          "duration_min": 25.4,
-          "kcal": 162,
-          "avg_hr": 136,
-          "max_hr": 150,
-          "zones": [
-            11.1,
-            12.9,
-            1.4,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "10:42",
-          "end": "10:58",
-          "duration_min": 15.9,
-          "distance_mi": 0.6,
-          "kcal": 136,
-          "avg_hr": 142,
-          "max_hr": 151,
-          "zones": [
-            3.1,
-            10.9,
-            1.9,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 54
     },
     "2026-07-11": {
       "total": 2,
-      "minutes": 46,
-      "items": [
-        {
-          "type": "strength",
-          "start": "10:13",
-          "end": "10:35",
-          "duration_min": 21.6,
-          "kcal": 86,
-          "avg_hr": 95,
-          "max_hr": 116,
-          "zones": [
-            20.9,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "rowing",
-          "start": "10:43",
-          "end": "11:07",
-          "duration_min": 24.7,
-          "kcal": 119,
-          "avg_hr": 132,
-          "max_hr": 156,
-          "zones": [
-            13.4,
-            8.0,
-            3.3,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 46
     },
     "2026-07-17": {
       "total": 1,
-      "minutes": 64,
-      "items": [
-        {
-          "type": "rowing",
-          "start": "11:38",
-          "end": "12:41",
-          "duration_min": 63.9,
-          "kcal": 403,
-          "avg_hr": 139,
-          "max_hr": 172,
-          "zones": [
-            23.3,
-            30.9,
-            5.0,
-            0.8,
-            0.3
-          ]
-        }
-      ]
+      "minutes": 64
     },
     "2026-07-21": {
       "total": 3,
-      "minutes": 186,
-      "items": [
-        {
-          "type": "strength",
-          "start": "10:44",
-          "end": "12:14",
-          "duration_min": 89.7,
-          "kcal": 369,
-          "avg_hr": 99,
-          "max_hr": 142,
-          "zones": [
-            88.9,
-            0.8,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "rowing",
-          "start": "12:14",
-          "end": "12:33",
-          "duration_min": 18.6,
-          "kcal": 124,
-          "avg_hr": 146,
-          "max_hr": 159,
-          "zones": [
-            3.0,
-            2.8,
-            12.3,
-            0.3,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "12:38",
-          "end": "13:57",
-          "duration_min": 78.2,
-          "distance_mi": 1.4,
-          "kcal": 476,
-          "avg_hr": 144,
-          "max_hr": 172,
-          "zones": [
-            27.4,
-            10.8,
-            26.6,
-            12.8,
-            0.6
-          ]
-        }
-      ]
+      "minutes": 186
     },
     "2026-07-22": {
       "total": 3,
-      "minutes": 74,
-      "items": [
-        {
-          "type": "rowing",
-          "start": "21:10",
-          "end": "21:41",
-          "duration_min": 17.5,
-          "kcal": 100,
-          "avg_hr": 135,
-          "max_hr": 153,
-          "zones": [
-            7.8,
-            7.5,
-            2.2,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "walking",
-          "start": "21:49",
-          "end": "22:37",
-          "duration_min": 48.5,
-          "distance_mi": 0.6,
-          "kcal": 224,
-          "avg_hr": 151,
-          "max_hr": 177,
-          "zones": [
-            11.1,
-            5.7,
-            15.1,
-            13.7,
-            3.0
-          ]
-        },
-        {
-          "type": "running",
-          "start": "22:38",
-          "end": "22:46",
-          "duration_min": 8.0,
-          "distance_mi": 0.8,
-          "kcal": 79,
-          "avg_hr": 159,
-          "max_hr": 168,
-          "zones": [
-            0.2,
-            0.6,
-            1.9,
-            5.4,
-            0.0
-          ]
-        }
-      ]
+      "minutes": 74
     },
     "2026-07-27": {
       "total": 1,
       "minutes": 134,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "22:35",
-          "end": "00:48",
-          "duration_min": 133.6,
-          "distance_mi": 19.5,
-          "kcal": 571,
-          "avg_hr": 152,
-          "max_hr": 174,
-          "zones": [
-            8.6,
-            31.0,
-            61.3,
-            30.8,
-            1.5
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-07-28": {
       "total": 1,
       "minutes": 188,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "23:23",
-          "end": "02:31",
-          "duration_min": 187.7,
-          "distance_mi": 20.3,
-          "kcal": 696,
-          "avg_hr": 137,
-          "max_hr": 176,
-          "zones": [
-            74.8,
-            28.1,
-            63.3,
-            20.4,
-            1.1
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-07-29": {
       "total": 2,
       "minutes": 321,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "12:23",
-          "end": "14:13",
-          "duration_min": 110.7,
-          "distance_mi": 7.3,
-          "kcal": 232,
-          "avg_hr": 130,
-          "max_hr": 169,
-          "zones": [
-            65.8,
-            18.5,
-            18.2,
-            7.9,
-            0.0
-          ]
-        },
-        {
-          "type": "cycling",
-          "start": "20:54",
-          "end": "00:23",
-          "duration_min": 209.9,
-          "distance_mi": 13.9,
-          "kcal": 427,
-          "avg_hr": 130,
-          "max_hr": 175,
-          "zones": [
-            134.9,
-            37.5,
-            24.4,
-            11.9,
-            1.3
-          ]
-        }
-      ]
+      "rides": 2
     },
     "2026-07-30": {
       "total": 1,
       "minutes": 184,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "13:43",
-          "end": "01:39",
-          "duration_min": 184.4,
-          "distance_mi": 14.1,
-          "kcal": 460,
-          "avg_hr": 131,
-          "max_hr": 160,
-          "zones": [
-            107.8,
-            49.4,
-            26.8,
-            0.2,
-            0.0
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-07-31": {
       "total": 2,
       "minutes": 234,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "16:10",
-          "end": "17:26",
-          "duration_min": 75.5,
-          "distance_mi": 9.5,
-          "kcal": 335,
-          "avg_hr": 148,
-          "max_hr": 177,
-          "zones": [
-            10.6,
-            21.8,
-            26.5,
-            14.3,
-            2.2
-          ]
-        },
-        {
-          "type": "cycling",
-          "start": "22:05",
-          "end": "00:44",
-          "duration_min": 158.7,
-          "distance_mi": 19.8,
-          "kcal": 713,
-          "avg_hr": 139,
-          "max_hr": 166,
-          "zones": [
-            65.8,
-            47.2,
-            32.9,
-            3.5,
-            0.0
-          ]
-        }
-      ]
+      "rides": 2
     },
     "2026-08-01": {
       "total": 1,
       "minutes": 252,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "09:36",
-          "end": "14:45",
-          "duration_min": 251.5,
-          "distance_mi": 21.3,
-          "kcal": 918,
-          "avg_hr": 125,
-          "max_hr": 158,
-          "zones": [
-            170.4,
-            56.2,
-            18.4,
-            0.0,
-            0.0
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-08-02": {
       "total": 1,
       "minutes": 385,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "08:50",
-          "end": "15:42",
-          "duration_min": 384.7,
-          "distance_mi": 24.0,
-          "kcal": 1031,
-          "avg_hr": 137,
-          "max_hr": 167,
-          "zones": [
-            165.1,
-            103.3,
-            111.5,
-            4.7,
-            0.0
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-08-04": {
       "total": 1,
       "minutes": 186,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "18:52",
-          "end": "21:59",
-          "duration_min": 186.3,
-          "name": "Evening Ride",
-          "distance_mi": 21.9,
-          "kcal": 837,
-          "elevation_ft": 750,
-          "avg_hr": 138,
-          "max_hr": 169,
-          "zones": [
-            89.9,
-            50.8,
-            34.0,
-            11.7,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19621080267"
-        }
-      ]
+      "rides": 1
     },
     "2026-08-05": {
       "total": 1,
       "minutes": 168,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "21:39",
-          "end": "00:27",
-          "duration_min": 167.7,
-          "name": "Night Ride",
-          "distance_mi": 16.8,
-          "kcal": 572,
-          "elevation_ft": 551,
-          "avg_hr": 124,
-          "max_hr": 172,
-          "zones": [
-            119.6,
-            25.7,
-            16.8,
-            4.4,
-            0.9
-          ],
-          "strava": "https://www.strava.com/activities/19645418624"
-        }
-      ]
+      "rides": 1
     },
     "2026-08-06": {
       "total": 2,
       "minutes": 230,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "13:59",
-          "end": "15:33",
-          "duration_min": 94.5,
-          "name": "Afternoon Ride",
-          "distance_mi": 10.9,
-          "kcal": 380,
-          "elevation_ft": 377,
-          "avg_hr": 140,
-          "max_hr": 169,
-          "zones": [
-            33.4,
-            20.2,
-            32.1,
-            8.6,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19645418638"
-        },
-        {
-          "type": "cycling",
-          "start": "17:51",
-          "end": "20:07",
-          "duration_min": 135.2,
-          "name": "Afternoon Ride",
-          "distance_mi": 7.5,
-          "kcal": 420,
-          "elevation_ft": 692,
-          "avg_hr": 146,
-          "max_hr": 177,
-          "zones": [
-            29.2,
-            36.1,
-            46.6,
-            21.6,
-            1.6
-          ],
-          "strava": "https://www.strava.com/activities/19645418775"
-        }
-      ]
+      "rides": 2
     },
     "2026-08-07": {
       "total": 1,
       "minutes": 96,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "11:50",
-          "end": "13:26",
-          "duration_min": 96.5,
-          "name": "Lunch Ride",
-          "distance_mi": 7.8,
-          "kcal": 363,
-          "elevation_ft": 669,
-          "avg_hr": 147,
-          "max_hr": 172,
-          "zones": [
-            22.0,
-            13.0,
-            36.7,
-            24.2,
-            0.5
-          ],
-          "strava": "https://www.strava.com/activities/19645418759"
-        }
-      ]
+      "rides": 1
     },
     "2026-08-08": {
       "total": 1,
       "minutes": 83,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "08:48",
-          "end": "13:05",
-          "duration_min": 83.4,
-          "name": "Morning Ride",
-          "distance_mi": 4.6,
-          "kcal": 218,
-          "elevation_ft": 209,
-          "avg_hr": 141,
-          "max_hr": 178,
-          "zones": [
-            33.6,
-            20.0,
-            17.7,
-            10.4,
-            1.7
-          ],
-          "strava": "https://www.strava.com/activities/19660099711"
-        }
-      ]
+      "rides": 1
     },
     "2026-08-09": {
       "total": 1,
       "minutes": 137,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "10:57",
-          "end": "13:14",
-          "duration_min": 137.2,
-          "name": "Morning Ride",
-          "distance_mi": 10.2,
-          "kcal": 429,
-          "elevation_ft": 386,
-          "avg_hr": 120,
-          "max_hr": 160,
-          "zones": [
-            103.0,
-            20.8,
-            8.0,
-            0.9,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19687473032"
-        }
-      ]
+      "rides": 1
     },
     "2026-08-10": {
       "total": 2,
       "minutes": 251,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "10:12",
-          "end": "13:00",
-          "duration_min": 106.9,
-          "name": "Morning Ride",
-          "distance_mi": 10.3,
-          "kcal": 345,
-          "elevation_ft": 382,
-          "avg_hr": 125,
-          "max_hr": 166,
-          "zones": [
-            72.7,
-            23.3,
-            10.2,
-            0.6,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19687472991"
-        },
-        {
-          "type": "cycling",
-          "start": "19:35",
-          "end": "21:59",
-          "duration_min": 143.8,
-          "name": "Evening Ride",
-          "distance_mi": 18.4,
-          "kcal": 588,
-          "elevation_ft": 486,
-          "avg_hr": 126,
-          "max_hr": 164,
-          "zones": [
-            85.0,
-            34.7,
-            21.8,
-            2.1,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19706160900"
-        }
-      ]
+      "rides": 2
     },
     "2026-08-11": {
       "total": 1,
       "minutes": 125,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "22:24",
-          "end": "00:29",
-          "duration_min": 124.8,
-          "distance_mi": 13.8,
-          "kcal": 412,
-          "avg_hr": 122,
-          "max_hr": 159,
-          "zones": [
-            94.7,
-            21.4,
-            8.3,
-            0.4,
-            0.0
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-08-13": {
       "total": 2,
       "minutes": 63,
-      "items": [
-        {
-          "type": "rowing",
-          "start": "09:07",
-          "end": "09:39",
-          "duration_min": 31.4,
-          "kcal": 219,
-          "avg_hr": 132,
-          "max_hr": 145,
-          "zones": [
-            22.5,
-            8.7,
-            0.0,
-            0.0,
-            0.0
-          ]
-        },
-        {
-          "type": "cycling",
-          "start": "15:38",
-          "end": "16:10",
-          "duration_min": 31.8,
-          "distance_mi": 5.1,
-          "kcal": 183,
-          "avg_hr": 151,
-          "max_hr": 177,
-          "zones": [
-            1.9,
-            6.8,
-            14.1,
-            8.5,
-            0.5
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-08-15": {
       "total": 1,
       "minutes": 158,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "08:33",
-          "end": "11:11",
-          "duration_min": 158.5,
-          "distance_mi": 12.9,
-          "kcal": 373,
-          "avg_hr": 142,
-          "max_hr": 174,
-          "zones": [
-            59.1,
-            16.7,
-            39.7,
-            38.4,
-            4.5
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-08-16": {
       "total": 1,
       "minutes": 95,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "17:48",
-          "end": "19:23",
-          "duration_min": 94.8,
-          "name": "Afternoon Ride",
-          "distance_mi": 9.6,
-          "kcal": 471,
-          "elevation_ft": 594,
-          "avg_hr": 157,
-          "max_hr": 178,
-          "zones": [
-            5.3,
-            7.9,
-            19.9,
-            55.0,
-            6.6
-          ],
-          "strava": "https://www.strava.com/activities/19775666301"
-        }
-      ]
+      "rides": 1
     },
     "2026-08-17": {
       "total": 2,
       "minutes": 141,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "19:42",
-          "end": "21:14",
-          "duration_min": 91.8,
-          "name": "Evening Ride",
-          "distance_mi": 6.9,
-          "kcal": 302,
-          "elevation_ft": 252,
-          "avg_hr": 132,
-          "max_hr": 172,
-          "zones": [
-            52.8,
-            16.7,
-            10.4,
-            10.9,
-            1.0
-          ],
-          "strava": "https://www.strava.com/activities/19787846600"
-        },
-        {
-          "type": "walking",
-          "start": "21:14",
-          "end": "22:03",
-          "duration_min": 48.9,
-          "name": "Night Walk",
-          "distance_mi": 0.9,
-          "kcal": 98,
-          "elevation_ft": 32,
-          "avg_hr": 103,
-          "max_hr": 133,
-          "zones": [
-            48.9,
-            0.0,
-            0.0,
-            0.0,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19828703350"
-        }
-      ]
+      "rides": 1
     },
     "2026-08-20": {
       "total": 3,
       "minutes": 172,
-      "items": [
-        {
-          "type": "rowing",
-          "start": "11:51",
-          "end": "12:20",
-          "duration_min": 29.2,
-          "name": "Lunch Row",
-          "kcal": 182,
-          "avg_hr": 131,
-          "max_hr": 152,
-          "zones": [
-            17.9,
-            10.4,
-            0.8,
-            0.0,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19828703083"
-        },
-        {
-          "type": "cycling",
-          "start": "20:13",
-          "end": "21:53",
-          "duration_min": 91.0,
-          "name": "Evening Ride",
-          "distance_mi": 5.5,
-          "kcal": 264,
-          "elevation_ft": 175,
-          "avg_hr": 120,
-          "max_hr": 161,
-          "zones": [
-            63.7,
-            11.4,
-            13.8,
-            2.1,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19838519557"
-        },
-        {
-          "type": "cycling",
-          "start": "22:44",
-          "end": "23:37",
-          "duration_min": 52.2,
-          "name": "Night Ride",
-          "distance_mi": 7.3,
-          "kcal": 164,
-          "elevation_ft": 55,
-          "avg_hr": 120,
-          "max_hr": 159,
-          "zones": [
-            44.0,
-            3.3,
-            1.5,
-            0.3,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/19838519382"
-        }
-      ]
+      "rides": 2
     },
     "2026-08-21": {
       "total": 2,
       "minutes": 83,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "09:36",
-          "end": "09:59",
-          "duration_min": 22.8,
-          "name": "Morning Ride",
-          "distance_mi": 3.2,
-          "kcal": 110,
-          "elevation_ft": 26,
-          "avg_hr": 157,
-          "max_hr": 177,
-          "zones": [
-            0.0,
-            4.8,
-            3.3,
-            4.8,
-            3.8
-          ],
-          "strava": "https://www.strava.com/activities/19838519298"
-        },
-        {
-          "type": "cycling",
-          "start": "11:18",
-          "end": "12:18",
-          "duration_min": 60.4,
-          "name": "Lunch Ride",
-          "distance_mi": 5.1,
-          "kcal": 254,
-          "elevation_ft": 474,
-          "avg_hr": 153,
-          "max_hr": 174,
-          "zones": [
-            6.0,
-            8.6,
-            20.8,
-            23.7,
-            1.1
-          ],
-          "strava": "https://www.strava.com/activities/19840813394"
-        }
-      ]
+      "rides": 2
     },
     "2026-08-28": {
       "total": 1,
       "minutes": 55,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "20:05",
-          "end": "21:00",
-          "duration_min": 55.2,
-          "name": "Evening Ride",
-          "distance_mi": 5.5,
-          "kcal": 246,
-          "elevation_ft": 182,
-          "avg_hr": 143,
-          "max_hr": 183,
-          "zones": [
-            19.3,
-            12.5,
-            13.2,
-            7.0,
-            3.1
-          ],
-          "strava": "https://www.strava.com/activities/19943548749"
-        }
-      ]
+      "rides": 1
     },
     "2026-08-29": {
       "total": 1,
       "minutes": 168,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "08:30",
-          "end": "11:18",
-          "duration_min": 167.6,
-          "distance_mi": 10.1,
-          "kcal": 388,
-          "avg_hr": 140,
-          "max_hr": 184,
-          "zones": [
-            78.6,
-            16.3,
-            20.5,
-            28.1,
-            24.2
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-08-30": {
       "total": 1,
       "minutes": 136,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "12:38",
-          "end": "14:55",
-          "duration_min": 136.3,
-          "distance_mi": 9.8,
-          "kcal": 433,
-          "avg_hr": 145,
-          "max_hr": 179,
-          "zones": [
-            42.9,
-            13.2,
-            30.8,
-            42.4,
-            7.0
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-08-31": {
       "total": 1,
       "minutes": 94,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "11:25",
-          "end": "12:59",
-          "duration_min": 93.6,
-          "name": "Lunch Ride",
-          "distance_mi": 7.3,
-          "kcal": 387,
-          "elevation_ft": 719,
-          "avg_hr": 148,
-          "max_hr": 170,
-          "zones": [
-            13.6,
-            21.7,
-            38.5,
-            19.1,
-            0.6
-          ],
-          "strava": "https://www.strava.com/activities/19979591716"
-        }
-      ]
+      "rides": 1
     },
     "2026-09-07": {
       "total": 1,
       "minutes": 149,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "10:27",
-          "end": "12:56",
-          "duration_min": 148.8,
-          "distance_mi": 8.5,
-          "kcal": 308,
-          "avg_hr": 140,
-          "max_hr": 189,
-          "zones": [
-            73.2,
-            19.9,
-            17.1,
-            24.7,
-            13.9
-          ]
-        }
-      ]
+      "rides": 1
     },
     "2026-09-10": {
       "total": 1,
       "minutes": 103,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "12:33",
-          "end": "14:16",
-          "duration_min": 102.8,
-          "distance_mi": 4.9,
-          "kcal": 230
-        }
-      ]
+      "rides": 1
     },
     "2026-09-12": {
       "total": 1,
       "minutes": 157,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "08:45",
-          "end": "11:22",
-          "duration_min": 156.8,
-          "distance_mi": 7.2,
-          "kcal": 353
-        }
-      ]
+      "rides": 1
     },
     "2026-09-16": {
       "total": 1,
       "minutes": 98,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "13:11",
-          "end": "15:13",
-          "duration_min": 98.1,
-          "distance_mi": 6.5,
-          "kcal": 229
-        }
-      ]
+      "rides": 1
     },
     "2026-09-18": {
       "total": 1,
       "minutes": 54,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "12:57",
-          "end": "13:59",
-          "duration_min": 54.3,
-          "name": "Lunch Ride",
-          "distance_mi": 5.4,
-          "elevation_ft": 479,
-          "avg_hr": 153,
-          "max_hr": 177,
-          "zones": [
-            7.7,
-            11.0,
-            20.8,
-            19.6,
-            3.1
-          ],
-          "strava": "https://www.strava.com/activities/20230976628"
-        }
-      ]
+      "rides": 1
     },
     "2026-09-19": {
       "total": 2,
       "minutes": 197,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "11:13",
-          "end": "13:11",
-          "duration_min": 114.9,
-          "name": "Lunch Ride",
-          "distance_mi": 11.7,
-          "elevation_ft": 944,
-          "avg_hr": 156,
-          "max_hr": 178,
-          "zones": [
-            3.5,
-            11.6,
-            51.8,
-            44.3,
-            7.1
-          ],
-          "strava": "https://www.strava.com/activities/20244780802"
-        },
-        {
-          "type": "cycling",
-          "start": "15:50",
-          "end": "17:56",
-          "duration_min": 81.8,
-          "name": "Afternoon Ride",
-          "distance_mi": 5.2,
-          "elevation_ft": 149,
-          "avg_hr": 144,
-          "max_hr": 171,
-          "zones": [
-            155.6,
-            26.9,
-            19.9,
-            15.6,
-            2.2
-          ],
-          "strava": "https://www.strava.com/activities/20247650855"
-        }
-      ]
+      "rides": 2
     },
     "2026-09-20": {
       "total": 1,
       "minutes": 109,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "11:10",
-          "end": "12:59",
-          "duration_min": 108.8,
-          "name": "Lunch Ride",
-          "distance_mi": 12.1,
-          "elevation_ft": 1003,
-          "avg_hr": 155,
-          "max_hr": 176,
-          "zones": [
-            0.5,
-            6.5,
-            63.2,
-            36.4,
-            2.7
-          ],
-          "strava": "https://www.strava.com/activities/20259057644"
-        }
-      ]
+      "rides": 1
     },
     "2026-09-21": {
       "total": 1,
       "minutes": 108,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "12:50",
-          "end": "14:41",
-          "duration_min": 107.7,
-          "name": "Lunch Ride",
-          "distance_mi": 12.1,
-          "elevation_ft": 1003,
-          "avg_hr": 159,
-          "max_hr": 174,
-          "zones": [
-            2.2,
-            3.6,
-            37.1,
-            61.7,
-            6.0
-          ],
-          "strava": "https://www.strava.com/activities/20272304471"
-        }
-      ]
+      "rides": 1
     },
     "2026-09-22": {
       "total": 1,
       "minutes": 102,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "09:14",
-          "end": "10:56",
-          "duration_min": 101.7,
-          "name": "Morning Ride",
-          "distance_mi": 11.1,
-          "kcal": 485,
-          "elevation_ft": 975,
-          "avg_hr": 155,
-          "max_hr": 170,
-          "zones": [
-            0.5,
-            8.9,
-            51.6,
-            40.0,
-            0.7
-          ],
-          "strava": "https://www.strava.com/activities/20283821584"
-        }
-      ]
+      "rides": 1
     },
     "2026-09-25": {
       "total": 1,
       "minutes": 90,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "12:50",
-          "end": "14:20",
-          "duration_min": 90.2,
-          "name": "Lunch Ride",
-          "distance_mi": 10.4,
-          "elevation_ft": 769,
-          "avg_hr": 152,
-          "max_hr": 173,
-          "zones": [
-            1.7,
-            12.9,
-            55.5,
-            18.5,
-            1.6
-          ],
-          "strava": "https://www.strava.com/activities/20327830964"
-        }
-      ]
+      "rides": 1
     },
     "2026-09-26": {
       "total": 1,
       "minutes": 168,
-      "items": [
-        {
-          "type": "cycling",
-          "start": "08:25",
-          "end": "11:13",
-          "duration_min": 168.3,
-          "name": "Morning Ride",
-          "distance_mi": 11.4,
-          "kcal": 555,
-          "elevation_ft": 1041,
-          "avg_hr": 148,
-          "max_hr": 181,
-          "zones": [
-            38.0,
-            25.0,
-            30.5,
-            43.5,
-            31.1
-          ],
-          "strava": "https://www.strava.com/activities/20340096816"
-        }
-      ]
+      "rides": 1
     },
     "2026-10-06": {
       "total": 1,
-      "minutes": 39,
-      "items": [
-        {
-          "type": "rowing",
-          "start": "12:01",
-          "end": "12:40",
-          "duration_min": 38.9,
-          "name": "Lunch Row",
-          "kcal": 289,
-          "avg_hr": 147,
-          "max_hr": 165,
-          "zones": [
-            3.7,
-            8.1,
-            23.2,
-            3.9,
-            0.0
-          ],
-          "strava": "https://www.strava.com/activities/20477937296"
-        }
-      ]
+      "minutes": 39
     }
   }
 }
