@@ -233,7 +233,7 @@ function computeSleepStats(days, start, today){
   const avg = n ? Math.round((sum / n) * 10) / 10 : 0;
   return {avg, longest, current, bestDay, bestScore, bestMo};
 }
-/* stats stay at the reserved placeholders until that tracker's cells colour in. */
+/* stats stay at the reserved placeholders until that tracker's cells have finished sweeping. */
 const pendingStats = new Map();
 function stashStats(section, payload){ pendingStats.set(section, payload); }
 function revealStats(section){
@@ -566,9 +566,9 @@ async function main(){
     /* same breath that used to sit between titles, now between a title and its own cells. */
     await wait(TIMING.afterKicker);
     if (skipped) return;
-    revealStats(step.section);
     await sweepSection(step.section);
     if (skipped) return;
+    revealStats(step.section);
   }
   finish();
 }
