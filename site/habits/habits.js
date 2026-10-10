@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.01): four year graphs in one column (code, workouts, journal, sleep). cells use the state colour; a run of 10 or more active days is gold. */
+/* jaytha.ninja/habits/ (v2.02): four year graphs in one column (code, workouts, journal, sleep). cells use the state colour; a run of 10 or more active days is gold. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
