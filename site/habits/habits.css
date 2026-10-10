@@ -139,8 +139,8 @@ body.day .home{margin:0 0 22px}
   .kicker,.tracker .kicker{font-size:17px}
   .daysec h2{font-size:17px}
   body.board .graph{width:100%;--gap:1px;--lab:0px;--mh:13px;grid-template-columns:minmax(0,1fr);column-gap:0}
-  /* the cells sit 1px apart. the 8px desktop glow would paint the neighbours, so the phone glow is 4px. */
-  .cell[data-glow="1"]{box-shadow:0 0 4px rgba(var(--au-cell-rgb),.85)}
+  /* the cells sit 1px apart. the 8px desktop glow would paint the neighbours, so the phone glow is 3px. */
+  .cell[data-glow="1"]{box-shadow:0 0 3px rgba(var(--au-cell-rgb),.85)}
   body.board .months{grid-column:1}
   body.board .dow{display:none}
   body.board .weeks{grid-column:1}
