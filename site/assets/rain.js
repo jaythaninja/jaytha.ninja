@@ -12,6 +12,12 @@
   const LIGHT_Q=matchMedia('(prefers-color-scheme: light)'), L_TEAL=[18,127,132], L_ORANGE=[232,93,12], L_GOLD=[166,124,0];
   const modeName=()=>document.documentElement.dataset.mode==='fast'?'fast':'normal';
 function Rain(cv, o){
+  // v2.04: homepage rain behind text stays at 75% (v1.13). subpages passed .3, which dimmed the same drops and skipped glyphs under alpha .012, so the page looked thinner. every page uses that floor. the footer is not a dim target (the homepage selector is .copy only).
+  o.partFloor = .75;
+  if (o.partSel){
+    const sel = String(o.partSel).split(',').map(s => s.trim()).filter(s => s && s !== '.foot');
+    o.partSel = sel.length ? sel.join(', ') : null;
+  }
   const R = {cv, o, drops:[], rects:[], ptr:{x:-9999,y:-9999}, last:0};
   // v1.14 preview: both palette families ease together, including drops already mid-fall.
   R.tint = o.tint ? {from: o.tint, to: o.tint, t0: 0, dur: 1} : null;
@@ -38,10 +44,13 @@ function Rain(cv, o){
     const fs = w < 600 ? o.fsMobile : o.fs; R.fs = fs; R.lh = Math.round(fs*1.32); R.cw = Math.round(fs*1.12);
     ctx.font = `500 ${fs}px ${o.mono}`; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
     seed = o.seed || 17; R.drops = [];
+    // v2.04: perCol is the homepage's count for one screen. a taller page used to spread that same count down the whole document, so the rain looked sparser. scale with the page so each screen stays as dense.
+    const view = Math.max(1, window.innerHeight || H);
     for (const band of o.bands(w, H)){
       const rows = Math.ceil((band.y1 - band.y0)/R.lh);
+      const screens = Math.max(1, (band.y1 - band.y0) / view);
       for (let x = 2; x < w; x += R.cw){
-        let n = band.perCol * (band.colDensity ? band.colDensity(x, w) : 1);
+        let n = band.perCol * screens * (band.colDensity ? band.colDensity(x, w) : 1);
         let k = Math.floor(n) + (rnd() < n % 1 ? 1 : 0);
         for (let j=0;j<k;j++){
           const len = band.lenMin + Math.floor(rnd()*(band.lenMax - band.lenMin));
