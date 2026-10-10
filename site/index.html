@@ -800,7 +800,8 @@ function fitLine(l, avail){
 }
 function fitAll(){
   const avail = eggEl.getBoundingClientRect().width;
-  const out = EGG.filter(l => l.body).map(l => Object.assign({l, full: lineText(l, l.body)}, fitLine(l, avail)));
+  /* the 📝 line stays in EGG so the recap fetch and the midnight check keep working. it is not painted. */
+  const out = EGG.filter(l => l.body && !l.recap).map(l => Object.assign({l, full: lineText(l, l.body)}, fitLine(l, avail)));
   if (meas){ meas.remove(); meas = null; }
   state.eggFit = {avail: Math.round(avail*10)/10, lines: out.map(x => ({full: x.full, shown: x.text, cut: x.cut}))};
   return out;
