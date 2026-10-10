@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.05): four year graphs in one column (code, workouts, journal, sleep). cells use the state colour; a run of 10 or more active days is gold. a code day with 21 or more sessions, and every day in a run of 21 or more on any tracker, is that same gold with a steady glow. */
+/* jaytha.ninja/habits/ (v2.06): four year graphs in one column (code, workouts, journal, sleep). five colour steps plus empty, cut from each grid's own nonzero days. a streak day uses that same scale. longest and current stay. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -127,48 +127,33 @@ function build(section, model){
   });
 }
 
+/* five colour steps. the cuts are the 20/40/60/80th of the nonzero days.
+   a tied cut would skip a step, so it moves up to the next value the data actually has. */
 function thresholds(values){
   const pos = values.filter(v => v > 0).sort((a, b) => a - b);
   if (!pos.length) return null;
   const at = p => pos[Math.min(pos.length - 1, Math.max(0, Math.ceil(p * pos.length) - 1))];
-  return [at(0.25), at(0.5), at(0.75)];
+  const raw = [0.2, 0.4, 0.6, 0.8].map(at);
+  const uniq = [...new Set(pos)];
+  const cuts = [];
+  raw.forEach(c => {
+    const prev = cuts.length ? cuts[cuts.length - 1] : 0;
+    if (c > prev){ cuts.push(c); return; }
+    const higher = uniq.filter(u => u > prev);
+    cuts.push(higher.length ? higher[0] : prev);
+  });
+  return cuts;
 }
 function level(v, t){
   if (!t || v <= 0) return 0;
-  if (v <= t[0]) return 1;
-  if (v <= t[1]) return 2;
-  if (v <= t[2]) return 3;
-  return 4;
-}
-function minutesLevel(mins, edges){
-  if (mins <= 0) return 0;
-  const cuts = edges && edges.length ? edges : [45, 90, 150];
   let lv = 1;
-  for (let i = 0; i < cuts.length; i++){
-    if (mins < cuts[i]) return lv;
+  for (let i = 0; i < t.length; i++){
+    if (v <= t[i]) return lv;
     lv++;
   }
   return lv;
 }
 const SLEEP_STREAK = 70;
-function scoreLevel(score){
-  if (score < 50) return 1;
-  if (score < 70) return 2;
-  if (score < 85) return 3;
-  return 4;
-}
-function markGold(dates, days, today, min){
-  const gold = new Set();
-  let run = [];
-  const flush = () => { if (run.length >= min) run.forEach(d => gold.add(d)); run = []; };
-  dates.forEach(iso => {
-    if (iso > today){ flush(); return; }
-    if (days[iso] && days[iso].total > 0) run.push(iso);
-    else flush();
-  });
-  flush();
-  return gold;
-}
 function computeStats(days, start, today, metric){
   let total = 0, longest = 0, run = 0, bestN = 0;
   let bestDay = '', bestMo = '', bestMoN = 0;
@@ -263,17 +248,12 @@ function fillSleepStats(section, s){
     current: s.current + 'd'
   });
 }
-const GLOW_AT = 21;
-function paint(cell, lv, gold, glow){
+function paint(cell, lv){
   cell.dataset.lv = String(lv);
-  if (gold) cell.dataset.gold = '1';
-  else delete cell.dataset.gold;
-  if (glow) cell.dataset.glow = '1';
-  else delete cell.dataset.glow;
   cell.classList.remove('hot');
 }
 function paintAll(){
-  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold, fin.glow));
+  final.forEach((fin, cell) => paint(cell, fin.lv));
 }
 function daysOf(section, data){
   const kind = section.dataset.kind || '';
@@ -304,36 +284,36 @@ function apply(section, days, meta){
   const kind = section.dataset.kind || '';
   const unit = section.dataset.unit || 'contribution';
   const metric = (meta && meta.intensity && meta.intensity.metric) || section.dataset.metric || '';
-  const edges = (meta && meta.intensity && meta.intensity.edges) || (section.dataset.buckets || '').split(',').map(Number).filter(Boolean);
   const today = section.dataset.today;
   const start = section.dataset.start;
   const cells = [...section.querySelectorAll('.cell')];
   const dates = cells.map(c => c.dataset.date);
-  const counted = [];
+  const measure = day => {
+    if (!day) return 0;
+    if (kind === 'sleep') return Number.isFinite(day.score) ? day.score : 0;
+    if (metric === 'minutes') return Math.round(day.minutes || 0);
+    return day.total || 0;
+  };
+  const samples = [];
   dates.forEach(iso => {
-    if (iso >= start && iso <= today) counted.push((days[iso] && days[iso].total) || 0);
+    if (iso >= start && iso <= today) samples.push(measure(days[iso]));
   });
-  const scale = thresholds(counted);
-  const gold = markGold(dates, days, today, 10);
-  const glowRun = markGold(dates, days, today, 21);
+  const scale = thresholds(samples);
   cells.forEach(cell => {
     const iso = cell.dataset.date;
     if (iso > today) return;
     const day = days[iso];
     const n = (day && day.total) || 0;
+    const amount = measure(day);
     if (kind === 'sleep'){
       const recorded = !!(day && Number.isFinite(day.score));
       const score = recorded ? day.score : 0;
-      final.set(cell, {lv: recorded ? scoreLevel(score) : 0, gold: recorded && gold.has(iso), glow: recorded && glowRun.has(iso), n: score});
+      final.set(cell, {lv: level(amount, scale), n: score});
       labelCell(cell, recorded ? sleepLine(iso, score, day.asleep) : shortDate(iso) + ': no record');
       return;
     }
-    const minutes = metric === 'minutes' ? Math.round((day && day.minutes) || 0) : null;
-    const lv = metric === 'minutes' || (kind === 'journal' && edges.length)
-      ? minutesLevel(minutes != null ? minutes : n, edges)
-      : level(n, scale);
-    const glow = glowRun.has(iso) || (section.dataset.id === 'cursor' && n >= GLOW_AT);
-    final.set(cell, {lv, gold: gold.has(iso), glow, n, minutes});
+    const minutes = metric === 'minutes' ? amount : null;
+    final.set(cell, {lv: level(amount, scale), n, minutes});
     labelCell(cell, kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
   });
   if (kind === 'sleep') fillSleepStats(section, computeSleepStats(days, start, today));
@@ -436,12 +416,12 @@ async function sweepSection(section){
       const cell = cells[i * 7 + r];
       if (!cell) continue;
       const f = final.get(cell);
-      if (f && (f.lv > 0 || f.gold || f.glow)) live.push(cell);
+      if (f && f.lv > 0) live.push(cell);
     }
     live.forEach(c => c.classList.add('hot'));
     await wait(18);
     if (skipped) return;
-    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold, f.glow); });
+    live.forEach(c => { const f = final.get(c); paint(c, f.lv); });
     await wait(26);
   }
 }
