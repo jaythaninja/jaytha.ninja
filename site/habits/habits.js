@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.06): four year graphs in one column (code, workouts, journal, sleep). five colour steps plus empty, cut from each grid's own nonzero days. a streak day uses that same scale. longest and current stay. */
+/* jaytha.ninja/habits/ (v2.07): four year graphs in one column (code, workouts, journal, sleep). five colour steps plus empty. workouts, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. a streak day uses that same scale. longest and current stay. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -127,6 +127,11 @@ function build(section, model){
   });
 }
 
+/* code is hand-set from the 12 nonzero days since 2026-09-29, when the bot work started.
+   those days are 5, 6, 9, 18, 21, 25, 26, 30, 37, 45, 54, 62.
+   the steps are 1–10, 11–24, 25–36, 37–50, 51+, which puts them at 3, 2, 3, 2, 2.
+   an older day just falls into the step its count hits. */
+const CODE_CUTS = [10, 24, 36, 50];
 /* five colour steps. the cuts are the 20/40/60/80th of the nonzero days.
    a tied cut would skip a step, so it moves up to the next value the data actually has. */
 function thresholds(values){
@@ -294,11 +299,14 @@ function apply(section, days, meta){
     if (metric === 'minutes') return Math.round(day.minutes || 0);
     return day.total || 0;
   };
-  const samples = [];
-  dates.forEach(iso => {
-    if (iso >= start && iso <= today) samples.push(measure(days[iso]));
-  });
-  const scale = thresholds(samples);
+  let scale = CODE_CUTS;
+  if (section.dataset.id !== 'cursor'){
+    const samples = [];
+    dates.forEach(iso => {
+      if (iso >= start && iso <= today) samples.push(measure(days[iso]));
+    });
+    scale = thresholds(samples);
+  }
   cells.forEach(cell => {
     const iso = cell.dataset.date;
     if (iso > today) return;
