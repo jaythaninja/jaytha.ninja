@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.02): four year graphs in one column (code, workouts, journal, sleep). cells use the state colour; a run of 10 or more active days is gold. */
+/* jaytha.ninja/habits/ (v2.04): four year graphs in one column (code, workouts, journal, sleep). cells use the state colour; a run of 10 or more active days is gold. a code day with 21 or more sessions is a gold cursor that pulses. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -263,14 +263,17 @@ function fillSleepStats(section, s){
     current: s.current + 'd'
   });
 }
-function paint(cell, lv, gold){
+const PULSE_AT = 21;
+function paint(cell, lv, gold, pulse){
   cell.dataset.lv = String(lv);
-  if (gold) cell.dataset.gold = '1';
+  if (gold && !pulse) cell.dataset.gold = '1';
   else delete cell.dataset.gold;
+  if (pulse) cell.dataset.pulse = '1';
+  else delete cell.dataset.pulse;
   cell.classList.remove('hot');
 }
 function paintAll(){
-  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold));
+  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold, fin.pulse));
 }
 function daysOf(section, data){
   const kind = section.dataset.kind || '';
@@ -328,7 +331,8 @@ function apply(section, days, meta){
     const lv = metric === 'minutes' || (kind === 'journal' && edges.length)
       ? minutesLevel(minutes != null ? minutes : n, edges)
       : level(n, scale);
-    final.set(cell, {lv, gold: gold.has(iso), n, minutes});
+    const pulse = section.dataset.id === 'cursor' && n >= PULSE_AT;
+    final.set(cell, {lv, gold: gold.has(iso), pulse, n, minutes});
     labelCell(cell, kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
   });
   if (kind === 'sleep') fillSleepStats(section, computeSleepStats(days, start, today));
@@ -431,12 +435,12 @@ async function sweepSection(section){
       const cell = cells[i * 7 + r];
       if (!cell) continue;
       const f = final.get(cell);
-      if (f && (f.lv > 0 || f.gold)) live.push(cell);
+      if (f && (f.lv > 0 || f.gold || f.pulse)) live.push(cell);
     }
     live.forEach(c => c.classList.add('hot'));
     await wait(18);
     if (skipped) return;
-    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold); });
+    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold, f.pulse); });
     await wait(26);
   }
 }
