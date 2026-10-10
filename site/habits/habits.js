@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.08): four year graphs in one column (sleep, fitness, code, journal). five colour steps plus empty. fitness, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. from that same day a journal day is one daily update. a streak day uses that same scale. longest and current stay. */
+/* jaytha.ninja/habits/ (v2.09): four year graphs in one column (sleep, fitness, code, journal). five colour steps plus empty. fitness, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. from that same day a journal day is one daily update, and the hover says so. a failed recaps load keeps the note counts. a streak day uses that same scale. longest and current stay. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -51,7 +51,8 @@ function sentence(n, iso, unit, minutes){
 function shortDate(iso){
   return SHORT[+iso.slice(5, 7) - 1] + ' ' + (+iso.slice(8));
 }
-function noteLine(n, iso){
+function noteLine(n, iso, update){
+  if (update) return shortDate(iso) + ': 1 daily update';
   return shortDate(iso) + ': ' + n + ' ' + unitWord(n, 'note');
 }
 function sleepLine(iso, score, mins){
@@ -325,7 +326,7 @@ function apply(section, days, meta){
     }
     const minutes = metric === 'minutes' ? amount : null;
     final.set(cell, {lv: level(amount, scale), n, minutes});
-    labelCell(cell, kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
+    labelCell(cell, kind === 'journal' ? noteLine(n, iso, day && day.update) : sentence(n, iso, unit, minutes));
   });
   if (kind === 'sleep') fillSleepStats(section, computeSleepStats(days, start, today));
   else fillStats(section, computeStats(days, start, today, metric));
@@ -493,17 +494,22 @@ async function loadAll(){
   }));
 }
 async function withRecaps(days){
-  const res = await fetch('/daily-update/recaps.json', {cache: 'no-cache'});
-  if (!res.ok) return days;
-  const rows = await res.json();
-  Object.keys(days).forEach(iso => { if (iso >= JOURNAL_FROM) delete days[iso]; });
-  (Array.isArray(rows) ? rows : []).forEach(row => {
-    const iso = row && row.date;
-    if (typeof iso !== 'string' || iso < JOURNAL_FROM || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
-    if (!String(row.text || '').trim()) return;
-    days[iso] = {total: 1};
-  });
-  return days;
+  try {
+    const res = await fetch('/daily-update/recaps.json', {cache: 'no-cache'});
+    if (!res.ok) return days;
+    const rows = await res.json();
+    const next = {};
+    Object.keys(days).forEach(iso => { if (iso < JOURNAL_FROM) next[iso] = days[iso]; });
+    (Array.isArray(rows) ? rows : []).forEach(row => {
+      const iso = row && row.date;
+      if (typeof iso !== 'string' || iso < JOURNAL_FROM || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
+      if (!String(row.text || '').trim()) return;
+      next[iso] = {total: 1, update: true};
+    });
+    return next;
+  } catch (e) {
+    return days;
+  }
 }
 const dataReady = loadAll();
 /* v2.00: the intro walks trackers.json, not a fixed list. a section with no matching id still plays, after those. */
