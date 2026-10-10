@@ -9,6 +9,23 @@
   ],
   "trackers": [
     {
+      "id": "sleep",
+      "label": "sleep",
+      "enabled": true,
+      "unit": "night",
+      "kind": "sleep",
+      "data": "/habits/sleep.json",
+      "sources": []
+    },
+    {
+      "id": "workouts",
+      "label": "fitness",
+      "enabled": true,
+      "unit": "workout",
+      "data": "/habits/workouts.json",
+      "sources": []
+    },
+    {
       "id": "cursor",
       "label": "code",
       "enabled": true,
@@ -24,29 +41,12 @@
       ]
     },
     {
-      "id": "workouts",
-      "label": "workouts",
-      "enabled": true,
-      "unit": "workout",
-      "data": "/habits/workouts.json",
-      "sources": []
-    },
-    {
       "id": "journal",
       "label": "journal",
       "enabled": true,
       "unit": "note",
       "kind": "journal",
       "data": "/habits/journal.json",
-      "sources": []
-    },
-    {
-      "id": "sleep",
-      "label": "sleep",
-      "enabled": true,
-      "unit": "night",
-      "kind": "sleep",
-      "data": "/habits/sleep.json",
       "sources": []
     }
   ]
