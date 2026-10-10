@@ -136,3 +136,5 @@ v2.10: the homepage no longer shows the 📝 daily update line. `/daily-update/`
 v2.11: `site/habits/journal-jarvis.json` is a counts-only date map, and it starts empty. Each count adds on top of that day's journal total. A missing file or a failed fetch leaves the grid as it was. A day with jarvis entries says "N journal entries". A daily-update day keeps "N notes" and adds "+ N entries". `habits.js` is `?v=2.11`.
 
 v2.12: the matrix rain matches the homepage on every page that has it. Rain behind the text stays at 75%. The footer is not dimmed. Subpages had been holding that rain at 30%, which also dropped glyphs under the draw cutoff, so the same drops looked thinner. A tall page keeps the homepage's drop count on each screen instead of spreading that count down the whole document. `rain.css` and `rain.js` are `?v=2.04`. `foot.js` stays `?v=2.03`.
+
+v2.13: `site/habits/journal-jarvis.json` adds 7 on 2026-10-08 and 9 on 2026-10-09. Those days already have a daily update and no Obsidian count, so the journal totals are 8 and 10. The hover is "1 note + 7 entries" and "1 note + 9 entries".
