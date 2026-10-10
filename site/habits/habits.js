@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.09): four year graphs in one column (sleep, fitness, code, journal). five colour steps plus empty. fitness, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. from that same day a journal day is one daily update, and the hover says so. a failed recaps load keeps the note counts. a streak day uses that same scale. longest and current stay. */
+/* jaytha.ninja/habits/ (v2.10): four year graphs in one column (sleep, fitness, code, journal). five colour steps plus empty. fitness, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. from that same day a daily update adds one note on top of the obsidian count, and the hover says "N notes". a failed recaps load keeps the note counts. a streak day uses that same scale. longest and current stay. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -51,8 +51,7 @@ function sentence(n, iso, unit, minutes){
 function shortDate(iso){
   return SHORT[+iso.slice(5, 7) - 1] + ' ' + (+iso.slice(8));
 }
-function noteLine(n, iso, update){
-  if (update) return shortDate(iso) + ': 1 daily update';
+function noteLine(n, iso){
   return shortDate(iso) + ': ' + n + ' ' + unitWord(n, 'note');
 }
 function sleepLine(iso, score, mins){
@@ -160,8 +159,8 @@ function level(v, t){
   return lv;
 }
 const SLEEP_STREAK = 70;
-/* from this day on, a journal day is a daily update in recaps.json, and the count is 1.
-   earlier days keep the obsidian note counts in journal.json. */
+/* from this day on, a daily update in recaps.json adds one note on top of the obsidian count.
+   earlier days stay the obsidian counts in journal.json. a failed recaps load keeps those counts. */
 const JOURNAL_FROM = '2026-09-29';
 function computeStats(days, start, today, metric){
   let total = 0, longest = 0, run = 0, bestN = 0;
@@ -326,7 +325,7 @@ function apply(section, days, meta){
     }
     const minutes = metric === 'minutes' ? amount : null;
     final.set(cell, {lv: level(amount, scale), n, minutes});
-    labelCell(cell, kind === 'journal' ? noteLine(n, iso, day && day.update) : sentence(n, iso, unit, minutes));
+    labelCell(cell, kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
   });
   if (kind === 'sleep') fillSleepStats(section, computeSleepStats(days, start, today));
   else fillStats(section, computeStats(days, start, today, metric));
@@ -499,12 +498,13 @@ async function withRecaps(days){
     if (!res.ok) return days;
     const rows = await res.json();
     const next = {};
-    Object.keys(days).forEach(iso => { if (iso < JOURNAL_FROM) next[iso] = days[iso]; });
+    Object.keys(days).forEach(iso => { next[iso] = days[iso]; });
     (Array.isArray(rows) ? rows : []).forEach(row => {
       const iso = row && row.date;
       if (typeof iso !== 'string' || iso < JOURNAL_FROM || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
       if (!String(row.text || '').trim()) return;
-      next[iso] = {total: 1, update: true};
+      const prev = (next[iso] && next[iso].total) || 0;
+      next[iso] = {total: prev + 1};
     });
     return next;
   } catch (e) {
