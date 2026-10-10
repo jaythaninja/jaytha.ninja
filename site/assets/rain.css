@@ -50,7 +50,7 @@ html.au-snap,html.au-snap *,html.au-snap *::before,html.au-snap *::after{transit
 :root{--left:max(64px,calc((100vw - 1312px)/2));--edge:24px;--col:min(777.6px,calc(100vw - var(--left) - var(--edge)))}
 @media (max-width:760px){:root{--left:24px;--edge:24px;--col:calc(100vw - var(--left) - var(--edge))}}
 /* v2.03 (jay 2026.10.10): the caret that used to stay after the intro is gone. the ninja (first in the row) pulses instead, in the speed colour, on the same 1.05s as the old blink. a page with no intro starts that pulse on load (foot.js). a reduced-motion page keeps a still glow. the transform does not change the row. */
-/* v2.04 (jay 2026.10.10): the rain canvas is not dimmed in css. every page uses the homepage floor (75% behind the text, footer left alone) from rain.js, so a subpage is as bright and as dense as the homepage. */
+/* v2.04 (jay 2026.10.10): the rain canvas is not dimmed in css. every page uses the homepage floor (75% behind the text, footer left alone) from rain.js, and a tall page keeps the homepage's drop count per screen, so a subpage is as bright and as dense as the homepage. */
 @keyframes nj-pulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 2px rgba(var(--c-rgb),.45))}50%{transform:scale(1.08);filter:drop-shadow(0 0 12px rgba(var(--c-rgb),.95))}}
 html.intro-done .social .nj{transform-origin:50% 50%;animation:nj-pulse 1.05s ease-in-out infinite}
 @media (prefers-reduced-motion:reduce){html.intro-done .social .nj{animation:none;transform:none;filter:drop-shadow(0 0 8px rgba(var(--c-rgb),.75))}}

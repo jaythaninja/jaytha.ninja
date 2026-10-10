@@ -44,10 +44,13 @@ function Rain(cv, o){
     const fs = w < 600 ? o.fsMobile : o.fs; R.fs = fs; R.lh = Math.round(fs*1.32); R.cw = Math.round(fs*1.12);
     ctx.font = `500 ${fs}px ${o.mono}`; ctx.textBaseline = 'top'; ctx.textAlign = 'left';
     seed = o.seed || 17; R.drops = [];
+    // v2.04: perCol is the homepage's count for one screen. a taller page used to spread that same count down the whole document, so the rain looked sparser. scale with the page so each screen stays as dense.
+    const view = Math.max(1, window.innerHeight || H);
     for (const band of o.bands(w, H)){
       const rows = Math.ceil((band.y1 - band.y0)/R.lh);
+      const screens = Math.max(1, (band.y1 - band.y0) / view);
       for (let x = 2; x < w; x += R.cw){
-        let n = band.perCol * (band.colDensity ? band.colDensity(x, w) : 1);
+        let n = band.perCol * screens * (band.colDensity ? band.colDensity(x, w) : 1);
         let k = Math.floor(n) + (rnd() < n % 1 ? 1 : 0);
         for (let j=0;j<k;j++){
           const len = band.lenMin + Math.floor(rnd()*(band.lenMax - band.lenMin));
