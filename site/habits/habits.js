@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.04): four year graphs in one column (code, workouts, journal, sleep). cells use the state colour; a run of 10 or more active days is gold. a code day with 21 or more sessions is a gold cursor that pulses. */
+/* jaytha.ninja/habits/ (v2.05): four year graphs in one column (code, workouts, journal, sleep). cells use the state colour; a run of 10 or more active days is gold. a code day with 21 or more sessions, and every day in a run of 21 or more on any tracker, is that same gold with a steady glow. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -263,17 +263,17 @@ function fillSleepStats(section, s){
     current: s.current + 'd'
   });
 }
-const PULSE_AT = 21;
-function paint(cell, lv, gold, pulse){
+const GLOW_AT = 21;
+function paint(cell, lv, gold, glow){
   cell.dataset.lv = String(lv);
-  if (gold && !pulse) cell.dataset.gold = '1';
+  if (gold) cell.dataset.gold = '1';
   else delete cell.dataset.gold;
-  if (pulse) cell.dataset.pulse = '1';
-  else delete cell.dataset.pulse;
+  if (glow) cell.dataset.glow = '1';
+  else delete cell.dataset.glow;
   cell.classList.remove('hot');
 }
 function paintAll(){
-  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold, fin.pulse));
+  final.forEach((fin, cell) => paint(cell, fin.lv, fin.gold, fin.glow));
 }
 function daysOf(section, data){
   const kind = section.dataset.kind || '';
@@ -315,6 +315,7 @@ function apply(section, days, meta){
   });
   const scale = thresholds(counted);
   const gold = markGold(dates, days, today, 10);
+  const glowRun = markGold(dates, days, today, 21);
   cells.forEach(cell => {
     const iso = cell.dataset.date;
     if (iso > today) return;
@@ -323,7 +324,7 @@ function apply(section, days, meta){
     if (kind === 'sleep'){
       const recorded = !!(day && Number.isFinite(day.score));
       const score = recorded ? day.score : 0;
-      final.set(cell, {lv: recorded ? scoreLevel(score) : 0, gold: recorded && gold.has(iso), n: score});
+      final.set(cell, {lv: recorded ? scoreLevel(score) : 0, gold: recorded && gold.has(iso), glow: glowRun.has(iso), n: score});
       labelCell(cell, recorded ? sleepLine(iso, score, day.asleep) : shortDate(iso) + ': no record');
       return;
     }
@@ -331,8 +332,8 @@ function apply(section, days, meta){
     const lv = metric === 'minutes' || (kind === 'journal' && edges.length)
       ? minutesLevel(minutes != null ? minutes : n, edges)
       : level(n, scale);
-    const pulse = section.dataset.id === 'cursor' && n >= PULSE_AT;
-    final.set(cell, {lv, gold: gold.has(iso), pulse, n, minutes});
+    const glow = glowRun.has(iso) || (section.dataset.id === 'cursor' && n >= GLOW_AT);
+    final.set(cell, {lv, gold: gold.has(iso), glow, n, minutes});
     labelCell(cell, kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
   });
   if (kind === 'sleep') fillSleepStats(section, computeSleepStats(days, start, today));
@@ -435,12 +436,12 @@ async function sweepSection(section){
       const cell = cells[i * 7 + r];
       if (!cell) continue;
       const f = final.get(cell);
-      if (f && (f.lv > 0 || f.gold || f.pulse)) live.push(cell);
+      if (f && (f.lv > 0 || f.gold || f.glow)) live.push(cell);
     }
     live.forEach(c => c.classList.add('hot'));
     await wait(18);
     if (skipped) return;
-    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold, f.pulse); });
+    live.forEach(c => { const f = final.get(c); paint(c, f.lv, f.gold, f.glow); });
     await wait(26);
   }
 }
