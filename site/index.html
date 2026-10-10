@@ -134,8 +134,8 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 .social.fade{animation:egg-fade 1.4s ease-out both}
 .social li.cur{display:flex;align-items:center;height:var(--ich);pointer-events:none;flex:none;width:0;min-width:0;margin-left:calc(-1*var(--igap));white-space:nowrap}
 .social li.cur .cursor{margin:0 0 0 var(--igap);vertical-align:0;flex:none}
-/* v1.99 (jay 2026.10.09): the social row and the konami row are the shared content column on every width.
-   X and up sit on the left edge; the ninja and start sit on the right edge; the items spread evenly between.
+/* v2.03 (jay 2026.10.10): the social row and the konami row are the shared content column on every width.
+   the ninja and up sit on the left edge; mail and start sit on the right edge; the items spread evenly between.
    the prompt caret stays out of the flex line, and it is removed when the intro finishes. the ninja pulses instead. */
 .social{position:relative;justify-content:space-between;gap:0}
 .social li.cur{position:absolute;top:0;height:100%;width:auto;margin-left:0}
@@ -458,7 +458,7 @@ a:focus-visible,button:focus-visible{outline:2px solid var(--c);outline-offset:2
 <meta name="twitter:image" content="https://jaytha.ninja/og/home.png?d=2026-10-10">
 <meta name="twitter:image:alt" content="the intro on jaytha.ninja: the internet was a place to make genuine connections with other humans, somewhere along the way, we messed up, my team and i hope to run it back">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "jay", "url": "https://jaytha.ninja/", "sameAs": ["https://x.com/jaythaninja", "https://www.instagram.com/jaythaninja", "https://www.threads.com/jaythaninja", "https://github.com/jaythaninja", "https://www.strava.com/athletes/64153021", "https://www.linkedin.com/in/jaythaninja"]}</script>
-<link rel="stylesheet" href="/assets/rain.css?v=1.99"><script src="/assets/rain.js?v=1.99"></script>
+<link rel="stylesheet" href="/assets/rain.css?v=2.03"><script src="/assets/rain.js?v=2.03"></script>
 </head>
 <body>
 <div class="glows" aria-hidden="true">
@@ -671,10 +671,10 @@ const NJ_SVG = "<svg class=\"nj\" xmlns=\"http://www.w3.org/2000/svg\" viewBox=\
 const iconLink = s => { const a = gateTap(mk('a')); a.setAttribute('href', s.href); a.setAttribute('aria-label', s.label); a.title = s.label;
   if (/^https?:/.test(s.href)){ a.target = '_blank'; a.rel = 'noopener'; }
   a.innerHTML = ICONS[s.icon] || ''; return a; };
-/* v1.99 (jay 2026.10.09): the row ends with the ninja (a quiet link to /now/, aria-label "now", no link styling,
+/* v2.03 (jay 2026.10.10): the row starts with the ninja (a quiet link to /now/, aria-label "now", no link styling,
    the state colours as before). gated like the icons until it lands (gateTap / revealTap); rain.js' tap-for-speed already ignores taps on links */
-COPY.socials.forEach(s => { const li = mk('li'); li.appendChild(iconLink(s)); ul.appendChild(li); });
 { const li = mk('li', 'who'), t = gateTap(mk('a', 'who-t')); t.setAttribute('href', '/now/'); t.setAttribute('aria-label', 'now'); t.innerHTML = NJ_SVG; li.appendChild(t); ul.appendChild(li); }
+COPY.socials.forEach(s => { const li = mk('li'); li.appendChild(iconLink(s)); ul.appendChild(li); });
 const curLi = mk('li', 'cur'); curLi.setAttribute('aria-hidden', 'true'); const curHold = cursor.cloneNode(); curHold.style.visibility = 'hidden'; curLi.appendChild(curHold); ul.appendChild(curLi);
 
 const eggEl = $('.egg');
