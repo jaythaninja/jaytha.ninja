@@ -324,7 +324,7 @@ function apply(section, days, meta){
     if (kind === 'sleep'){
       const recorded = !!(day && Number.isFinite(day.score));
       const score = recorded ? day.score : 0;
-      final.set(cell, {lv: recorded ? scoreLevel(score) : 0, gold: recorded && gold.has(iso), glow: glowRun.has(iso), n: score});
+      final.set(cell, {lv: recorded ? scoreLevel(score) : 0, gold: recorded && gold.has(iso), glow: recorded && glowRun.has(iso), n: score});
       labelCell(cell, recorded ? sleepLine(iso, score, day.asleep) : shortDate(iso) + ': no record');
       return;
     }
