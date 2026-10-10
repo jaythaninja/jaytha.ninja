@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.07): four year graphs in one column (code, workouts, journal, sleep). five colour steps plus empty. workouts, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. a streak day uses that same scale. longest and current stay. */
+/* jaytha.ninja/habits/ (v2.08): four year graphs in one column (sleep, fitness, code, journal). five colour steps plus empty. fitness, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. from that same day a journal day is one daily update. a streak day uses that same scale. longest and current stay. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -159,6 +159,9 @@ function level(v, t){
   return lv;
 }
 const SLEEP_STREAK = 70;
+/* from this day on, a journal day is a daily update in recaps.json, and the count is 1.
+   earlier days keep the obsidian note counts in journal.json. */
+const JOURNAL_FROM = '2026-09-29';
 function computeStats(days, start, today, metric){
   let total = 0, longest = 0, run = 0, bestN = 0;
   let bestDay = '', bestMo = '', bestMoN = 0;
@@ -479,13 +482,28 @@ async function loadAll(){
       const res = await fetch(section.dataset.src, {cache: 'no-cache'});
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
-      apply(section, daysOf(section, data), data);
+      let days = daysOf(section, data);
+      if ((section.dataset.kind || '') === 'journal') days = await withRecaps(days);
+      apply(section, days, data);
     } catch (err) {
       section.dataset.error = '1';
       const el = section.querySelector('[data-k="total"]');
       if (el) el.textContent = '—';
     }
   }));
+}
+async function withRecaps(days){
+  const res = await fetch('/daily-update/recaps.json', {cache: 'no-cache'});
+  if (!res.ok) return days;
+  const rows = await res.json();
+  Object.keys(days).forEach(iso => { if (iso >= JOURNAL_FROM) delete days[iso]; });
+  (Array.isArray(rows) ? rows : []).forEach(row => {
+    const iso = row && row.date;
+    if (typeof iso !== 'string' || iso < JOURNAL_FROM || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
+    if (!String(row.text || '').trim()) return;
+    days[iso] = {total: 1};
+  });
+  return days;
 }
 const dataReady = loadAll();
 /* v2.00: the intro walks trackers.json, not a fixed list. a section with no matching id still plays, after those. */
