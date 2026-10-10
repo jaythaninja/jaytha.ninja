@@ -48,15 +48,6 @@
       "kind": "sleep",
       "data": "/habits/sleep.json",
       "sources": []
-    },
-    {
-      "id": "caffeine",
-      "label": "caffeine",
-      "enabled": true,
-      "unit": "day",
-      "kind": "caffeine",
-      "data": "/habits/caffeine.json",
-      "sources": []
     }
   ]
 }

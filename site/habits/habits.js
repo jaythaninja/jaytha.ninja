@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v1.84): four year graphs on one screen. cells use the state colour; a run of 10 or more active days is gold. a caffeine day without a zero-caffeine record stays the empty gray cell. */
+/* jaytha.ninja/habits/ (v2.01): four year graphs in one column (code, workouts, journal, sleep). cells use the state colour; a run of 10 or more active days is gold. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -283,15 +283,6 @@ function daysOf(section, data){
     });
     return days;
   }
-  if (kind === 'caffeine'){
-    const days = {};
-    const raw = (data && data.days) || {};
-    Object.keys(raw).forEach(iso => {
-      const success = raw[iso] === true;
-      days[iso] = {total: success ? 1 : 0, success};
-    });
-    return days;
-  }
   if (kind === 'sleep'){
     const days = {};
     const raw = (data && data.days) || {};
@@ -313,7 +304,6 @@ function apply(section, days, meta){
   const edges = (meta && meta.intensity && meta.intensity.edges) || (section.dataset.buckets || '').split(',').map(Number).filter(Boolean);
   const today = section.dataset.today;
   const start = section.dataset.start;
-  const habitStart = (meta && meta.start) || '';
   const cells = [...section.querySelectorAll('.cell')];
   const dates = cells.map(c => c.dataset.date);
   const counted = [];
@@ -327,15 +317,6 @@ function apply(section, days, meta){
     if (iso > today) return;
     const day = days[iso];
     const n = (day && day.total) || 0;
-    if (kind === 'caffeine'){
-      const inRange = !!habitStart && iso >= habitStart && iso <= today;
-      const success = !!(day && day.success);
-      const on = success && gold.has(iso);
-      final.set(cell, {lv: success ? 4 : 0, gold: on, n});
-      if (inRange) labelCell(cell, shortDate(iso) + ': ' + (success ? 'zero caffeine' : 'caffeine'));
-      else labelCell(cell, '');
-      return;
-    }
     if (kind === 'sleep'){
       const recorded = !!(day && Number.isFinite(day.score));
       const score = recorded ? day.score : 0;
