@@ -43,6 +43,7 @@ TRACKERS = HABITS / "trackers.json"
 CURSOR = HABITS / "cursor.json"
 WORKOUTS = HABITS / "workouts.json"
 JOURNAL = HABITS / "journal.json"
+JARVIS = HABITS / "journal-jarvis.json"
 SLEEP = HABITS / "sleep.json"
 INDEX = HABITS / "index.html"
 TZ = ZoneInfo("America/Chicago")
@@ -791,6 +792,32 @@ def write_workouts(src: Path) -> dict:
     return data
 
 
+def check_jarvis() -> None:
+    """journal-jarvis.json is a flat date-to-count map. Counts only, never text."""
+    if not JARVIS.exists():
+        raise SystemExit("habits: journal-jarvis.json is missing")
+    data = load_json(JARVIS)
+    if not isinstance(data, dict):
+        raise SystemExit("habits: journal-jarvis.json must be a flat object")
+
+    def no_strings(value: object, path: str) -> None:
+        if isinstance(value, str):
+            raise SystemExit(f"habits: journal-jarvis.json has a string at {path or 'root'}")
+        if isinstance(value, dict):
+            for key, item in value.items():
+                no_strings(item, f"{path}.{key}" if path else str(key))
+        elif isinstance(value, list):
+            for i, item in enumerate(value):
+                no_strings(item, f"{path}[{i}]")
+
+    no_strings(data, "")
+    for key, n in data.items():
+        if not DATE_RE.fullmatch(key):
+            raise SystemExit(f"habits: bad jarvis date {key}")
+        if isinstance(n, bool) or not isinstance(n, int) or n < 1:
+            raise SystemExit(f"habits: {key} jarvis count {n!r} is not an int >= 1")
+
+
 def check_sleep() -> None:
     data = load_json(SLEEP)
     days = data.get("days") or {}
@@ -920,6 +947,7 @@ def check() -> None:
         if key.startswith("2025-") or key[5:7] in {"04", "05"} and key.startswith("2026-"):
             raise SystemExit(f"habits: {key} falls in a real empty stretch and should not be in the file")
     check_sleep()
+    check_jarvis()
     n = assert_redirects()
     pages = f"{n} day urls redirect to /habits/"
     print(

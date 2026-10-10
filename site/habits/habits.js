@@ -1,4 +1,4 @@
-/* jaytha.ninja/habits/ (v2.10): four year graphs in one column (sleep, fitness, code, journal). five colour steps plus empty. fitness, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. from that same day a daily update adds one note on top of the obsidian count, and the hover says "N notes". a failed recaps load keeps the note counts. a streak day uses that same scale. longest and current stay. */
+/* jaytha.ninja/habits/ (v2.11): four year graphs in one column (sleep, fitness, code, journal). five colour steps plus empty. fitness, journal, and sleep cut those steps from their own nonzero days. code uses a fixed scale set from the days since 2026-09-29. from that same day a daily update adds one note on top of the obsidian count, and the hover says "N notes". jarvis counts in journal-jarvis.json add on top of that. a jarvis day says "N journal entries", and a daily-update day keeps the note line and adds "+ N entries". a failed recaps or jarvis load keeps the counts already on the grid. a streak day uses that same scale. longest and current stay. */
 (() => {
 const VER = 'habits-1.84';
 const TIMING = {kickerSpeed: 55, window: 4, afterKicker: 280};
@@ -40,6 +40,7 @@ function ordinal(n){
 }
 function unitWord(n, unit){
   if (n === 1) return unit;
+  if (unit === 'entry') return 'entries';
   return unit.endsWith('s') ? unit : unit + 's';
 }
 function sentence(n, iso, unit, minutes){
@@ -51,8 +52,13 @@ function sentence(n, iso, unit, minutes){
 function shortDate(iso){
   return SHORT[+iso.slice(5, 7) - 1] + ' ' + (+iso.slice(8));
 }
-function noteLine(n, iso){
-  return shortDate(iso) + ': ' + n + ' ' + unitWord(n, 'note');
+function noteLine(n, iso, day){
+  const when = shortDate(iso);
+  const jarvis = (day && day.jarvis) || 0;
+  const notes = when + ': ' + (n - jarvis) + ' ' + unitWord(n - jarvis, 'note');
+  if (jarvis > 0 && day && day.update) return notes + ' + ' + jarvis + ' ' + unitWord(jarvis, 'entry');
+  if (jarvis > 0) return when + ': ' + n + ' journal ' + unitWord(n, 'entry');
+  return when + ': ' + n + ' ' + unitWord(n, 'note');
 }
 function sleepLine(iso, score, mins){
   const h = Math.floor(mins / 60);
@@ -160,7 +166,8 @@ function level(v, t){
 }
 const SLEEP_STREAK = 70;
 /* from this day on, a daily update in recaps.json adds one note on top of the obsidian count.
-   earlier days stay the obsidian counts in journal.json. a failed recaps load keeps those counts. */
+   earlier days stay the obsidian counts in journal.json. a failed recaps load keeps those counts.
+   journal-jarvis.json adds its count on top of whatever is already there. a failed load changes nothing. */
 const JOURNAL_FROM = '2026-09-29';
 function computeStats(days, start, today, metric){
   let total = 0, longest = 0, run = 0, bestN = 0;
@@ -325,7 +332,7 @@ function apply(section, days, meta){
     }
     const minutes = metric === 'minutes' ? amount : null;
     final.set(cell, {lv: level(amount, scale), n, minutes});
-    labelCell(cell, kind === 'journal' ? noteLine(n, iso) : sentence(n, iso, unit, minutes));
+    labelCell(cell, kind === 'journal' ? noteLine(n, iso, day) : sentence(n, iso, unit, minutes));
   });
   if (kind === 'sleep') fillSleepStats(section, computeSleepStats(days, start, today));
   else fillStats(section, computeStats(days, start, today, metric));
@@ -483,7 +490,10 @@ async function loadAll(){
       if (!res.ok) throw new Error(String(res.status));
       const data = await res.json();
       let days = daysOf(section, data);
-      if ((section.dataset.kind || '') === 'journal') days = await withRecaps(days);
+      if ((section.dataset.kind || '') === 'journal'){
+        days = await withRecaps(days);
+        days = await withJarvis(days);
+      }
       apply(section, days, data);
     } catch (err) {
       section.dataset.error = '1';
@@ -504,7 +514,29 @@ async function withRecaps(days){
       if (typeof iso !== 'string' || iso < JOURNAL_FROM || !/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
       if (!String(row.text || '').trim()) return;
       const prev = (next[iso] && next[iso].total) || 0;
-      next[iso] = {total: prev + 1};
+      next[iso] = {total: prev + 1, update: true};
+    });
+    return next;
+  } catch (e) {
+    return days;
+  }
+}
+async function withJarvis(days){
+  try {
+    const res = await fetch('/habits/journal-jarvis.json', {cache: 'no-cache'});
+    if (!res.ok) return days;
+    const rows = await res.json();
+    if (!rows || typeof rows !== 'object' || Array.isArray(rows)) return days;
+    const next = {};
+    Object.keys(days).forEach(iso => { next[iso] = days[iso]; });
+    Object.keys(rows).forEach(iso => {
+      if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return;
+      const n = rows[iso];
+      if (typeof n !== 'number' || !Number.isInteger(n) || n < 1) return;
+      const prev = next[iso] || {};
+      const day = {total: (prev.total || 0) + n, jarvis: n};
+      if (prev.update) day.update = true;
+      next[iso] = day;
     });
     return next;
   } catch (e) {
